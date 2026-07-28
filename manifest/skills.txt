@@ -1,0 +1,13 @@
+cx-acceptance-qa
+cx-browser-automation
+cx-coding-agent-sessions
+cx-debugging
+cx-design-director
+cx-insane-search
+cx-interview
+cx-programming
+cx-scope-check
+cx-slopslap
+cx-ultraresearch
+cx-unstuck
+cx-visual-qa

@@ -1,0 +1,76 @@
+name: Bug report
+description: Report a reproducible problem in the installer, repository, skill, or agent kit.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include secrets, private transcripts, or vulnerability details.
+        Security reports follow SECURITY.md.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Installer / update / uninstall
+        - Skill
+        - Custom agent
+        - Documentation
+        - Validation / CI
+        - License / provenance
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Highfloor version or commit
+      placeholder: v0.1.0 or commit SHA
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Operating system, shell, Codex surface/version, and relevant destination path.
+      placeholder: macOS 15, zsh, Codex desktop, ~/.codex/skills
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Exact commands or prompt sequence with private data removed.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+      description: Preserve exact error text and relevant logs.
+    validations:
+      required: true
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional evidence
+      description: Focused screenshots, traces, or links. Redact personal paths and secrets.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues.
+          required: true
+        - label: This report does not contain secrets or private data.
+          required: true
+        - label: This is not a security vulnerability.
+          required: true

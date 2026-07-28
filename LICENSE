@@ -1,0 +1,35 @@
+Highfloor for Codex — Original Content License
+
+Except where THIRD_PARTY_NOTICES.md or a component-level provenance file
+states otherwise, the original content in this repository—including original
+documentation, installer and validation scripts, manifests, custom agent
+definitions, artwork, and original portions of the CX skills—is licensed under
+the MIT License below.
+
+Third-party and derivative components remain subject to their respective
+upstream licenses. This license does not replace, weaken, or extend those
+licenses. In particular, components derived from code-yeongyu/oh-my-openagent
+remain subject to the Sustainable Use License 1.0 described in
+THIRD_PARTY_NOTICES.md.
+
+MIT License
+
+Copyright (c) 2026 BongSuCHOI
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

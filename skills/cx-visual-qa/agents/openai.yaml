@@ -1,0 +1,4 @@
+interface:
+  display_name: "CX Visual QA"
+  short_description: "Verify affected rendered surfaces with sufficient evidence"
+  default_prompt: "Use $cx-visual-qa to verify the affected rendered surface and return a scoped PASS, FAIL, or NOT_PROVEN verdict."

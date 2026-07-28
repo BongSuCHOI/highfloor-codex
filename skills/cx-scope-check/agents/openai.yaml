@@ -1,0 +1,4 @@
+interface:
+  display_name: "CX Scope Check"
+  short_description: "Detect unapproved scope and requirement drift"
+  default_prompt: "Use $cx-scope-check to compare the current work with its approved task contract."

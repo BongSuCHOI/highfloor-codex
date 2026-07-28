@@ -1,0 +1,4 @@
+interface:
+  display_name: "Slopslap"
+  short_description: "UI AI-slop 정적 점검과 근거 기반 제거"
+  default_prompt: "Use $cx-slopslap to audit and remove AI-slop from this UI with scoped evidence."

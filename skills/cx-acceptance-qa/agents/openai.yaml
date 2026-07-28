@@ -1,0 +1,4 @@
+interface:
+  display_name: "CX Acceptance QA"
+  short_description: "Verify acceptance criteria with observed evidence"
+  default_prompt: "Use $cx-acceptance-qa to verify this result against its acceptance criteria and evidence."

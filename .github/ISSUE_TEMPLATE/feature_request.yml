@@ -1,0 +1,59 @@
+name: Proposal
+description: Propose a focused skill, agent, installer, workflow, or repository improvement.
+title: "[Proposal]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What current state or failure mode needs an owner?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe observable success, not only a preferred implementation.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Proposed area
+      options:
+        - Existing skill
+        - New skill
+        - Existing custom agent
+        - New custom agent
+        - Installer / distribution
+        - Documentation / workflow
+        - Governance / provenance
+    validations:
+      required: true
+  - type: textarea
+    id: boundaries
+    attributes:
+      label: Scope and non-goals
+      description: What should this proposal own, and what should remain elsewhere?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: textarea
+    id: provenance
+    attributes:
+      label: Upstream or provenance
+      description: List related projects, copied/adapted material, and licenses.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing skills, agents, issues, and pull requests for overlap.
+          required: true
+        - label: I can explain why this needs a distinct owner or repository change.
+          required: true

@@ -1,0 +1,4 @@
+interface:
+  display_name: "CX Browser Automation"
+  short_description: "Interact with browsers and capture scoped evidence"
+  default_prompt: "Use $cx-browser-automation to interact with this browser surface and capture the required evidence."

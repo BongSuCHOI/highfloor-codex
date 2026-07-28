@@ -1,0 +1,4 @@
+interface:
+  display_name: "CX Coding Agent Sessions"
+  short_description: "Find and inspect local coding-agent sessions"
+  default_prompt: "Use $cx-coding-agent-sessions to find the relevant local coding-agent session."

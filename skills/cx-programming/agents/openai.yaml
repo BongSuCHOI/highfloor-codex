@@ -1,0 +1,4 @@
+interface:
+  display_name: "CX Programming"
+  short_description: "Non-obvious Python, TypeScript, Go and Rust boundaries"
+  default_prompt: "Use $cx-programming only for the language-specific failure modes relevant to this task."

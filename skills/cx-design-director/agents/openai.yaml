@@ -1,0 +1,4 @@
+interface:
+  display_name: "CX Design Director"
+  short_description: "Guide broad product UI and design-system direction"
+  default_prompt: "Use $cx-design-director to establish a coherent first-party UI contract for this broad design task."

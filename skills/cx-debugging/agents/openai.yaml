@@ -1,0 +1,4 @@
+interface:
+  display_name: "CX Debugging"
+  short_description: "Evidence-driven runtime debugging and diagnosis"
+  default_prompt: "Use $cx-debugging to diagnose this runtime problem from evidence."
