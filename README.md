@@ -8,12 +8,16 @@
 </p>
 
 <p align="center">
+  <a href="README.md"><strong>English</strong></a> ·
+  <a href="README_KR.md">Korean</a>
+</p>
+
+<p align="center">
   <a href="#install">Install</a> ·
   <a href="#philosophy">Philosophy</a> ·
   <a href="#skills">Skills</a> ·
   <a href="#custom-agents">Agents</a> ·
-  <a href="#composable-workflows">Workflows</a> ·
-  <a href="README_KR.md">Korean</a>
+  <a href="#composable-workflows">Workflows</a>
 </p>
 
 > [!NOTE]

@@ -8,12 +8,16 @@
 </p>
 
 <p align="center">
+  <a href="README.md">English</a> ·
+  <a href="README_KR.md"><strong>한국어</strong></a>
+</p>
+
+<p align="center">
   <a href="#설치">설치</a> ·
   <a href="#철학">철학</a> ·
   <a href="#skills">Skills</a> ·
   <a href="#custom-agents">Agents</a> ·
-  <a href="#조합형-workflow">Workflows</a> ·
-  <a href="README.md">English</a>
+  <a href="#조합형-workflow">Workflows</a>
 </p>
 
 > [!NOTE]

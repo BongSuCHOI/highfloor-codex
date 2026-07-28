@@ -6,6 +6,10 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Separated the README language selector from its section navigation.
+
 ## [0.1.0] - 2026-07-28
 
 First public release.
