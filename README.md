@@ -285,11 +285,11 @@ matches the current task.
 | [`cx-coding-agent-sessions`](skills/cx-coding-agent-sessions/SKILL.md) | Finds and summarizes earlier coding-agent sessions. | You need the exact prior task, prompt, session, child task, or transcript. |
 | [`cx-debugging`](skills/cx-debugging/SKILL.md) | Reproduces a runtime failure and separates the proven cause from guesses. | A crash, hang, wrong result, silent failure, flaky behavior, or binary symptom needs diagnosis. |
 | [`cx-design-director`](skills/cx-design-director/SKILL.md) | Sets the direction for a broad product UI or UX change. | The visual language, layout system, component patterns, or an end-to-end flow will change. |
-| [`cx-insane-search`](skills/cx-insane-search/SKILL.md) | Reads relevant public content when ordinary web access cannot. | A public page is blocked by `402`, `403`, WAF, empty HTML, JavaScript-only rendering, or broken markup. |
+| [`cx-insane-search`](skills/cx-insane-search/SKILL.md) | Reads blocked public content through a guarded fetch path and preserves retrieval evidence. | A public page is blocked by `402`, `403`, WAF, empty HTML, JavaScript-only rendering, or broken markup. |
 | [`cx-programming`](skills/cx-programming/SKILL.md) | Handles tricky language behavior in Python, TypeScript, Go, or Rust. | Types, concurrency, resources, errors, FFI, or toolchain behavior could change the correct implementation. |
 | [`cx-scope-check`](skills/cx-scope-check/SKILL.md) | Compares current work with the approved Task Contract. | A long task, resume, handoff, or expanding change may have crossed the agreed boundary. |
 | [`cx-slopslap`](skills/cx-slopslap/SKILL.md) | Finds and removes common AI-generated UI patterns. | The user explicitly asks to remove an AI-looking or statistically repetitive interface style. |
-| [`cx-ultraresearch`](skills/cx-ultraresearch/SKILL.md) | Builds a careful answer from several primary or authoritative sources. | The user explicitly asks for deep research, a rigorous comparison, or citation-heavy evidence. |
+| [`cx-ultraresearch`](skills/cx-ultraresearch/SKILL.md) | Builds a careful answer from claim-relative primary evidence, counterevidence, and explicit unresolved gaps. | The user explicitly asks for deep research, a rigorous comparison, or citation-heavy evidence. |
 | [`cx-acceptance-qa`](skills/cx-acceptance-qa/SKILL.md) | Checks claimed work against explicit acceptance criteria. | A release, handoff, or formal QA decision needs `PASS`, `FAIL`, or `NOT_PROVEN`. |
 | [`cx-visual-qa`](skills/cx-visual-qa/SKILL.md) | Judges the current rendered result from visual evidence. | A changed web, mobile, terminal, or TUI surface needs a final visual verdict. |
 
@@ -425,9 +425,10 @@ generic design-improvement stage.
 The user explicitly requests deep research
   → Use cx-ultraresearch
   → Use cx-insane-search only for a blocked public page
+  → Reuse its one-fetch content + retrieval-evidence handoff
   → Delegate a separate question only when it improves the evidence
   → Explain the conclusion with sources
-  → Separate fact, observation, and inference
+  → Separate supported, unresolved, refuted, observation, and inference
 ```
 
 ### 5. Resume and scope recovery
@@ -530,6 +531,7 @@ remain in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), the
 | `cx-coding-agent-sessions`, `cx-debugging`, `cx-programming`, `cx-ultraresearch`, `cx-visual-qa` | [`code-yeongyu/oh-my-openagent`](https://github.com/code-yeongyu/oh-my-openagent) — Sustainable Use License 1.0 | Condenses, reorganizes, or adapts the original skills for Codex routing, permission boundaries, focused evidence, and Highfloor's event-driven workflow. Some upstream files remain retained or byte-identical where documented. |
 | `cx-browser-automation` | [`microsoft/playwright-cli`](https://github.com/microsoft/playwright-cli) — Apache-2.0 | Adapts browser interaction for Codex, adds local wrappers and evidence guidance, and separates browser operation from final visual judgment. `vercel-labs/agent-browser` is invoked as a runtime dependency and is not bundled. |
 | `cx-insane-search` | [`fivetaku/insane-search`](https://github.com/fivetaku/insane-search) — MIT | Retains adapted engine and test material while rewriting public-content, permission, fallback, and failure boundaries for Codex. |
+| `cx-insane-search`, `cx-ultraresearch` | [`fivetaku/insane-research`](https://github.com/fivetaku/insane-research) — MIT | Independently adapts selected retrieval-metadata, source-map, claim-map, countersearch, contradiction, and temporal-evidence concepts. It excludes the fixed seven-phase orchestration, automatic agent fan-out, permission bypass, mandatory artifacts, claim validator, and report evaluator. |
 | `cx-slopslap` | [`vibedesignlab/slopslap`](https://github.com/vibedesignlab/slopslap) — MIT | Preserves the upstream taxonomy, data, references, and scripts while adapting host discovery, concurrency, Git behavior, report serving, and browser resolution. |
 | `cx-design-director` | Original Highfloor content; optional [`ibelick/ui-skills`](https://github.com/ibelick/ui-skills) runtime lookup — MIT | The skill itself is original Highfloor material. UI Skills may be invoked as an external reference source; its content is not bundled or presented as Highfloor-owned material. |
 

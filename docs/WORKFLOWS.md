@@ -72,14 +72,16 @@ If the request is specifically about common AI UI patterns, add
 ## Recipe E: Deep research
 
 1. Use `cx-ultraresearch` after the user explicitly requests deep research.
-2. Define the questions and evidence needed to answer them.
+2. Define the questions and evidence needed, then keep a working source map and
+   material-claim map.
 3. Use `docs-researcher` for a separate API or version question that requires
    authoritative documentation.
 4. Use `research-analyst` only when an independent comparison will improve the
    evidence.
 5. Use `cx-insane-search` only when ordinary access cannot read a relevant
-   public page.
-6. Stop when the available evidence is sufficient to answer the questions.
+   public page. Reuse its single-fetch content and retrieval-evidence handoff.
+6. Classify material claims as `supported`, `unresolved`, or `refuted`, then
+   stop when the available claim-relative evidence is sufficient.
 
 Separate documentation claims, code evidence, observed runtime behavior, and
 inference.

@@ -297,11 +297,11 @@ Codex가 불러올 수도 있습니다.
 | [`cx-coding-agent-sessions`](skills/cx-coding-agent-sessions/SKILL.md) | 이전 코딩 에이전트 세션을 찾아 요약합니다. | 과거의 정확한 작업, prompt, session, child task 또는 transcript가 필요할 때 사용합니다. |
 | [`cx-debugging`](skills/cx-debugging/SKILL.md) | 런타임 실패를 재현하고 확인된 원인과 추측을 구분합니다. | crash, hang, 잘못된 결과, 조용한 실패, flaky 동작 또는 binary 증상을 진단할 때 사용합니다. |
 | [`cx-design-director`](skills/cx-design-director/SKILL.md) | 넓은 범위의 product UI 또는 UX 변경 방향을 정합니다. | 시각 언어, layout system, component pattern 또는 end-to-end flow가 바뀔 때 사용합니다. |
-| [`cx-insane-search`](skills/cx-insane-search/SKILL.md) | 일반 웹 접근으로 읽지 못한 관련 공개 콘텐츠를 가져옵니다. | 공개 페이지가 `402`, `403`, WAF, 빈 HTML, JavaScript-only rendering 또는 손상된 markup으로 막혔을 때 사용합니다. |
+| [`cx-insane-search`](skills/cx-insane-search/SKILL.md) | 보호된 fetch 경로로 차단된 공개 콘텐츠를 읽고 retrieval evidence를 보존합니다. | 공개 페이지가 `402`, `403`, WAF, 빈 HTML, JavaScript-only rendering 또는 손상된 markup으로 막혔을 때 사용합니다. |
 | [`cx-programming`](skills/cx-programming/SKILL.md) | Python, TypeScript, Go 또는 Rust의 까다로운 언어 동작을 다룹니다. | type, concurrency, resource, error, FFI 또는 toolchain 동작이 올바른 구현을 바꿀 수 있을 때 사용합니다. |
 | [`cx-scope-check`](skills/cx-scope-check/SKILL.md) | 현재 작업을 승인된 Task Contract와 비교합니다. | 긴 작업, 재개, handoff 또는 커진 변경이 합의한 경계를 벗어났을 가능성이 있을 때 사용합니다. |
 | [`cx-slopslap`](skills/cx-slopslap/SKILL.md) | 흔한 AI 생성형 UI 패턴을 찾아 제거합니다. | 사용자가 AI처럼 보이거나 통계적으로 반복되는 UI 스타일을 없애 달라고 명시했을 때 사용합니다. |
-| [`cx-ultraresearch`](skills/cx-ultraresearch/SKILL.md) | 여러 primary source와 authoritative source를 바탕으로 신중한 답을 만듭니다. | 사용자가 deep research, 엄밀한 비교 또는 많은 인용이 필요한 조사를 명시했을 때 사용합니다. |
+| [`cx-ultraresearch`](skills/cx-ultraresearch/SKILL.md) | claim-relative primary evidence, counterevidence와 명시적인 unresolved gap을 바탕으로 신중한 답을 만듭니다. | 사용자가 deep research, 엄밀한 비교 또는 많은 인용이 필요한 조사를 명시했을 때 사용합니다. |
 | [`cx-acceptance-qa`](skills/cx-acceptance-qa/SKILL.md) | 완료했다고 주장한 작업을 명시적인 acceptance criteria와 비교합니다. | release, handoff 또는 formal QA에 `PASS`, `FAIL`, `NOT_PROVEN` 판정이 필요할 때 사용합니다. |
 | [`cx-visual-qa`](skills/cx-visual-qa/SKILL.md) | 현재 렌더링된 결과를 시각 증거로 판정합니다. | 변경된 web, mobile, terminal 또는 TUI에 최종 시각 판정이 필요할 때 사용합니다. |
 
@@ -433,9 +433,10 @@ Runtime failure 발생
 사용자가 deep research를 명시적으로 요청
   → cx-ultraresearch 사용
   → 차단된 공개 페이지에만 cx-insane-search 사용
+  → 한 번의 fetch에서 받은 content + retrieval-evidence handoff 재사용
   → 증거가 실제로 좋아질 때만 별도 질문 위임
   → 출처와 함께 결론 설명
-  → 사실, 관찰과 추론 구분
+  → supported, unresolved, refuted, 관찰과 추론 구분
 ```
 
 ### 5. Resume과 scope recovery
@@ -525,6 +526,7 @@ Highfloor는 실질적으로 가져오거나 수정한 모든 component의 출�
 | `cx-coding-agent-sessions`, `cx-debugging`, `cx-programming`, `cx-ultraresearch`, `cx-visual-qa` | [`code-yeongyu/oh-my-openagent`](https://github.com/code-yeongyu/oh-my-openagent) — Sustainable Use License 1.0 | 원장의 skill을 Codex routing, permission boundary, 집중된 evidence와 Highfloor의 event-driven workflow에 맞게 압축·재구성하거나 수정했습니다. 문서에 표시된 일부 upstream 파일은 그대로 유지하거나 byte-identical 상태로 보존합니다. |
 | `cx-browser-automation` | [`microsoft/playwright-cli`](https://github.com/microsoft/playwright-cli) — Apache-2.0 | Browser interaction을 Codex에 맞게 수정하고 local wrapper와 evidence 지침을 추가했으며, browser 조작과 최종 visual 판정을 분리했습니다. `vercel-labs/agent-browser`는 번들하지 않고 runtime dependency로 호출합니다. |
 | `cx-insane-search` | [`fivetaku/insane-search`](https://github.com/fivetaku/insane-search) — MIT | 수정한 engine과 test material을 유지하면서 공개 콘텐츠 접근, permission, fallback과 failure boundary를 Codex에 맞게 다시 작성했습니다. |
+| `cx-insane-search`, `cx-ultraresearch` | [`fivetaku/insane-research`](https://github.com/fivetaku/insane-research) — MIT | Retrieval metadata, source map, claim map, countersearch, contradiction, temporal evidence 개념 중 선택한 부분을 독립적인 문장으로 반영했습니다. 고정 7단계 orchestration, automatic agent fan-out, permission bypass, mandatory artifact, claim validator와 report evaluator는 포함하지 않습니다. |
 | `cx-slopslap` | [`vibedesignlab/slopslap`](https://github.com/vibedesignlab/slopslap) — MIT | Upstream taxonomy, data, reference와 script를 보존하면서 host discovery, concurrency, Git behavior, report serving과 browser resolution을 수정했습니다. |
 | `cx-design-director` | Original Highfloor content; optional [`ibelick/ui-skills`](https://github.com/ibelick/ui-skills) runtime lookup — MIT | Skill 자체는 Highfloor original material입니다. UI Skills는 외부 reference source로 호출할 수 있지만 그 내용을 번들하거나 Highfloor 소유로 표시하지 않습니다. |
 

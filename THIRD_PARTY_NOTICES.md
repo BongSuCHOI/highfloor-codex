@@ -16,6 +16,7 @@ third-party or derivative component.
 | `cx-browser-automation` | `microsoft/playwright-cli` | modified derivative | Apache-2.0 | `LICENSES/Apache-2.0-microsoft-playwright-cli.txt` |
 | `cx-coding-agent-sessions`, `cx-debugging`, `cx-programming`, `cx-ultraresearch`, `cx-visual-qa` | `code-yeongyu/oh-my-openagent`, source archive version `4.14.0`, exact commit `NOT_PROVEN` | modified derivatives | Sustainable Use License 1.0 | `LICENSES/SUL-1.0-oh-my-openagent.txt` |
 | `cx-insane-search` | `fivetaku/insane-search`, exact commit `NOT_PROVEN` | modified derivative | MIT | `LICENSES/MIT-fivetaku-insane-search.txt` |
+| `cx-insane-search`, `cx-ultraresearch` | `fivetaku/insane-research` at `68f7e59168a9c9b0a586bd4122cb7a229e119d9c` | independently worded adaptations of selected access-evidence and research-method concepts | MIT | `LICENSES/MIT-fivetaku-insane-research.txt` |
 | `cx-slopslap` | `vibedesignlab/slopslap` version `1.3.0`, exact commit `NOT_PROVEN` | modified derivative with vendored taxonomy, data, references, and scripts | MIT | `LICENSES/MIT-vibedesignlab-slopslap.txt` |
 
 ## Modification notices
@@ -41,6 +42,16 @@ They were condensed, reorganized, or adapted for Codex. Some session and visual 
 ### Insane Search
 
 `cx-insane-search` adapts `fivetaku/insane-search` for Codex, rewrites public-content and permission boundaries, and retains modified engine and test material.
+
+Copyright (c) 2026 fivetaku.
+
+### Insane Research
+
+`cx-insane-search` and `cx-ultraresearch` adapt selected concepts from
+`fivetaku/insane-research`: retrieval metadata separation, working source and
+claim maps, countersearch, contradiction states, and temporal evidence. The
+fixed orchestration, automatic agent fan-out, permission bypass, mandatory
+artifacts, claim validator, and report evaluator are not included.
 
 Copyright (c) 2026 fivetaku.
 

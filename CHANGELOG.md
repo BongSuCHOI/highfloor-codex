@@ -9,6 +9,20 @@ The project follows [Semantic Versioning](https://semver.org/).
 ### Changed
 
 - Separated the README language selector from its section navigation.
+- Strengthened `cx-interview` with conditional multi-surface coverage,
+  non-monotonic readiness, and explicit approval for removing or substituting
+  confirmed requirements; recorded Gajae Code `v0.12.0` as a research-only
+  provenance refresh.
+- Hardened `cx-insane-search` with fail-closed DNS resolution, curl address
+  pinning, guarded redirects and Phase 0 routes, local browser execution
+  disabled at the public fetch boundary with an explicit host-browser handoff,
+  opt-in persistent state, and a compact single-fetch retrieval evidence
+  handoff.
+- Strengthened `cx-ultraresearch` with claim-relative source assessment,
+  lineage-based independence, selective countersearch, explicit
+  `supported` / `unresolved` / `refuted` states, and lightweight composition
+  with `cx-insane-search`; recorded `fivetaku/insane-research` as a selected
+  method source without importing its fixed orchestration or validators.
 
 ## [0.1.0] - 2026-07-28
 

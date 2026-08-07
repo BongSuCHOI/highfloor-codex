@@ -1,6 +1,6 @@
 # CX Skills Migration Manifest
 
-- Updated: 2026-07-28
+- Updated: 2026-07-30
 - Repository root: `skills/`
 - Installed root: selected by `install.sh` (`$CODEX_HOME/skills` by default,
   unless explicitly overridden)
@@ -46,12 +46,12 @@ Relationships follow the licensing governance in `CX_SKILLS.md`.
 | `cx-coding-agent-sessions` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/coding-agent-sessions` | source archive `4.14.0`; commit `NOT_PROVEN` | `modified derivative` with retained byte-identical files | Sustainable Use License 1.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-debugging` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/debugging` | source archive `4.14.0`; commit `NOT_PROVEN` | `modified derivative` | Sustainable Use License 1.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-design-director` | current local references; optional `ibelick/ui-skills@0.2.4` | external CLI content not bundled | original content; `runtime invocation` | original content license; UI Skills MIT | `references/upstream.md` |
-| `cx-insane-search` | `fivetaku/insane-search` | source snapshot `NOT_PROVEN` | `modified derivative`; engine and tests retained | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
+| `cx-insane-search` | `fivetaku/insane-search`; method reference: `fivetaku/insane-research` | insane-search snapshot `NOT_PROVEN`; insane-research `68f7e59168a9c9b0a586bd4122cb7a229e119d9c` | `modified derivative`; engine and tests retained; independently worded retrieval-evidence adaptation | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt`, `references/LICENSE.insane-research.txt` |
 | `cx-interview` | `Q00/ouroboros` | `2dec0dbd01bb5b2243ea138af9d91f3583b92c5d` | `independently worded` | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-programming` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/programming` | source archive `4.14.0`; commit `NOT_PROVEN` | `modified derivative` | Sustainable Use License 1.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-scope-check` | `Q00/ouroboros` | `2dec0dbd01bb5b2243ea138af9d91f3583b92c5d` | `independently worded` | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-slopslap` | `vibedesignlab/slopslap` | plugin version `1.3.0`; commit `NOT_PROVEN` | `modified derivative`; taxonomy, data, references, scripts retained | MIT | `references/upstream-attribution.md`, `references/UPSTREAM_LICENSE.txt` |
-| `cx-ultraresearch` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/ulw-research` | source archive `4.14.0`; commit `NOT_PROVEN` | `modified derivative` | Sustainable Use License 1.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
+| `cx-ultraresearch` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/ulw-research`; method reference: `fivetaku/insane-research` | source archive `4.14.0`, commit `NOT_PROVEN`; insane-research `68f7e59168a9c9b0a586bd4122cb7a229e119d9c` | `modified derivative`; independently worded adaptation of selected research-method concepts | Sustainable Use License 1.0; MIT | `references/upstream.md`, `references/LICENSE.upstream.txt`, `references/LICENSE.insane-research.txt` |
 | `cx-unstuck` | `Q00/ouroboros` | `2dec0dbd01bb5b2243ea138af9d91f3583b92c5d` | `independently worded` | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-visual-qa` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/visual-qa` | source archive `4.14.0`; commit `NOT_PROVEN` | `modified derivative` with retained byte-identical files | Sustainable Use License 1.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 
@@ -61,9 +61,70 @@ Distribution boundary:
 - Original content may use the repository's root license.
 - Third-party and derivative material remains under the license named above.
 - `oh-my-openagent` derivatives may be distributed only free of charge for non-commercial purposes and must retain the Sustainable Use License terms and prominent modification notice.
-- `code-yeongyu/lazycodex` and `Yeachan-Heo/gajae-code` were research/comparison references, not current redistribution sources.
+- `code-yeongyu/lazycodex` and `Yeachan-Heo/gajae-code` remain research/comparison references, not current redistribution sources.
 
-## 4. 2026-07-28 additions and normalization
+## 4. 2026-07-30 guarded retrieval and research composition
+
+Selected concepts reviewed from `fivetaku/insane-research` at
+`68f7e59168a9c9b0a586bd4122cb7a229e119d9c`:
+
+- source and material-claim maps;
+- countersearch and explicit contradiction states;
+- `observed_at` versus `valid_at`;
+- executable observation with an environment boundary;
+- retrieval access metadata separated from claim judgment.
+
+Independently absorbed:
+
+- `cx-insane-search`: fail-closed resolution, curl DNS pinning, guarded Phase 0,
+  local browser subprocess disabled at the public fetch boundary with an
+  explicit host-browser handoff, opt-in persistent state, and a compact
+  retrieval-only evidence envelope;
+- `cx-ultraresearch`: claim-relative source assessment, lineage-based
+  independence, `supported` / `unresolved` / `refuted` states, selective
+  countersearch, and a single-fetch blocked-source handoff.
+
+Deliberately not migrated:
+
+- fixed seven-phase execution and automatic agent fan-out;
+- permission bypass and mandatory plan approval;
+- mandatory session, ledger, report, and website artifacts;
+- fixed source grades, domain-based independence, and universal two-source
+  rules;
+- claim truth or signature claims from self-reported metadata;
+- the upstream validator and report evaluator.
+
+## 5. 2026-07-29 upstream research refresh
+
+### Gajae Code `v0.12.0`
+
+- Repository: `Yeachan-Heo/gajae-code`
+- Tag: `v0.12.0`
+- Commit: `4e927cca7e6dda31d715957a2ecfbcbc4e62869a`
+- License: MIT
+- Relationship: `research reference`; no GJC source or wording is bundled
+- Reviewed surfaces: `deep-interview` skill/runtime, `ralplan` skill/runtime,
+  and the Architect/Critic re-review prompt changes
+
+Independently absorbed into `cx-interview`:
+
+- conditional top-level coverage for materially multi-surface requests;
+- non-monotonic readiness when later evidence reopens a settled decision;
+- explicit approval for removing, merging, or substituting a confirmed material
+  item.
+
+Deliberately not migrated:
+
+- GJC CLI, state, HUD, staged-transition, receipt, and artifact-ledger runtime;
+- numeric ambiguity authority, deterministic score floors, fixed ontology, and
+  hash-bound intent manifests;
+- mandatory or persisted Planner/Architect/Critic orchestration.
+
+The `ralplan` re-review ratchet remains a reviewed agent-workflow candidate. It
+was not added to the skill library because it requires an explicit multi-agent
+review context rather than a general skill runtime.
+
+## 6. 2026-07-28 additions and normalization
 
 ### Added from `Q00/ouroboros`
 
@@ -114,7 +175,7 @@ The first migration preserved safety boundaries but left some rationale too impl
 - `CX_SKILL_CATALOG.md`: uniform five-field summary for all live skills
 - `CX_MIGRATION_MANIFEST.md`: inventory, migration history, upstream provenance, and license ledger
 
-## 5. 2026-07-22 restructure
+## 7. 2026-07-22 restructure
 
 - Renamed `cx-visual-qa-strict` to `cx-visual-qa`.
 - Replaced copied third-party design trees with six original references.
@@ -124,7 +185,7 @@ The first migration preserved safety boundaries but left some rationale too impl
 - Condensed browser, session, debugging, slopslap, and ultraresearch hot paths.
 - Absorbed generic refactor and implementation-neutral anti-slop rules into retained owners.
 
-## 6. Removed from live root
+## 8. Removed from live root
 
 - `cx-ultimate-browsing` — deleted by the user on 2026-07-28; stale routes removed
 - `cx-refactor`
@@ -135,7 +196,7 @@ The first migration preserved safety boundaries but left some rationale too impl
 
 Managed/plugin skills outside the `cx-*` namespace are out of scope.
 
-## 7. Synchronization
+## 9. Synchronization
 
 Canonical public files live under this repository's `skills/` directory.
 Installed copies are generated runtime artifacts and must not be treated as the

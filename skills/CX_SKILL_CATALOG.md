@@ -151,10 +151,12 @@ Runtime contract: [`SKILL.md`](cx-insane-search/SKILL.md)
   degraded URL on a supported platform.
 - **Non-trigger:** ordinary search, login, paywall, CAPTCHA, private network,
   deleted content, or permission-gated content.
-- **Method:** use built-in web access first, then let the pinned engine's trace,
-  validator, and stop reason determine the next fallback.
+- **Method:** use built-in web access first, then use the pinned, DNS-guarded
+  engine. Keep persistent learning off unless explicitly requested and preserve
+  its retrieval-only evidence envelope.
 - **Routes:** use `cx-browser-automation` when real rendered interaction is
-  required; `cx-ultraresearch` owns deep synthesis.
+  required; pass `--evidence-json` once when `cx-ultraresearch` needs
+  blocked-source content and access metadata.
 
 ### `cx-interview`
 
@@ -166,8 +168,9 @@ Runtime contract: [`SKILL.md`](cx-interview/SKILL.md)
   decision could materially change the result.
 - **Non-trigger:** an already specified narrow edit, pure diagnosis, or a
   decision already settled by project rules.
-- **Method:** expose hidden assumptions through Socratic questions, expand the
-  ambiguity, then converge through restatement and approval.
+- **Method:** expose hidden assumptions through Socratic questions; for
+  materially multi-surface requests, confirm top-level coverage before
+  converging through restatement, explicit review of reductions, and approval.
 - **Routes:** UI/product-flow discovery → `cx-design-director`; external
   comparison → `cx-ultraresearch`; implementation drift, deadlock, or formal
   proof → the corresponding owner.
@@ -227,10 +230,13 @@ Runtime contract: [`SKILL.md`](cx-ultraresearch/SKILL.md)
   evidence-based investigation, or careful comparison.
 - **Non-trigger:** an ordinary current-fact lookup, a simple web question, or
   reading one accessible page.
-- **Method:** define only the necessary evidence axes, prefer primary sources,
-  and stop when sufficient independent evidence has converged.
+- **Method:** define only the necessary evidence axes, keep claim-relative
+  source and material-claim maps, distinguish source lineage from domain, and
+  classify claims as `supported`, `unresolved`, or `refuted`.
 - **Routes:** blocked public URL → `cx-insane-search`; real page interaction or
-  rendered state → `cx-browser-automation`.
+  rendered state → `cx-browser-automation`; apply the evidence contract in
+  context for high-stakes or citation-heavy work, but materialize durable
+  artifacts only when requested.
 
 ### `cx-unstuck`
 
