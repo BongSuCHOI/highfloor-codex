@@ -3,7 +3,8 @@
 
 Usage:
     bash scripts/run.sh URL [--selector CSS] [--device auto|desktop|mobile]
-                          [--timeout N] [--max-attempts N] [--json] [--trace]
+                          [--timeout N] [--max-attempts N]
+                          [--json | --evidence-json] [--trace]
 
 Examples:
     bash scripts/run.sh "https://example.com/" --selector "h1"
@@ -43,18 +44,30 @@ def build_parser() -> argparse.ArgumentParser:
                    help="Disable content-rescue extraction (PDF/JSON-LD/render-merge); "
                         "always return the raw response text.")
     p.add_argument("--no-playwright", action="store_true",
-                   help="Skip Playwright fallback (curl-only).")
+                   help=argparse.SUPPRESS)
     p.add_argument("--no-phase0", action="store_true",
                    help="Skip the Phase 0 official-API router (generic grid only).")
-    p.add_argument("--json", action="store_true",
-                   help="Emit FetchResult as JSON to stdout (content omitted).")
+    p.add_argument("--learn", action="store_true", default=None,
+                   help="Opt in to the bounded cross-process route-learning store.")
+    output = p.add_mutually_exclusive_group()
+    output.add_argument("--json", action="store_true",
+                        help="Emit FetchResult as JSON to stdout (content omitted).")
+    output.add_argument("--evidence-json", action="store_true",
+                        help="Emit only the compact research handoff: retrieval "
+                             "evidence plus untrusted content from this fetch.")
+    p.add_argument("--include-content", action="store_true",
+                   help="With --json, include the same fetch's content inside an "
+                        "explicit untrusted-data envelope.")
     p.add_argument("--trace", action="store_true",
                    help="Print per-attempt trace to stderr.")
     return p
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    if args.include_content and not args.json:
+        parser.error("--include-content requires --json")
     try:
         result = fetch(
             args.url,
@@ -62,8 +75,9 @@ def main(argv: list[str] | None = None) -> int:
             device_class=args.device,
             timeout=args.timeout,
             max_attempts=args.max_attempts,
-            enable_playwright=not args.no_playwright,
+            enable_playwright=False,
             enable_phase0=not args.no_phase0,
+            enable_learning=args.learn,
             enable_extraction=not args.no_extract,
             enable_retry=not args.no_retry,
         )
@@ -116,8 +130,14 @@ def main(argv: list[str] | None = None) -> int:
             print("   ➜ must_invoke_browser_automation = TRUE — use the available browser automation from the agent session.", file=sys.stderr)
         print("════════════════════════════════════════════════════════════════", file=sys.stderr)
 
-    if args.json:
-        payload = result.to_dict()
+    if args.evidence_json:
+        print(json.dumps(
+            result.to_research_handoff_dict(),
+            ensure_ascii=False,
+            indent=2,
+        ))
+    elif args.json:
+        payload = result.to_dict(include_content=args.include_content)
         print(json.dumps(payload, ensure_ascii=False, indent=2))
     else:
         print(result.to_untrusted_text(), end="")

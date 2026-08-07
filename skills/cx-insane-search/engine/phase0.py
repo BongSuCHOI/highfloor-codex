@@ -28,27 +28,33 @@ import re
 import shutil
 import subprocess
 from typing import Optional
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 
 # --- low-level helpers -------------------------------------------------------
 def _cffi_get(url: str, *, impersonate: str = "safari", timeout: int = 15):
-    from curl_cffi import requests as r  # lazy: engine works even if missing
-    return r.get(
+    from .transport import POOL
+    response, error = POOL.request(
         url,
-        impersonate=impersonate,  # type: ignore[arg-type]
+        impersonate=impersonate,
         timeout=timeout,
-        headers={
+        extra_headers={
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language": "en-US,en;q=0.9,ko;q=0.8",
         },
-        allow_redirects=True,
     )
+    if response is None:
+        raise RuntimeError(error or "guarded transport failed")
+    return response
 
 
 def _host(url: str) -> str:
-    h = (urlsplit(url).hostname or "").lower()
+    h = (urlsplit(url).hostname or "").lower().rstrip(".")
     return h[4:] if h.startswith("www.") else h  # strip the literal "www." prefix only
+
+
+def _host_matches(host: str, base: str) -> bool:
+    return host == base or host.endswith(f".{base}")
 
 
 def _attempt(platform: str, route: str, ok: bool, status: int, body: str, note: str = "") -> dict:
@@ -61,11 +67,11 @@ def _detect(url: str) -> Optional[str]:
     h = _host(url)
     if not h:
         return None
-    if "reddit.com" in h or h == "redd.it":
+    if _host_matches(h, "reddit.com") or h == "redd.it":
         return "reddit"
-    if h in ("x.com", "twitter.com") or h.endswith(".x.com") or h.endswith(".twitter.com"):
+    if _host_matches(h, "x.com") or _host_matches(h, "twitter.com"):
         return "x"
-    if "youtube.com" in h or h == "youtu.be":
+    if _canonical_youtube_url(url) is not None:
         return "youtube"
     return None
 
@@ -86,7 +92,9 @@ def _reddit(url: str, timeout: int) -> dict:
                                  "feed" if ok else "no-feed-markers"))
         if ok:
             return {"platform": "reddit", "ok": True, "route": "rss",
-                    "content": x.text, "final_url": rss_url, "attempts": attempts}
+                    "content": x.text,
+                    "final_url": str(getattr(x, "url", rss_url) or rss_url),
+                    "attempts": attempts}
     except Exception as e:
         attempts.append(_attempt("reddit", "rss", False, 0, "", f"{type(e).__name__}"))
 
@@ -98,7 +106,9 @@ def _reddit(url: str, timeout: int) -> dict:
                                  "json" if ok else f"status={x.status_code}"))
         if ok:
             return {"platform": "reddit", "ok": True, "route": "json",
-                    "content": x.text, "final_url": json_url, "attempts": attempts}
+                    "content": x.text,
+                    "final_url": str(getattr(x, "url", json_url) or json_url),
+                    "attempts": attempts}
     except Exception as e:
         attempts.append(_attempt("reddit", "json", False, 0, "", f"{type(e).__name__}"))
 
@@ -124,7 +134,10 @@ def _x(url: str, timeout: int) -> dict:
                                      "has-text" if ok else f"status={x.status_code}"))
             if ok:
                 return {"platform": "x", "ok": True, "route": "tweet-result",
-                        "content": x.text, "final_url": url, "attempts": attempts}
+                        "content": x.text,
+                        "final_url": str(getattr(x, "url", "") or
+                                         f"https://cdn.syndication.twimg.com/tweet-result?id={tid}&token=a"),
+                        "attempts": attempts}
         except Exception as e:
             attempts.append(_attempt("x", "tweet-result", False, 0, "", f"{type(e).__name__}"))
         try:
@@ -136,13 +149,19 @@ def _x(url: str, timeout: int) -> dict:
                                      "has-html" if ok else f"status={x.status_code}"))
             if ok:
                 return {"platform": "x", "ok": True, "route": "oembed",
-                        "content": x.text, "final_url": ourl, "attempts": attempts}
+                        "content": x.text,
+                        "final_url": str(getattr(x, "url", ourl) or ourl),
+                        "attempts": attempts}
         except Exception as e:
             attempts.append(_attempt("x", "oembed", False, 0, "", f"{type(e).__name__}"))
     else:  # profile timeline → syndication (rate-limit-prone; retry once)
         handle = urlsplit(url).path.strip("/").split("/")[0]
         _reserved = {"i", "search", "home", "explore", "messages", "notifications", "settings", "hashtag"}
-        if handle and handle.lower() not in _reserved:
+        if (
+            handle
+            and handle.lower() not in _reserved
+            and re.fullmatch(r"[A-Za-z0-9_]{1,15}", handle)
+        ):
             surl = f"https://syndication.twitter.com/srv/timeline-profile/screen-name/{handle}"
             for attempt_no in range(2):
                 try:
@@ -153,7 +172,9 @@ def _x(url: str, timeout: int) -> dict:
                                              "timeline" if ok else f"status={x.status_code}"))
                     if ok:
                         return {"platform": "x", "ok": True, "route": "syndication-timeline",
-                                "content": x.text, "final_url": surl, "attempts": attempts}
+                                "content": x.text,
+                                "final_url": str(getattr(x, "url", surl) or surl),
+                                "attempts": attempts}
                 except Exception as e:
                     attempts.append(_attempt("x", f"syndication-timeline#{attempt_no+1}", False, 0, "", f"{type(e).__name__}"))
 
@@ -168,8 +189,46 @@ def _ytdlp_argv() -> Optional[list[str]]:
     return [uvx, "yt-dlp@2026.07.04"] if uvx else None
 
 
+_YOUTUBE_ID_RE = re.compile(r"^[A-Za-z0-9_-]{6,32}$")
+_YOUTUBE_LIST_RE = re.compile(r"^[A-Za-z0-9_-]{10,128}$")
+
+
+def _canonical_youtube_url(url: str) -> Optional[str]:
+    """Accept only canonical video or playlist inputs before invoking yt-dlp."""
+    parsed = urlsplit(url)
+    host = _host(url)
+    path_parts = [part for part in parsed.path.split("/") if part]
+    video_id = ""
+    if host == "youtu.be" and path_parts:
+        video_id = path_parts[0]
+    elif _host_matches(host, "youtube.com"):
+        if parsed.path.rstrip("/") == "/watch":
+            video_id = (parse_qs(parsed.query).get("v") or [""])[0]
+        elif len(path_parts) == 2 and path_parts[0] in {"embed", "live", "shorts"}:
+            video_id = path_parts[1]
+        elif parsed.path.rstrip("/") == "/playlist":
+            list_id = (parse_qs(parsed.query).get("list") or [""])[0]
+            if _YOUTUBE_LIST_RE.fullmatch(list_id):
+                return f"https://www.youtube.com/playlist?list={list_id}"
+            return None
+    if _YOUTUBE_ID_RE.fullmatch(video_id):
+        return f"https://www.youtube.com/watch?v={video_id}"
+    return None
+
+
 def _youtube(url: str, timeout: int) -> dict:
     attempts: list[dict] = []
+    canonical_url = _canonical_youtube_url(url)
+    if canonical_url is None:
+        attempts.append(_attempt("youtube", "yt-dlp", False, 0, "", "unsupported URL shape"))
+        return {"platform": "youtube", "ok": False, "route": None, "content": "",
+                "final_url": url, "attempts": attempts}
+    from .safety import resolve_public_target
+    target, reason = resolve_public_target(canonical_url)
+    if target is None:
+        attempts.append(_attempt("youtube", "yt-dlp", False, 0, "", reason))
+        return {"platform": "youtube", "ok": False, "route": None, "content": "",
+                "final_url": canonical_url, "attempts": attempts}
     argv = _ytdlp_argv()
     if argv is None:
         attempts.append(_attempt("youtube", "yt-dlp", False, 0, "", "uvx not available"))
@@ -177,7 +236,7 @@ def _youtube(url: str, timeout: int) -> dict:
                 "final_url": url, "attempts": attempts}
     try:
         p = subprocess.run(
-            argv + ["--dump-json", "--skip-download", url],
+            argv + ["--dump-json", "--skip-download", canonical_url],
             capture_output=True, text=True, timeout=max(timeout, 60),
         )
         ok = p.returncode == 0 and p.stdout.strip().startswith("{")
@@ -185,13 +244,13 @@ def _youtube(url: str, timeout: int) -> dict:
         attempts.append(_attempt("youtube", "yt-dlp", ok, 200 if ok else 0, p.stdout, note))
         if ok:
             return {"platform": "youtube", "ok": True, "route": "yt-dlp",
-                    "content": p.stdout, "final_url": url, "attempts": attempts}
+                    "content": p.stdout, "final_url": canonical_url, "attempts": attempts}
     except FileNotFoundError:
         attempts.append(_attempt("youtube", "yt-dlp", False, 0, "", "uvx not available"))
     except Exception as e:
         attempts.append(_attempt("youtube", "yt-dlp", False, 0, "", f"{type(e).__name__}"))
     return {"platform": "youtube", "ok": False, "route": None, "content": "",
-            "final_url": url, "attempts": attempts}
+            "final_url": canonical_url, "attempts": attempts}
 
 
 _ROUTERS = {"reddit": _reddit, "x": _x, "youtube": _youtube}

@@ -15,6 +15,8 @@
  */
 
 const fs = require('fs');
+const os = require('os');
+const path = require('path');
 
 // Drain stdout fully before exiting. `process.exit()` can truncate a large
 // HTML payload because it does not wait for pending stdout I/O (Node docs).
@@ -59,7 +61,8 @@ async function main() {
   const url = args.url;
   if (!url) { process.stderr.write('missing url\n'); process.exit(2); }
 
-  const profileDir = args.profileDir || '/tmp/.insane_pw_profile';
+  const ephemeralProfile = !args.profileDir;
+  const profileDir = args.profileDir || fs.mkdtempSync(path.join(os.tmpdir(), 'cx-insane-search-pw-'));
   const waitSelector = args.waitSelector || null;
   const timeoutMs = args.timeout || 60000;
   const headless = args.headless ?? false;     // Akamai/etc detect headless
@@ -161,6 +164,7 @@ async function main() {
     return;
   } finally {
     try { if (ctx) await ctx.close(); } catch (_e) {}
+    try { if (ephemeralProfile) fs.rmSync(profileDir, { recursive: true, force: true }); } catch (_e) {}
   }
 }
 

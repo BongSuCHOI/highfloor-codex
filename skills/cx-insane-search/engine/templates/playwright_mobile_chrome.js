@@ -11,6 +11,10 @@
  * NO-SITE-NAME RULE: same as playwright_real_chrome.js — no hostname branches.
  */
 
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+
 function writeStdoutAsync(payload) {
   return new Promise((resolve, reject) => {
     process.stdout.write(payload, (err) => (err ? reject(err) : resolve()));
@@ -50,7 +54,8 @@ async function main() {
   const url = args.url;
   if (!url) { process.stderr.write('missing url\n'); process.exit(2); }
 
-  const profileDir = args.profileDir || '/tmp/.insane_pw_mobile_profile';
+  const ephemeralProfile = !args.profileDir;
+  const profileDir = args.profileDir || fs.mkdtempSync(path.join(os.tmpdir(), 'cx-insane-search-pw-'));
   const deviceName = args.device || 'iPhone 13 Pro';
   const waitSelector = args.waitSelector || null;
   const timeoutMs = args.timeout || 60000;
@@ -109,6 +114,7 @@ async function main() {
     return;
   } finally {
     try { if (ctx) await ctx.close(); } catch (_e) {}
+    try { if (ephemeralProfile) fs.rmSync(profileDir, { recursive: true, force: true }); } catch (_e) {}
   }
 }
 

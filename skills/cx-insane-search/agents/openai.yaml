@@ -1,4 +1,4 @@
 interface:
   display_name: "CX Insane Search"
-  short_description: "Read blocked or degraded public web content"
-  default_prompt: "Use $cx-insane-search to read this blocked public URL."
+  short_description: "Guarded access to blocked public web content"
+  default_prompt: "Use $cx-insane-search to read this blocked public URL and preserve its retrieval evidence."

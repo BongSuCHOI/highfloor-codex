@@ -8,13 +8,17 @@ from __future__ import annotations
 
 import os
 import sys
+import inspect
+import tempfile
+from unittest.mock import patch
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ""))
 sys.path.insert(0, os.path.abspath(os.path.join(HERE, "..", "..")))
 
 from engine.transport import SessionPool, _host_of, _root_of  # noqa: E402
-from engine.executor import _parse_envelope  # noqa: E402
+from engine.executor import _parse_envelope, _profile_dir_for  # noqa: E402
+from engine.fetch_chain import fetch  # noqa: E402
 
 
 def t_host_and_root_helpers():
@@ -72,6 +76,39 @@ def t_parse_envelope_raw_html_fallback():
     print("  ✓ raw-HTML fallback (non-JSON stdout, innerText default '')")
 
 
+def t_browser_state_is_process_scoped_and_fallback_default_off():
+    with patch.dict(
+        os.environ,
+        {
+            key: value
+            for key, value in os.environ.items()
+            if key not in {"INSANE_PERSIST_BROWSER_PROFILE", "INSANE_BROWSER_PROFILE_PATH"}
+        },
+        clear=True,
+    ):
+        first = _profile_dir_for("https://example.com/a", "playwright_real_chrome")
+        second = _profile_dir_for("https://example.com/b", "playwright_real_chrome")
+    assert first == second
+    assert "cx-insane-search-pw-" in first, first
+    assert "/.insane_pw/" not in first, first
+    assert inspect.signature(fetch).parameters["enable_playwright"].default is False
+
+    with tempfile.TemporaryDirectory() as persistent_root:
+        with patch.dict(
+            os.environ,
+            {
+                "INSANE_PERSIST_BROWSER_PROFILE": "1",
+                "INSANE_BROWSER_PROFILE_PATH": persistent_root,
+            },
+            clear=False,
+        ):
+            persistent = _profile_dir_for(
+                "https://example.com/a", "playwright_real_chrome"
+            )
+        assert persistent.startswith(persistent_root), persistent
+    print("  ✓ browser profile is process-scoped; local fallback defaults off")
+
+
 def t_warmup_once_guard_online():
     p = SessionPool()
     first = p.warmup("example.com", "safari", "https://example.com/", timeout=15)
@@ -108,6 +145,10 @@ ALL = [
     ("inject_cookies_then_present", t_inject_cookies_then_present),
     ("parse_envelope_json", t_parse_envelope_json),
     ("parse_envelope_raw_html_fallback", t_parse_envelope_raw_html_fallback),
+    (
+        "browser_state_is_process_scoped_and_fallback_default_off",
+        t_browser_state_is_process_scoped_and_fallback_default_off,
+    ),
     ("warmup_once_guard_online", t_warmup_once_guard_online),
     ("fetch_many_reuses_pool_online", t_fetch_many_reuses_pool_online),
 ]

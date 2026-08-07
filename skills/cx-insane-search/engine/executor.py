@@ -33,21 +33,39 @@ from .fetch_chain import Attempt
 
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "templates")
+_PROCESS_PROFILE_TEMP: Optional[tempfile.TemporaryDirectory] = None
 
 
 def _profile_dir_for(url: str, choice: str) -> str:
     """Per-host + per-device Chrome profile directory.
 
-    The host is hashed (never stored as a site name) so the No-Site-Name Rule
-    holds while each host keeps an isolated, reusable profile. Desktop and
-    mobile get separate subdirs so emulation state never bleeds across.
+    Default profiles are process-scoped and cleaned up at exit. Cross-process
+    browser state requires the explicit ``INSANE_PERSIST_BROWSER_PROFILE=1``
+    opt-in.
     """
     import hashlib
     from urllib.parse import urlsplit
+    global _PROCESS_PROFILE_TEMP
     host = (urlsplit(url).hostname or "unknown").lower()
-    host_hash = hashlib.sha1(host.encode("utf-8", "ignore")).hexdigest()[:16]
+    host_hash = hashlib.sha256(host.encode("utf-8", "ignore")).hexdigest()[:24]
     device = "mobile" if "mobile" in choice else "desktop"
-    return os.path.join(tempfile.gettempdir(), ".insane_pw", host_hash, device)
+    persistent = os.environ.get(
+        "INSANE_PERSIST_BROWSER_PROFILE", "0"
+    ).lower() in ("1", "true", "yes")
+    if persistent:
+        root = os.environ.get("INSANE_BROWSER_PROFILE_PATH") or os.path.join(
+            os.path.expanduser("~"), ".insane_search", "browser-profiles"
+        )
+        os.makedirs(root, mode=0o700, exist_ok=True)
+        if not os.environ.get("INSANE_BROWSER_PROFILE_PATH"):
+            os.chmod(root, 0o700)
+    else:
+        if _PROCESS_PROFILE_TEMP is None:
+            _PROCESS_PROFILE_TEMP = tempfile.TemporaryDirectory(
+                prefix="cx-insane-search-pw-"
+            )
+        root = _PROCESS_PROFILE_TEMP.name
+    return os.path.join(root, host_hash, device)
 
 
 def _node_available() -> bool:
@@ -195,11 +213,7 @@ def run_playwright_fallback(
 
     args: dict = {
         "url": url,
-        # Per-host + per-device profile isolation. A single shared profile dir
-        # (the old default) leaked cookies/storage across hosts and caused
-        # profile-lock collisions when two fallbacks ran concurrently. Hashing
-        # the host (not storing it) keeps the No-Site-Name Rule intact while
-        # letting a host reuse its own warm storageState across calls.
+        # Per-host + per-device isolation inside a process-scoped directory.
         "profileDir": profile_dir or _profile_dir_for(url, choice),
         "timeout": timeout * 1000,
     }

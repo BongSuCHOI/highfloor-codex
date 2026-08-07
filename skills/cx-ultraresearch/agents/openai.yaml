@@ -1,4 +1,4 @@
 interface:
   display_name: "CX Ultraresearch"
   short_description: "Deep source-backed research and synthesis"
-  default_prompt: "Use $cx-ultraresearch to investigate this question with current sources."
+  default_prompt: "Use $cx-ultraresearch to investigate this question with claim-relative primary evidence and explicit unresolved gaps."

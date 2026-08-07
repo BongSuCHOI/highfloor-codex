@@ -35,6 +35,7 @@ import os
 import random
 import time
 from dataclasses import dataclass, field, asdict
+from datetime import datetime, timezone
 from typing import Any, Optional
 
 from .content_safety import ContentSafetyReport, analyze_untrusted_content, wrap_untrusted_content
@@ -85,7 +86,9 @@ class Attempt:
 class FetchResult:
     ok: bool
     content: str = ""
+    requested_url: str = ""
     final_url: str = ""
+    retrieved_at: str = ""
     verdict: str = ""
     profile_used: Optional[str] = None
     trace: list[Attempt] = field(default_factory=list)
@@ -114,6 +117,10 @@ class FetchResult:
     extraction_quality: float = 0.0
     extraction_source: str = ""
     extraction_meta: dict = field(default_factory=dict)
+    retrieval_phase: str = ""
+    retrieval_executor: str = ""
+    limitations: list[str] = field(default_factory=list)
+    runtime_warnings: list[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         report = analyze_untrusted_content(self.content, source_url=self.final_url)
@@ -142,10 +149,59 @@ class FetchResult:
     def must_invoke_browser_automation(self) -> bool:
         return self.must_invoke_playwright_mcp
 
-    def to_dict(self) -> dict:
+    def to_evidence_dict(self) -> dict:
+        """Retrieval-only metadata for a research source record."""
+        content_role = (
+            "diagnostic_only"
+            if not self.ok
+            else (
+                "candidate_with_limitations"
+                if self.verdict == Verdict.WEAK_OK.value
+                else "published_source_candidate"
+            )
+        )
+        completeness = (
+            self.extraction_quality
+            if (
+                self.extraction_source
+                and self.extraction_meta.get("completeness_measured") is not False
+            )
+            else None
+        )
         return {
-            "ok": self.ok,
+            "schema_version": 1,
+            "requested_url": self.requested_url,
             "final_url": self.final_url,
+            "retrieved_at": self.retrieved_at,
+            "ok": self.ok,
+            "content_role": content_role,
+            "retrieval_verdict": self.verdict,
+            "stop_reason": self.stop_reason,
+            "untried_routes": list(self.untried_routes),
+            "retrieval_route": {
+                "phase": self.retrieval_phase,
+                "executor": self.retrieval_executor,
+                "fallback_used": self.retrieval_phase == "fallback",
+                "profile_used": self.profile_used,
+            },
+            "extraction": {
+                "method": self.extraction_source,
+                "completeness_heuristic": completeness,
+                "limitations": list(self.limitations),
+            },
+            "content_trust": self.content_trust,
+            "prompt_injection_risk": self.prompt_injection_risk,
+            "source_quality": "not_evaluated",
+            "claim_confidence": "not_evaluated",
+            "runtime_warnings": list(self.runtime_warnings),
+        }
+
+    def to_dict(self, *, include_content: bool = False) -> dict:
+        payload = {
+            "ok": self.ok,
+            "requested_url": self.requested_url,
+            "final_url": self.final_url,
+            "retrieved_at": self.retrieved_at,
             "verdict": self.verdict,
             "profile_used": self.profile_used,
             "trace": [a.to_dict() for a in self.trace],
@@ -165,6 +221,21 @@ class FetchResult:
             "extraction_quality": self.extraction_quality,
             "extraction_source": self.extraction_source,
             "extraction_meta": self.extraction_meta,
+            "retrieval_phase": self.retrieval_phase,
+            "retrieval_executor": self.retrieval_executor,
+            "limitations": self.limitations,
+            "runtime_warnings": self.runtime_warnings,
+            "evidence": self.to_evidence_dict(),
+        }
+        if include_content:
+            payload["untrusted_content"] = self.to_untrusted_text()
+        return payload
+
+    def to_research_handoff_dict(self) -> dict:
+        """Compact single-fetch payload for the ultraresearch composition."""
+        return {
+            "evidence": self.to_evidence_dict(),
+            "untrusted_content": self.to_untrusted_text(),
         }
 
 
@@ -359,9 +430,9 @@ def _curl_probe(
 ) -> tuple[Any, Optional[str]]:
     """Returns (response, error_str). response may be None on exception.
 
-    Routes through the per-host SessionPool so cookies (WAF sensors) and the
-    warm connection persist across attempts and across pages of the same host.
-    The pool degrades to a one-shot GET when a Session can't be created.
+    Routes through the guarded SessionPool so checked DNS addresses are pinned
+    into curl while cookies and warm connections can be reused for the same
+    host, identity, and address set.
     """
     from .transport import POOL
     return POOL.request(url, impersonate=impersonate, referer=referer, timeout=timeout,
@@ -552,6 +623,38 @@ def _winning_route(result: FetchResult) -> Optional[dict]:
     return None
 
 
+def _finalize_result(
+    result: FetchResult,
+    requested_url: str,
+    runtime_warnings: Optional[list[str]] = None,
+) -> FetchResult:
+    result.requested_url = requested_url
+    if not result.retrieved_at:
+        result.retrieved_at = datetime.now(timezone.utc).isoformat()
+    if runtime_warnings:
+        result.runtime_warnings.extend(
+            warning for warning in runtime_warnings if warning not in result.runtime_warnings
+        )
+
+    selected: Optional[Attempt] = None
+    if result.ok:
+        for attempt in reversed(result.trace):
+            if attempt.verdict in _OK_VALUES:
+                selected = attempt
+                break
+    if selected is None and result.trace:
+        selected = result.trace[-1]
+    if selected is not None:
+        result.retrieval_phase = selected.phase
+        result.retrieval_executor = selected.executor
+
+    if result.verdict == Verdict.WEAK_OK.value:
+        result.limitations.append("weak_ok requires inspection of the retrieved content")
+    if not result.ok and result.untried_routes:
+        result.limitations.append("reported retrieval routes remain untried")
+    return result
+
+
 def fetch(
     url: str,
     *,
@@ -561,9 +664,9 @@ def fetch(
     timeout: int = 25,
     max_attempts: Optional[int] = None,
     max_browser_attempts: int = 2,
-    enable_playwright: bool = True,
+    enable_playwright: bool = False,
     enable_phase0: bool = True,
-    enable_learning: bool = True,
+    enable_learning: Optional[bool] = None,
     enable_extraction: bool = True,
     enable_retry: bool = True,
 ) -> FetchResult:
@@ -575,9 +678,13 @@ def fetch(
        promoted and the run hit a REAL block, strike it (evicted after two
        consecutive strikes — see `learning.py`).
 
-    The store is a bounded, self-pruning JSON file; any error in it is swallowed
-    so learning can never break a fetch. Disable per-call with
-    ``enable_learning=False`` or globally with ``INSANE_LEARN=0``.
+    Persistent learning is off by default. Enable it explicitly with
+    ``enable_learning=True`` or ``INSANE_LEARN=1``. Storage failures remain
+    non-fatal and are exposed through ``FetchResult.runtime_warnings``.
+
+    Local Playwright subprocess fallback is disabled at this public boundary:
+    its browser egress cannot guarantee the same DNS pinning as the guarded
+    transport. Use the returned browser-automation handoff instead.
 
     ``enable_extraction`` (default True) turns on content-rescue extraction:
     PDF bodies come back as pypdf-extracted text, and thin SPA shells fall back
@@ -590,10 +697,15 @@ def fetch(
     multiply sleeps across dozens of candidates."""
     priority: Optional[dict] = None
     learned_existed = False
+    runtime_warnings: list[str] = []
     uh = dict(user_hint or {})
+    learning_active = False
     try:
         from . import learning
-        if enable_learning and learning.enabled():
+        learning_active = (
+            learning.enabled() if enable_learning is None else enable_learning
+        )
+        if learning_active:
             priority = learning.lookup(url, device_class)
             if priority:
                 learned_existed = True
@@ -602,30 +714,37 @@ def fetch(
     except Exception:
         priority = None
 
+    if enable_playwright:
+        runtime_warnings.append(
+            "local Playwright fallback was disabled; use the browser-automation handoff"
+        )
     result = _fetch_core(
         url, success_selectors=success_selectors, device_class=device_class,
         user_hint=uh, timeout=timeout, max_attempts=max_attempts,
         max_browser_attempts=max_browser_attempts,
-        enable_playwright=enable_playwright, enable_phase0=enable_phase0,
+        enable_playwright=False, enable_phase0=enable_phase0,
         priority=priority,
         enable_extraction=enable_extraction, enable_retry=enable_retry,
     )
 
     try:
         from . import learning
-        if enable_learning and learning.enabled():
+        if learning_active:
+            warning = None
             if result.ok:
                 win = _winning_route(result)
                 if win:
-                    learning.record_success(url, device_class, win)
+                    warning = learning.record_success(url, device_class, win)
             elif learned_existed:
-                learning.record_failure(
+                warning = learning.record_failure(
                     url, device_class,
                     penalize=learning.is_real_failure(result.stop_reason))
+            if warning:
+                runtime_warnings.append(warning)
     except Exception:
-        pass
+        runtime_warnings.append("persistent learning update failed")
 
-    return result
+    return _finalize_result(result, url, runtime_warnings)
 
 
 # --- Main entrypoint ---------------------------------------------------------
@@ -638,7 +757,7 @@ def _fetch_core(
     timeout: int = 25,
     max_attempts: Optional[int] = None,   # None = exhaustive (R6); int = budget
     max_browser_attempts: int = 2,
-    enable_playwright: bool = True,
+    enable_playwright: bool = False,
     enable_phase0: bool = True,
     priority: Optional[dict] = None,      # U5: learned route to retry first
     enable_extraction: bool = True,
@@ -702,12 +821,23 @@ def _fetch_core(
                     reasons=[a["note"]] if a.get("note") else [],
                 ))
             if p0["ok"]:
+                phase0_method = (
+                    "yt_dlp_metadata"
+                    if p0["route"] == "yt-dlp"
+                    else f"phase0_{str(p0['route']).replace('-', '_')}"
+                )
                 return FetchResult(
                     ok=True, content=p0["content"], final_url=p0["final_url"],
                     verdict=Verdict.STRONG_OK.value,
                     profile_used=f"phase0:{p0['platform']}", trace=trace,
                     summary=f"Phase 0 official route: {p0['platform']}:{p0['route']}",
                     stop_reason="success",
+                    extraction_source=phase0_method,
+                    extraction_quality=0.0,
+                    extraction_meta={"completeness_measured": False},
+                    limitations=[
+                        "Phase 0 did not measure extraction completeness"
+                    ],
                 )
             # Recognised platform but every official route failed → fall through
             # to the generic grid (don't give up; R6).

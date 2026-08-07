@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import os
 import sys
+from unittest.mock import patch
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
@@ -25,7 +26,8 @@ from engine.content_safety import (  # noqa: E402
     analyze_untrusted_content,
     wrap_untrusted_content,
 )
-from engine.fetch_chain import FetchResult  # noqa: E402
+from engine.fetch_chain import Attempt, FetchResult, _finalize_result, fetch  # noqa: E402
+from engine.validators import Verdict  # noqa: E402
 
 
 def t_benign_content_reports_no_risk() -> None:
@@ -167,6 +169,129 @@ def t_browser_automation_field_preserves_legacy_alias() -> None:
     print("  ✓ neutral browser automation field preserves legacy JSON alias")
 
 
+def t_retrieval_evidence_is_separate_from_claim_judgment() -> None:
+    requested = "https://example.test/requested"
+    text = "public article body"
+    result = FetchResult(
+        ok=True,
+        content=text,
+        final_url="https://example.test/final",
+        verdict=Verdict.STRONG_OK.value,
+        trace=[
+            Attempt(
+                phase="grid",
+                executor="curl_cffi",
+                url="https://example.test/final",
+                url_transform="original",
+                impersonate="chrome",
+                referer="self_root",
+                verdict=Verdict.STRONG_OK.value,
+            )
+        ],
+        extraction_source="raw",
+        extraction_quality=0.82,
+    )
+    _finalize_result(result, requested)
+
+    payload = result.to_dict(include_content=True)
+    evidence = payload["evidence"]
+    assert evidence["requested_url"] == requested
+    assert evidence["final_url"] == "https://example.test/final"
+    assert evidence["retrieved_at"].endswith("+00:00")
+    assert evidence["retrieval_route"]["phase"] == "grid"
+    assert evidence["retrieval_route"]["executor"] == "curl_cffi"
+    assert evidence["source_quality"] == "not_evaluated"
+    assert evidence["claim_confidence"] == "not_evaluated"
+    assert evidence["content_role"] == "published_source_candidate"
+    assert evidence["extraction"]["completeness_heuristic"] == 0.82
+    assert "content" not in payload
+    assert text in payload["untrusted_content"]
+    assert BEGIN_UNTRUSTED_WEB_CONTENT in payload["untrusted_content"]
+    assert END_UNTRUSTED_WEB_CONTENT in payload["untrusted_content"]
+    print("  ✓ one result carries content + retrieval evidence without truth overclaim")
+
+
+def t_research_handoff_is_compact() -> None:
+    result = FetchResult(
+        ok=True,
+        content="article",
+        final_url="https://example.test/article",
+        verdict=Verdict.STRONG_OK.value,
+        extraction_source="raw",
+        extraction_quality=0.8,
+    )
+    _finalize_result(result, "https://example.test/article")
+    payload = result.to_research_handoff_dict()
+    assert set(payload) == {"evidence", "untrusted_content"}
+    assert "trace" not in payload
+    assert payload["evidence"]["ok"] is True
+    assert "article" in payload["untrusted_content"]
+    print("  ✓ research handoff omits trace and duplicate result metadata")
+
+
+def t_failed_handoff_marks_content_diagnostic_only() -> None:
+    result = FetchResult(
+        ok=False,
+        content="<html>challenge</html>",
+        final_url="https://example.test/article",
+        verdict=Verdict.CHALLENGE.value,
+    )
+    _finalize_result(result, "https://example.test/article")
+    payload = result.to_research_handoff_dict()
+    assert payload["evidence"]["ok"] is False
+    assert payload["evidence"]["content_role"] == "diagnostic_only"
+    print("  ✓ failed retrieval content is explicitly diagnostic-only")
+
+
+def t_phase0_records_method_without_fake_completeness() -> None:
+    phase0 = {
+        "platform": "reddit",
+        "ok": True,
+        "route": "rss",
+        "content": "<rss>article</rss>",
+        "final_url": "https://www.reddit.com/r/example/.rss",
+        "attempts": [
+            {
+                "route": "rss",
+                "ok": True,
+                "status": 200,
+                "bytes": 18,
+                "note": "feed",
+            }
+        ],
+    }
+    with patch("engine.phase0.route", return_value=phase0):
+        result = fetch(
+            "https://www.reddit.com/r/example/",
+            enable_learning=False,
+        )
+    evidence = result.to_evidence_dict()
+    assert evidence["extraction"]["method"] == "phase0_rss"
+    assert evidence["extraction"]["completeness_heuristic"] is None
+    assert evidence["extraction"]["limitations"]
+    print("  ✓ Phase 0 records its method without inventing completeness")
+
+
+def t_public_fetch_disables_local_browser_even_when_legacy_flag_is_true() -> None:
+    failure = FetchResult(
+        ok=False,
+        verdict=Verdict.CHALLENGE.value,
+        stop_reason="exhausted",
+    )
+    with patch("engine.fetch_chain._fetch_core", return_value=failure) as core:
+        result = fetch(
+            "https://example.test/",
+            enable_playwright=True,
+            enable_learning=False,
+        )
+    assert core.call_args.kwargs["enable_playwright"] is False
+    assert any(
+        "local Playwright fallback was disabled" in warning
+        for warning in result.runtime_warnings
+    )
+    print("  ✓ public fetch cannot launch the retained local browser fallback")
+
+
 def t_lone_topical_keyword_stays_low() -> None:
     # A single sensitive noun ("secret"/"token"/"password") with no instruction
     # override is common in legitimate docs and must not cry wolf at medium.
@@ -202,6 +327,23 @@ ALL = [
     ),
     ("fetchresult_empty_content_remains_constructible", t_fetchresult_empty_content_remains_constructible),
     ("browser_automation_field_preserves_legacy_alias", t_browser_automation_field_preserves_legacy_alias),
+    (
+        "retrieval_evidence_is_separate_from_claim_judgment",
+        t_retrieval_evidence_is_separate_from_claim_judgment,
+    ),
+    ("research_handoff_is_compact", t_research_handoff_is_compact),
+    (
+        "failed_handoff_marks_content_diagnostic_only",
+        t_failed_handoff_marks_content_diagnostic_only,
+    ),
+    (
+        "phase0_records_method_without_fake_completeness",
+        t_phase0_records_method_without_fake_completeness,
+    ),
+    (
+        "public_fetch_disables_local_browser_even_when_legacy_flag_is_true",
+        t_public_fetch_disables_local_browser_even_when_legacy_flag_is_true,
+    ),
 ]
 
 

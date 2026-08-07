@@ -7,8 +7,11 @@ grid priority reordering, and winning-route extraction from a trace."""
 from __future__ import annotations
 
 import os
+import json
+import stat
 import tempfile
 from datetime import datetime, timezone, timedelta
+from unittest.mock import patch
 
 from engine import learning
 from engine.fetch_chain import _build_plan, _winning_route, _load_profiles, FetchResult, Attempt
@@ -53,6 +56,35 @@ learning.record_success(U, "desktop", ROUTE_B, path=p)
 data = learning.load(p)
 check("wins_reset_on_new_route", data[learning.key_for(U, "desktop")]["wins"] == 1
       and learning.lookup(U, "desktop", path=p) == ROUTE_B, "new route replaces, wins=1")
+with open(p, encoding="utf-8") as handle:
+    raw_store = json.load(handle)
+check("store_schema_and_host_privacy",
+      raw_store["schema_version"] == 1
+      and "example.com" not in json.dumps(raw_store)
+      and stat.S_IMODE(os.stat(p).st_mode) == 0o600,
+      "schema v1, no plaintext hostname, mode 0600")
+
+# 1b) persistence is opt-in
+with patch.dict(os.environ, {}, clear=True):
+    check("learning_default_off", learning.enabled() is False,
+          "INSANE_LEARN is disabled when unset")
+with patch.dict(os.environ, {"INSANE_LEARN": "1"}, clear=True):
+    check("learning_explicit_opt_in", learning.enabled() is True,
+          "INSANE_LEARN=1 enables persistence")
+with tempfile.TemporaryDirectory() as private_home:
+    with patch.dict(os.environ, {"HOME": private_home}, clear=True):
+        learning.record_success(U, "desktop", ROUTE_A)
+        default_dir = os.path.dirname(learning.default_path())
+        default_file = learning.default_path()
+    check("default_store_permissions",
+          stat.S_IMODE(os.stat(default_dir).st_mode) == 0o700
+          and stat.S_IMODE(os.stat(default_file).st_mode) == 0o600,
+          "default directory 0700, file 0600")
+with tempfile.TemporaryDirectory() as unwritable_target:
+    warning = learning.save({}, path=unwritable_target)
+check("learning_write_failure_is_reportable",
+      bool(warning and warning.startswith("persistent learning save failed:")),
+      warning or "missing warning")
 
 # 2) transient failure does NOT strike; refreshes last_used
 p = _tmp()
@@ -95,13 +127,17 @@ learning.TTL_DAYS = 30
 stale_ts = (datetime.now(timezone.utc) - timedelta(days=31)).isoformat()
 fresh_ts = datetime.now(timezone.utc).isoformat()
 learning.save({
-    "stale.com::desktop": {"route": ROUTE_A, "wins": 1, "consecutive_fails": 0,
-                           "last_used": stale_ts, "last_success": stale_ts},
-    "fresh.com::desktop": {"route": ROUTE_B, "wins": 1, "consecutive_fails": 0,
-                           "last_used": fresh_ts, "last_success": fresh_ts},
+    learning.key_for("https://stale.example/", "desktop"):
+        {"route": ROUTE_A, "wins": 1, "consecutive_fails": 0,
+         "last_used": stale_ts, "last_success": stale_ts},
+    learning.key_for("https://fresh.example/", "desktop"):
+        {"route": ROUTE_B, "wins": 1, "consecutive_fails": 0,
+         "last_used": fresh_ts, "last_success": fresh_ts},
 }, path=p)
 data = learning.load(p)
-check("ttl_prunes_stale", "stale.com::desktop" not in data and "fresh.com::desktop" in data,
+check("ttl_prunes_stale",
+      learning.key_for("https://stale.example/", "desktop") not in data
+      and learning.key_for("https://fresh.example/", "desktop") in data,
       f"31-day-old dropped, fresh kept (kept={list(data)})")
 learning.TTL_DAYS = old_ttl
 
@@ -113,11 +149,19 @@ now = datetime.now(timezone.utc)
 big = {}
 for i in range(12):
     ts = (now - timedelta(minutes=i)).isoformat()  # i=0 newest
-    big[f"h{i}.com::desktop"] = {"route": ROUTE_A, "wins": 1, "consecutive_fails": 0,
-                                 "last_used": ts, "last_success": ts}
+    big[learning.key_for(f"https://h{i}.example/", "desktop")] = {
+        "route": ROUTE_A,
+        "wins": 1,
+        "consecutive_fails": 0,
+        "last_used": ts,
+        "last_success": ts,
+    }
 learning.save(big, path=p)
 data = learning.load(p)
-kept_newest = all(f"h{i}.com::desktop" in data for i in range(5))
+kept_newest = all(
+    learning.key_for(f"https://h{i}.example/", "desktop") in data
+    for i in range(5)
+)
 check("lru_cap", len(data) == 5 and kept_newest,
       f"capped to 5, kept 5 most-recent (n={len(data)})")
 learning.MAX_ENTRIES = old_max

@@ -11,7 +11,8 @@ Why (multi-AI review 2026-06-21):
     (`_FakeResp` kept only HTML). The bridge here lets one expensive browser
     pass convert into cheap curl_cffi throughput (the FlareSolverr pattern).
 
-No-Site-Name Rule: keys are hashed hosts; no site names are stored or branched.
+No-Site-Name Rule: the transport has no site-specific branches, and persistent
+learning hashes host keys.
 """
 from __future__ import annotations
 
@@ -41,9 +42,20 @@ def _root_of(url: str) -> str:
     return f"{p.scheme}://{p.netloc}/"
 
 
+def _cookie_matches_host(cookie: dict, host: str) -> bool:
+    domain = str(cookie.get("domain") or host).lower().lstrip(".").rstrip(".")
+    normalized_host = host.lower().rstrip(".")
+    if not domain:
+        return False
+    if normalized_host == domain:
+        return True
+    return "." in domain and normalized_host.endswith(f".{domain}")
+
+
 @dataclass
 class _Entry:
     session: Any
+    resolved_ips: tuple[str, ...] = ()
     warmed: bool = False
     injected_ua: Optional[str] = None
     requests_made: int = 0
@@ -51,17 +63,32 @@ class _Entry:
 
 @dataclass
 class SessionPool:
-    """Thread-safe pool of curl_cffi Sessions keyed by (host, impersonate)."""
+    """Pool keyed by scheme, host, port, curl identity, and checked IP set."""
     _entries: dict = field(default_factory=dict)
+    _cookie_seeds: dict = field(default_factory=dict)
     _lock: Any = field(default_factory=threading.Lock)
 
-    def _key(self, host: str, impersonate: str) -> tuple:
-        return (host, impersonate)
+    def _key(
+        self,
+        host: str,
+        impersonate: str,
+        resolved_ips: tuple[str, ...] = (),
+        scheme: str = "",
+        port: int = 0,
+    ) -> tuple:
+        return (scheme, host, port, impersonate, resolved_ips)
 
-    def get(self, host: str, impersonate: str) -> Optional[_Entry]:
+    def get(
+        self,
+        host: str,
+        impersonate: str,
+        resolved_ips: tuple[str, ...] = (),
+        scheme: str = "",
+        port: int = 0,
+    ) -> Optional[_Entry]:
         """Return (creating if needed) the pool entry, or None if curl_cffi
         is unavailable."""
-        key = self._key(host, impersonate)
+        key = self._key(host, impersonate, resolved_ips, scheme, port)
         with self._lock:
             ent = self._entries.get(key)
             if ent is not None:
@@ -71,12 +98,17 @@ class SessionPool:
             except ImportError:
                 return None
             try:
-                sess = cffi_requests.Session(impersonate=impersonate)
+                sess = cffi_requests.Session(
+                    impersonate=impersonate,
+                    trust_env=False,
+                )
             except Exception:
-                # Some impersonate names need a newer curl_cffi; let caller
-                # fall back to a one-shot get by returning None.
                 return None
-            ent = _Entry(session=sess)
+            ent = _Entry(session=sess, resolved_ips=resolved_ips)
+            seed = self._cookie_seeds.get((host, impersonate))
+            if seed:
+                cookies, user_agent = seed
+                self._apply_cookie_seed(ent, host, cookies, user_agent)
             self._entries[key] = ent
             return ent
 
@@ -86,28 +118,47 @@ class SessionPool:
         ent = self.get(host, impersonate)
         if ent is None or ent.warmed:
             return False
-        from . import safety
-        ok, _reason = safety.classify_url(root_url, safety.allow_private_default())
-        if not ok:
+        if _host_of(root_url).rstrip(".") != host.lower().rstrip("."):
             ent.warmed = True   # don't retry a blocked root
             return False
         ent.warmed = True  # mark first to avoid duplicate warmups under race
-        try:
-            ent.session.get(root_url, timeout=timeout, allow_redirects=True)
-            ent.requests_made += 1
-            return True
-        except Exception:
-            return False
+        response, error = self.request(
+            root_url,
+            impersonate=impersonate,
+            timeout=timeout,
+        )
+        return response is not None and error is None
 
     def inject_cookies(self, host: str, impersonate: str,
                        cookies: list[dict], user_agent: Optional[str] = None) -> bool:
         """Seed a session with cookies harvested by a real browser. Subsequent
         requests on this (host, impersonate) reuse the browser-cleared state."""
-        ent = self.get(host, impersonate)
-        if ent is None:
+        filtered = [c for c in cookies or [] if _cookie_matches_host(c, host)]
+        if not filtered and not user_agent:
             return False
+        with self._lock:
+            self._cookie_seeds[(host, impersonate)] = (filtered, user_agent)
+            entries = [
+                ent for key, ent in self._entries.items()
+                if key[1] == host and key[3] == impersonate
+            ]
+        if not entries:
+            ent = self.get(host, impersonate)
+            entries = [ent] if ent is not None else []
         ok = False
-        for c in cookies or []:
+        for ent in entries:
+            ok = self._apply_cookie_seed(ent, host, filtered, user_agent) or ok
+        return ok
+
+    @staticmethod
+    def _apply_cookie_seed(
+        ent: _Entry,
+        host: str,
+        cookies: list[dict],
+        user_agent: Optional[str],
+    ) -> bool:
+        ok = False
+        for c in cookies:
             name = c.get("name")
             value = c.get("value")
             if not name:
@@ -123,6 +174,7 @@ class SessionPool:
                     continue
         if user_agent:
             ent.injected_ua = user_agent
+            ok = True
         return ok
 
     def request(self, url: str, *, impersonate: str, referer: str = "",
@@ -132,8 +184,7 @@ class SessionPool:
                 max_retries: int = 0) -> tuple[Any, Optional[str]]:
         """GET via the pooled session (cookie + connection reuse), with an SSRF
         guard: the initial URL and EVERY redirect hop are validated against the
-        private/loopback/link-local/metadata block-list before being fetched.
-        Falls back to a one-shot get if no session could be created.
+        non-global-address block-list and pinned before being fetched.
 
         ``max_retries`` > 0 retries transient statuses (429/502/503/504) on the
         SAME identity with exponential backoff before the caller sees the
@@ -141,16 +192,12 @@ class SessionPool:
         total retry sleep is capped (see ``_retry_transient``). Default 0 —
         callers opt in per request so a failing grid never multiplies sleeps."""
         from . import safety
-        if allow_private is None:
-            allow_private = safety.allow_private_default()
+        if allow_private:
+            return None, "ssrf_blocked:private_targets_disabled"
+        allow_private = False
         if max_redirects is None:
             max_redirects = safety.DEFAULT_MAX_REDIRECTS
 
-        ok, reason = safety.classify_url(url, allow_private)
-        if not ok:
-            return None, f"ssrf_blocked:{reason}"
-
-        host = _host_of(url)
         headers = {
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
@@ -160,30 +207,54 @@ class SessionPool:
         if extra_headers:
             headers.update(extra_headers)
 
-        ent = self.get(host, impersonate)
-        if ent is None:
+        def _do_get(current_url, target):
+            ent = self.get(
+                target.host,
+                impersonate,
+                target.ips,
+                scheme=target.scheme,
+                port=target.port,
+            )
+            if ent is None:
+                raise RuntimeError("curl_cffi not installed or impersonate unavailable")
             try:
-                from curl_cffi import requests as cffi_requests
+                from curl_cffi import CurlOpt
             except ImportError:
-                return None, "curl_cffi not installed"
-            def _do_get(u):
-                return cffi_requests.get(u, impersonate=impersonate, headers=headers,
-                                         timeout=timeout, allow_redirects=False)
-            return self._fetch_following(_do_get, url, allow_private, max_redirects, None,
-                                         max_retries=max_retries)
+                raise RuntimeError("curl_cffi not installed")
+            resolve_entries = target.curl_resolve_entries()
+            if resolve_entries:
+                ent.session.curl_options[CurlOpt.RESOLVE] = resolve_entries
+            else:
+                ent.session.curl_options.pop(CurlOpt.RESOLVE, None)
+            request_headers = dict(headers)
+            if ent.injected_ua:
+                request_headers.setdefault("User-Agent", ent.injected_ua)
+            response = ent.session.get(
+                current_url,
+                headers=request_headers,
+                timeout=timeout,
+                allow_redirects=False,
+            )
+            ent.requests_made += 1
+            primary_ip = str(getattr(response, "primary_ip", "") or "")
+            if primary_ip:
+                import ipaddress
+                primary_ip = primary_ip.split("%", 1)[0]
+                try:
+                    primary_ip = str(ipaddress.ip_address(primary_ip))
+                except ValueError:
+                    raise RuntimeError(f"connection_ip_invalid:{primary_ip}")
+                if safety._ip_blocked(primary_ip) or primary_ip not in target.ips:
+                    raise RuntimeError(f"connection_ip_mismatch:{primary_ip}")
+            return response
 
-        if ent.injected_ua:
-            headers.setdefault("User-Agent", ent.injected_ua)
-        def _do_get(u):
-            return ent.session.get(u, headers=headers, timeout=timeout, allow_redirects=False)
-        return self._fetch_following(_do_get, url, allow_private, max_redirects, ent,
+        return self._fetch_following(_do_get, url, allow_private, max_redirects,
                                      max_retries=max_retries)
 
     @staticmethod
     def _fetch_following(do_get, url: str, allow_private: bool, max_redirects: int,
-                         ent, *, max_retries: int = 0) -> tuple[Any, Optional[str]]:
-        """Manually follow redirects so each hop is SSRF-validated (curl_cffi's
-        own allow_redirects=True would skip the per-hop check).
+                         *, max_retries: int = 0) -> tuple[Any, Optional[str]]:
+        """Resolve, pin, and fetch each redirect hop independently.
 
         Only the FIRST attempt on the original URL gets the transient-status
         retry loop; redirect hops are distinct URLs and are not retried."""
@@ -191,24 +262,27 @@ class SessionPool:
         cur = url
         first = True
         for _ in range(max_redirects + 1):
+            target, reason = safety.resolve_public_target(cur, allow_private=allow_private)
+            if target is None:
+                prefix = "ssrf_blocked" if first else "ssrf_redirect_blocked"
+                return None, f"{prefix}:{reason}"
             try:
                 if first and max_retries > 0:
-                    resp = _retry_transient(do_get, cur, max_retries)
+                    resp = _retry_transient(
+                        lambda current: do_get(current, target),
+                        target.request_url,
+                        max_retries,
+                    )
                 else:
-                    resp = do_get(cur)
+                    resp = do_get(target.request_url, target)
                 first = False
             except Exception as e:
                 return None, f"{type(e).__name__}:{str(e)[:200]}"
-            if ent is not None:
-                ent.requests_made += 1
             if safety.is_redirect(resp):
                 loc = safety.location_of(resp)
                 if not loc:
                     return resp, None     # redirect w/o Location → return as-is
-                nxt = safety.resolve_redirect(cur, loc)
-                ok, reason = safety.classify_url(nxt, allow_private)
-                if not ok:
-                    return None, f"ssrf_redirect_blocked:{reason}"
+                nxt = safety.resolve_redirect(target.request_url, loc)
                 cur = nxt
                 continue
             return resp, None
@@ -230,9 +304,11 @@ class SessionPool:
                 except Exception:
                     pass
             self._entries.clear()
+            self._cookie_seeds.clear()
 
 
-# Process-wide pool. Disable via INSANE_NO_SESSION_POOL=1 (one-shot mode).
+# Process-wide pool. INSANE_NO_SESSION_POOL disables optional warmup and
+# cookie-bridge reuse; guarded requests still use a target-pinned session.
 POOL = SessionPool()
 
 

@@ -1,4 +1,4 @@
-"""U5: lightweight per-host self-learning store (`observations/learned.json`).
+"""Opt-in, bounded route-learning store.
 
 Records which fetch route (impersonate × referer × url-transform × phase) last
 SUCCEEDED for a host, so the next visit promotes it to the probe / front of the
@@ -15,18 +15,20 @@ self-pruning so it can never grow without limit:
   * cap — at most ``MAX_ENTRIES`` (default 500); on overflow the
     least-recently-used entries are dropped.
 
-This is a DATA file, never code, so the No-Site-Name Rule (R3) holds: per-site
-knowledge lives in JSON that both the engine and the agent can read, while the
-fetch chain itself stays site-agnostic.
+Persistent learning is disabled by default. When explicitly enabled, hostnames
+are stored as non-secret hashes and the file is written with mode ``0600``.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
+import tempfile
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 from urllib.parse import urlsplit
 
+SCHEMA_VERSION = 1
 TTL_DAYS = int(os.environ.get("INSANE_LEARN_TTL_DAYS", "30"))
 MAX_ENTRIES = int(os.environ.get("INSANE_LEARN_MAX", "500"))
 EVICT_AFTER_FAILS = 2
@@ -38,7 +40,7 @@ PENALIZE_REASONS = frozenset({"exhausted", "challenge", "blocked"})
 
 
 def enabled() -> bool:
-    return os.environ.get("INSANE_LEARN", "1") not in ("0", "false", "no")
+    return os.environ.get("INSANE_LEARN", "0").lower() in ("1", "true", "yes")
 
 
 def default_path() -> str:
@@ -54,13 +56,21 @@ def is_real_failure(stop_reason: str) -> bool:
 
 
 def key_for(url: str, device_class: str) -> str:
-    # Use hostname (not netloc) so the learning key matches the session pool /
-    # profile-dir host key (transport._host_of, executor._profile_dir_for),
-    # which both drop port + userinfo. netloc kept them, so a URL with a port
-    # (or credentials) learned under a different key than it fetched under.
     host = (urlsplit(url).hostname or "").lower()
     dev = "mobile" if device_class == "mobile" else "desktop"
-    return f"{host}::{dev}"
+    digest = hashlib.sha256(host.encode("utf-8", "ignore")).hexdigest()
+    return f"h1:{digest}::{dev}"
+
+
+def _normalize_store_key(key: str) -> str:
+    if key.startswith("h1:"):
+        return key
+    host, separator, device = key.rpartition("::")
+    if not separator:
+        host, device = key, "desktop"
+    digest = hashlib.sha256(host.lower().encode("utf-8", "ignore")).hexdigest()
+    normalized_device = "mobile" if device == "mobile" else "desktop"
+    return f"h1:{digest}::{normalized_device}"
 
 
 def _now() -> datetime:
@@ -103,24 +113,63 @@ def load(path: Optional[str] = None) -> dict:
     path = path or default_path()
     try:
         with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        if not isinstance(data, dict):
+            raw = json.load(f)
+        if not isinstance(raw, dict):
             return {}
+        if "schema_version" in raw and raw.get("schema_version") != SCHEMA_VERSION:
+            return {}
+        if raw.get("schema_version") == SCHEMA_VERSION:
+            entries = raw.get("entries")
+            if not isinstance(entries, dict):
+                return {}
+            data = entries
+        else:
+            data = raw
     except (FileNotFoundError, json.JSONDecodeError, OSError):
         return {}
-    return _prune(data)
+    normalized = {
+        _normalize_store_key(str(key)): value
+        for key, value in data.items()
+        if isinstance(value, dict)
+    }
+    return _prune(normalized)
 
 
-def save(data: dict, path: Optional[str] = None) -> None:
+def save(data: dict, path: Optional[str] = None) -> Optional[str]:
+    using_default_path = path is None and not os.environ.get("INSANE_LEARNED_PATH")
     path = path or default_path()
+    temp_path = ""
     try:
-        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
-        tmp = f"{path}.tmp"
-        with open(tmp, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2, sort_keys=True)
-        os.replace(tmp, path)
-    except OSError:
-        pass  # learning is best-effort; never break a fetch on a write error
+        directory = os.path.dirname(path) or "."
+        os.makedirs(directory, mode=0o700, exist_ok=True)
+        if using_default_path:
+            os.chmod(directory, 0o700)
+        normalized = {
+            _normalize_store_key(str(key)): value
+            for key, value in data.items()
+            if isinstance(value, dict)
+        }
+        fd, temp_path = tempfile.mkstemp(prefix=".learned.", dir=directory, text=True)
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            json.dump(
+                {"schema_version": SCHEMA_VERSION, "entries": normalized},
+                handle,
+                ensure_ascii=False,
+                indent=2,
+                sort_keys=True,
+            )
+        os.chmod(temp_path, 0o600)
+        os.replace(temp_path, path)
+        temp_path = ""
+        os.chmod(path, 0o600)
+        return None
+    except OSError as exc:
+        if temp_path:
+            try:
+                os.unlink(temp_path)
+            except OSError:
+                pass
+        return f"persistent learning save failed:{type(exc).__name__}"
 
 
 def lookup(url: str, device_class: str, path: Optional[str] = None,
@@ -136,9 +185,8 @@ def lookup(url: str, device_class: str, path: Optional[str] = None,
 
 
 def record_success(url: str, device_class: str, route: dict,
-                   path: Optional[str] = None) -> None:
+                   path: Optional[str] = None) -> Optional[str]:
     """Upsert the winning route for this host (resets the failure strike)."""
-    path = path or default_path()
     data = load(path)
     k = key_for(url, device_class)
     now = _now().isoformat()
@@ -152,23 +200,22 @@ def record_success(url: str, device_class: str, route: dict,
         "last_used": now,
         "last_success": now,
     }
-    save(_prune(data), path)
+    return save(_prune(data), path)
 
 
 def record_failure(url: str, device_class: str, penalize: bool,
-                   path: Optional[str] = None) -> None:
+                   path: Optional[str] = None) -> Optional[str]:
     """Record that the learned route did not win this run.
 
     `penalize=True` (a real block) strikes the entry and deletes it after
     EVICT_AFTER_FAILS consecutive strikes. `penalize=False` (transient / URL
     issue) just refreshes `last_used` so an actively-retried host is not
     TTL-pruned. No-op when nothing was learned for this host."""
-    path = path or default_path()
     data = load(path)
     k = key_for(url, device_class)
     entry = data.get(k)
     if not isinstance(entry, dict):
-        return
+        return None
     if penalize:
         entry["consecutive_fails"] = int(entry.get("consecutive_fails", 0)) + 1
         entry["last_used"] = _now().isoformat()
@@ -176,4 +223,4 @@ def record_failure(url: str, device_class: str, penalize: bool,
             del data[k]
     else:
         entry["last_used"] = _now().isoformat()
-    save(_prune(data), path)
+    return save(_prune(data), path)

@@ -38,8 +38,12 @@ def t_youtube_route_reports_not_installed_without_subprocess() -> None:
     def _boom(*a, **k):
         raise AssertionError("subprocess.run must not run when yt-dlp is unavailable")
     with mock.patch.object(phase0, "_ytdlp_argv", return_value=None), \
+         mock.patch("engine.safety.resolve_public_target", return_value=(object(), "public")), \
          mock.patch.object(phase0.subprocess, "run", _boom):
-        out = phase0._youtube("https://www.youtube.com/watch?v=x", timeout=5)
+        out = phase0._youtube(
+            "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            timeout=5,
+        )
     assert out["ok"] is False, out
     assert out["attempts"] and out["attempts"][-1]["note"] == "uvx not available", out["attempts"]
     print("  ✓ unavailable → uvx note, subprocess not invoked")
@@ -58,11 +62,16 @@ def t_youtube_route_uses_resolved_argv() -> None:
         return _P()
 
     with mock.patch.object(phase0, "_ytdlp_argv", return_value=["/usr/bin/uvx", "yt-dlp@2026.07.04"]), \
+         mock.patch("engine.safety.resolve_public_target", return_value=(object(), "public")), \
          mock.patch.object(phase0.subprocess, "run", _fake_run):
-        out = phase0._youtube("https://youtu.be/abc", timeout=5)
+        out = phase0._youtube("https://youtu.be/dQw4w9WgXcQ", timeout=5)
     assert out["ok"] is True, out
     assert captured["cmd"][:2] == ["/usr/bin/uvx", "yt-dlp@2026.07.04"], captured["cmd"]
-    assert captured["cmd"][2:] == ["--dump-json", "--skip-download", "https://youtu.be/abc"], captured["cmd"]
+    assert captured["cmd"][2:] == [
+        "--dump-json",
+        "--skip-download",
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    ], captured["cmd"]
     print("  ✓ resolved argv is passed through to subprocess with the yt-dlp flags")
 
 
