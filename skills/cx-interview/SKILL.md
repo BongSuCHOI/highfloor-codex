@@ -10,8 +10,8 @@ Create the minimum approved contract needed for implementation. Do not force a f
 ## Method
 
 - Use Socratic questions to expose hidden assumptions and make a vague purpose concrete; ask what the desired thing is before prescribing how to build it.
-- Diverge only across materially different ambiguity threads, then converge through restatement and explicit user approval.
-- Treat repository and external evidence as facts about the current world, not as substitutes for user product decisions.
+- For requests with multiple material surfaces, establish the top-level shape before probing one thread deeply; diverge only across materially different ambiguity threads, then converge through restatement.
+- Treat clarity as non-monotonic: later answers or evidence may reopen an earlier decision. Use repository and external evidence as facts about the current world, not as substitutes for user product decisions.
 - The interview clarifies and records intent. It does not implement the result or silently convert model assumptions into requirements.
 
 ## Hard floor
@@ -22,15 +22,16 @@ Create the minimum approved contract needed for implementation. Do not force a f
 - Keep material unknowns and conflicts visible.
 - Require user approval before treating the task contract as implementation authority.
 - Reopen approval when a proposed change alters the goal, constraints, non-goals, or observable outcomes.
+- Do not silently drop, merge, or replace a previously confirmed material item. Show the proposed reduction or substitution and obtain explicit approval; that approval does not authorize implementation.
 
 ## Workflow
 
 1. Classify the request as greenfield, brownfield, or mixed. Read the nearest project rules and relevant current state.
-2. Start a decision ledger covering goal, users or actors, constraints, non-goals, outcomes, verification, unknowns, and assumptions with provenance.
+2. Start a decision ledger covering goal, users or actors, constraints, non-goals, outcomes, verification, unknowns, and assumptions with provenance. If the request spans multiple material surfaces, enumerate the top-level shape and mark each surface active, deferred, or out of scope before deep questioning.
 3. Resolve exact facts from code, configuration, documentation, or current research. Label product hypotheses as hypotheses.
 4. Ask only questions whose answers materially change the result. Prefer the highest-impact unresolved decision and one question at a time.
 5. Draft a task contract using `references/task-contract.md`. Keep optional sections optional.
-6. Close only when no material item remains `MISSING`, `CONFLICTING`, or `BLOCKED`, then present the complete contract for explicit approval.
+6. Close only when no material item remains `MISSING`, `CONFLICTING`, or `BLOCKED` and every confirmed material item is represented or has an explicitly approved reduction or substitution. Then present the complete contract for explicit approval.
 7. After approval, recommend one exit based on scope and explain why:
    - **Implement now (Recommended)** for bounded work likely to finish in the current task.
    - **Save contract (Recommended)** when the user requested planning or execution prerequisites are missing.

@@ -42,6 +42,17 @@ evidence
 
 `INFERRED` and `DEFAULTED` never become `CONFIRMED` merely because they look safe. A user may approve them explicitly.
 
+## Coverage and reduction
+
+Use this scaffold only when the request spans multiple materially distinct surfaces.
+
+- Enumerate and confirm the top-level shape before questioning one surface in depth. Mark each surface `ACTIVE`, `DEFERRED`, or `OUT_OF_SCOPE`.
+- Use stable item IDs only when they materially improve traceability; do not impose a fixed ontology on ordinary work.
+- Account for every confirmed material item in the proposed contract. Additions and clarifications need no separate ceremony.
+- If the proposal removes, merges, or replaces a confirmed item, show the old item and its proposed removal or substitution, then obtain explicit user approval.
+- Treat readiness as non-monotonic. A later answer, contradiction, or changed fact can reopen a previously settled item.
+- Approval of a reduction or substitution changes only the contract. It does not authorize implementation.
+
 ## Readiness
 
 A contract is ready when:
@@ -49,6 +60,7 @@ A contract is ready when:
 - the goal identifies one coherent outcome;
 - constraints and non-goals expose important boundaries;
 - each required acceptance criterion is independently valuable and has a plausible verification path;
+- every confirmed material item remains represented or has an explicitly approved reduction or substitution;
 - no material entry remains `MISSING`, `CONFLICTING`, or `BLOCKED`;
 - assumptions are visible with provenance;
 - the user approves the complete contract.
