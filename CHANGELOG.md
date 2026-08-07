@@ -6,6 +6,12 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Added `CODEX_AGENTS.md` as a portable English reference for the
+  maintainer's global Codex instructions while keeping repository runtime
+  rules in `AGENTS.md`.
+
 ### Changed
 
 - Separated the README language selector from its section navigation.
