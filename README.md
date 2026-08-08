@@ -34,8 +34,9 @@
 
 Today, Highfloor contains the skills and agents I use in my own Codex setup:
 
-- **13 focused `cx-*` skills** for moments such as clarification, diagnosis,
-  research, scope control, browser work, design direction, and verification.
+- **15 focused `cx-*` skills** for clarification, diagnosis, research, scope
+  control, browser work, design direction, verification, video analysis, and
+  unfamiliar-codebase mapping.
 - **27 specialist custom agents** for focused investigation, review,
   implementation, and documentation.
 
@@ -277,8 +278,13 @@ Each skill is a focused playbook for a specific kind of situation. You can ask
 for one directly, or Codex can load it when the trigger in its `SKILL.md`
 matches the current task.
 
+Explicit invocation uses `$cx-analyze-video` or `$cx-understand-codebase`; the latter
+routes trailing action words such as `analyze`, `dashboard`, or `ask`. Highfloor
+does not install legacy `/watch` or `/understand` custom-prompt aliases.
+
 | Skill | What it does | Use it when |
 |---|---|---|
+| [`cx-analyze-video`](skills/cx-analyze-video/SKILL.md) | Aligns sampled frames with captions or explicitly authorized transcription. | You need timestamped evidence from YouTube or another public URL, a local `.mp4` or `.mov`, or a screen recording. |
 | [`cx-interview`](skills/cx-interview/SKILL.md) | Turns an unclear request into an approved Task Contract. | Important boundaries or success conditions are unclear before implementation. |
 | [`cx-unstuck`](skills/cx-unstuck/SKILL.md) | Challenges a failed approach and offers a few realistic alternatives. | The same planning or implementation strategy keeps failing or has reached a real dead end. |
 | [`cx-browser-automation`](skills/cx-browser-automation/SKILL.md) | Operates a real browser and records what happened. | The task requires navigation, forms, signed-in state, screenshots, snapshots, or traces. |
@@ -292,12 +298,17 @@ matches the current task.
 | [`cx-ultraresearch`](skills/cx-ultraresearch/SKILL.md) | Builds a careful answer from claim-relative primary evidence, counterevidence, and explicit unresolved gaps. | The user explicitly asks for deep research, a rigorous comparison, or citation-heavy evidence. |
 | [`cx-acceptance-qa`](skills/cx-acceptance-qa/SKILL.md) | Checks claimed work against explicit acceptance criteria. | A release, handoff, or formal QA decision needs `PASS`, `FAIL`, or `NOT_PROVEN`. |
 | [`cx-visual-qa`](skills/cx-visual-qa/SKILL.md) | Judges the current rendered result from visual evidence. | A changed web, mobile, terminal, or TUI surface needs a final visual verdict. |
+| [`cx-understand-codebase`](skills/cx-understand-codebase/SKILL.md) | Builds an evidence-backed architecture graph and optional interactive local dashboard. | You are onboarding, receiving a handoff, or studying the logic and architecture of an unfamiliar codebase or agent harness. |
 
-The catalog, governance, and provenance ledger are canonical:
+These catalog and governance records are canonical for all installable skills:
 
 - [CX skill catalog](skills/CX_SKILL_CATALOG.md)
 - [CX skill governance](skills/CX_SKILLS.md)
 - [Migration and provenance manifest](skills/CX_MIGRATION_MANIFEST.md)
+
+All adapted skills also record exact source pins, retained material, licenses,
+and modifications in their own `references/upstream.md` and in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Custom agents
 
@@ -465,7 +476,7 @@ highfloor-codex/
 ├── LICENSES/             bundled upstream license texts
 ├── manifest/             exact installer ownership lists
 ├── scripts/              repository and installer validation
-├── skills/               CX governance plus 13 installable skills
+├── skills/               CX governance plus 15 installable skills
 ├── AGENTS.md             contributor-facing Codex instructions
 ├── install.sh            install, update, doctor, uninstall
 ├── LICENSE               original-content license and scope
@@ -479,7 +490,14 @@ highfloor-codex/
 - macOS and Linux with POSIX `sh`
 - `curl`, `tar`, `find`, `sed`, `grep`, `diff`, `cmp`, and standard file tools
 - a Codex release that supports skills and custom agents
-- Python 3.11+ only for repository validation, not for installation
+- Python 3.11+ for repository validation and `cx-analyze-video`
+
+Optional skill-specific runtimes:
+
+- `cx-analyze-video`: `ffmpeg` and `ffprobe`; `yt-dlp` only for public URLs;
+- `cx-understand-codebase`: Node.js 22+ and `npx`; its pinned workspace packages
+  install in a source-versioned user cache on first use, never in the analyzed
+  repository or installer-managed skill source.
 
 The installer is intentionally dependency-free and does not modify
 `config.toml`, install system packages, or contact services other than GitHub
@@ -495,6 +513,10 @@ when a remote source archive is needed.
 - Uninstall uses recorded state and retains backups.
 - Skills may invoke external runtimes or browser tools when their contracts say
   so; review each skill and its provenance before use.
+- External video transcription stays disabled until the user authorizes that
+  video's audio upload and cost boundary.
+- The codebase dashboard binds to `127.0.0.1`, requires a random token, and
+  does not open automatically.
 
 Report vulnerabilities privately according to [SECURITY.md](SECURITY.md).
 
@@ -521,12 +543,15 @@ This is a mixed-license collection.
 Highfloor preserves the provenance of every materially adapted component. This
 table summarizes what each upstream contributed and why the Highfloor version
 differs. Exact source pins, retained files, licenses, and modification records
-remain in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), the
-[migration manifest](skills/CX_MIGRATION_MANIFEST.md), and each skill's
-`references/upstream*.md`.
+remain in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), each adapted
+skill's `references/upstream*.md`, and, for the `cx-*` family, the
+[migration manifest](skills/CX_MIGRATION_MANIFEST.md).
 
 | Highfloor components | Upstream | How Highfloor adapts them |
 |---|---|---|
+| `CODEX_AGENTS.md` and the maintainer's synchronized global instructions | [`multica-ai/andrej-karpathy-skills`](https://github.com/multica-ai/andrej-karpathy-skills) — MIT declared in upstream metadata | Independently words its four ideas—think before coding, simplicity, surgical scope, and goal-driven execution—inside the existing Highfloor implementation sections, without adding a duplicate runtime skill or checklist. |
+| `cx-analyze-video` | [`bradautomates/claude-video`](https://github.com/bradautomates/claude-video) — MIT | Retains its frame, caption, focus-range, deduplication, and transcription engines while replacing Claude slash commands and hooks with Codex skill routing, preflight-only setup, explicit upload consent, guarded cleanup, and evidence lanes. |
+| `cx-understand-codebase` | [`Egonex-AI/Understand-Anything`](https://github.com/Egonex-AI/Understand-Anything) — MIT | Preserves its scanner, semantic batching, graph schema, specialist prompts, incremental model, and interactive viewer while using one Codex skill with action words, exact-worktree analysis, a source-versioned runtime cache, partial-result boundaries, and local token-gated serving. |
 | `cx-interview`, `cx-acceptance-qa`, `cx-scope-check`, `cx-unstuck` | [`Q00/ouroboros`](https://github.com/Q00/ouroboros) — MIT | Preserves its clarification, acceptance, drift-checking, and reframing methods while independently rewriting them as standalone Codex skills without the Ouroboros-specific MCP, session, scoring, orchestration, or persona runtime. |
 | `cx-coding-agent-sessions`, `cx-debugging`, `cx-programming`, `cx-ultraresearch`, `cx-visual-qa` | [`code-yeongyu/oh-my-openagent`](https://github.com/code-yeongyu/oh-my-openagent) — Sustainable Use License 1.0 | Condenses, reorganizes, or adapts the original skills for Codex routing, permission boundaries, focused evidence, and Highfloor's event-driven workflow. Some upstream files remain retained or byte-identical where documented. |
 | `cx-browser-automation` | [`microsoft/playwright-cli`](https://github.com/microsoft/playwright-cli) — Apache-2.0 | Adapts browser interaction for Codex, adds local wrappers and evidence guidance, and separates browser operation from final visual judgment. `vercel-labs/agent-browser` is invoked as a runtime dependency and is not bundled. |

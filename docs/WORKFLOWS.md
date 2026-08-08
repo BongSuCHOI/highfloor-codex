@@ -132,6 +132,32 @@ silently implement fixes.
 The release verdict must distinguish locally proven behavior from external host
 state that remains `NOT_PROVEN`.
 
+## Recipe I: Video evidence
+
+1. Invoke `$cx-analyze-video` with one public URL or local video path and the
+   actual question.
+2. Begin with transcript or efficient detail for long media; focus a range when
+   a visual claim needs more coverage.
+3. Keep external transcription disabled unless the user explicitly authorizes
+   that video's audio upload and cost boundary.
+4. Inspect every reported frame and separate visual, spoken, combined, and
+   inferred claims by timestamp.
+5. Retain the marked work directory for follow-up, then remove it through the
+   bundled guarded cleanup script.
+
+## Recipe J: Unfamiliar codebase or harness
+
+1. Invoke `$cx-understand-codebase analyze <target>` against the exact requested
+   checkout or worktree.
+2. Use deterministic scanning and semantic batches before specialist analysis;
+   never infer architecture from filenames alone.
+3. Validate the assembled graph before advancing freshness metadata. Preserve a
+   partial run separately and label missing coverage `NOT_PROVEN`.
+4. Use `$cx-understand-codebase dashboard <target>` only for a complete graph. The
+   viewer remains token-gated on `127.0.0.1` and starts with `--no-open`.
+5. Reuse `ask`, `explain`, `diff`, `onboard`, or `domain` actions while checking
+   the graph against current committed and working-tree state.
+
 ## Anti-patterns
 
 - Running every skill because it exists.
@@ -144,3 +170,5 @@ state that remains `NOT_PROVEN`.
 - Using `cx-insane-search` before ordinary public web access fails.
 - Running `cx-slopslap` on any UI task without an explicit slop-removal request.
 - Re-verifying an unchanged fact with equivalent tools.
+- Treating a transcript as proof of visuals, or a graph as fresher than its
+  recorded source state.

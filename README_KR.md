@@ -37,7 +37,8 @@
 있습니다.
 
 - 요구사항 정리, 진단, 조사, 범위 관리, 브라우저 작업, 디자인 방향,
-  검증처럼 특정 상황을 맡는 **13개의 `cx-*` 스킬**
+  검증, 영상 분석과 낯선 코드베이스 구조화를 맡는 **15개의 집중된
+  `cx-*` 스킬**
 - 조사, 검토, 구현, 문서화를 각자의 전문 영역에서 수행하는
   **27개의 전문 에이전트**
 
@@ -289,8 +290,14 @@ manifest에서 이름을 제거하면 업데이트는 그 항목을 은퇴한 �
 지정할 수도 있고, 현재 작업이 `SKILL.md`에 적힌 사용 조건과 맞을 때
 Codex가 불러올 수도 있습니다.
 
+명시적으로 호출할 때는 `$cx-analyze-video` 또는 `$cx-understand-codebase`를
+사용합니다. 후자는 뒤에 `analyze`, `dashboard`, `ask` 같은 action word를
+붙여 routing합니다. Legacy `/watch`, `/understand` custom-prompt alias는
+설치하지 않습니다.
+
 | Skill | 하는 일 | 사용 시점 |
 |---|---|---|
+| [`cx-analyze-video`](skills/cx-analyze-video/SKILL.md) | Sampling frame과 caption 또는 명시적으로 승인된 transcription을 시간축으로 맞춥니다. | YouTube 등 공개 URL, 로컬 `.mp4`·`.mov`, screen recording에서 timestamp evidence가 필요할 때 사용합니다. |
 | [`cx-interview`](skills/cx-interview/SKILL.md) | 모호한 요청을 사용자가 승인한 Task Contract로 정리합니다. | 구현 전에 중요한 경계나 성공 조건이 분명하지 않을 때 사용합니다. |
 | [`cx-unstuck`](skills/cx-unstuck/SKILL.md) | 실패한 접근을 다시 검토하고 현실적인 대안을 몇 가지 제시합니다. | 같은 계획이나 구현 전략이 반복해서 실패하거나 실제 막다른 길에 도달했을 때 사용합니다. |
 | [`cx-browser-automation`](skills/cx-browser-automation/SKILL.md) | 실제 브라우저를 조작하고 일어난 일을 증거로 남깁니다. | 페이지 이동, 폼 입력, 로그인 상태, 스크린샷, snapshot 또는 trace가 필요할 때 사용합니다. |
@@ -304,12 +311,17 @@ Codex가 불러올 수도 있습니다.
 | [`cx-ultraresearch`](skills/cx-ultraresearch/SKILL.md) | claim-relative primary evidence, counterevidence와 명시적인 unresolved gap을 바탕으로 신중한 답을 만듭니다. | 사용자가 deep research, 엄밀한 비교 또는 많은 인용이 필요한 조사를 명시했을 때 사용합니다. |
 | [`cx-acceptance-qa`](skills/cx-acceptance-qa/SKILL.md) | 완료했다고 주장한 작업을 명시적인 acceptance criteria와 비교합니다. | release, handoff 또는 formal QA에 `PASS`, `FAIL`, `NOT_PROVEN` 판정이 필요할 때 사용합니다. |
 | [`cx-visual-qa`](skills/cx-visual-qa/SKILL.md) | 현재 렌더링된 결과를 시각 증거로 판정합니다. | 변경된 web, mobile, terminal 또는 TUI에 최종 시각 판정이 필요할 때 사용합니다. |
+| [`cx-understand-codebase`](skills/cx-understand-codebase/SKILL.md) | Evidence-backed architecture graph와 선택적인 interactive local dashboard를 만듭니다. | 인수인계, onboarding 또는 낯선 codebase·agent harness의 logic과 architecture를 공부할 때 사용합니다. |
 
-Canonical 문서:
+모든 설치 대상 skill의 canonical catalog와 governance 문서:
 
 - [CX skill catalog](skills/CX_SKILL_CATALOG.md)
 - [CX skill governance](skills/CX_SKILLS.md)
 - [Migration and provenance manifest](skills/CX_MIGRATION_MANIFEST.md)
+
+모든 adapted skill의 정확한 source pin, 유지한 material, license와 수정
+기록은 각 `references/upstream.md`와
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)에도 남깁니다.
 
 ## Custom agents
 
@@ -473,7 +485,7 @@ highfloor-codex/
 ├── LICENSES/             upstream license text
 ├── manifest/             installer가 소유하는 정확한 목록
 ├── scripts/              repository·installer validation
-├── skills/               CX governance와 설치 가능한 skill 13개
+├── skills/               CX governance와 설치 가능한 skill 15개
 ├── AGENTS.md             contributor용 Codex instruction
 ├── install.sh            install, update, doctor, uninstall
 ├── LICENSE               original-content license와 범위
@@ -481,6 +493,23 @@ highfloor-codex/
 ├── README_KR.md          한국어 overview
 └── THIRD_PARTY_NOTICES.md
 ```
+
+## 호환성
+
+- POSIX `sh`가 있는 macOS 또는 Linux
+- `curl`, `tar`, `find`, `sed`, `grep`, `diff`, `cmp`와 표준 file tool
+- skill과 custom agent를 지원하는 Codex release
+- repository validation과 `cx-analyze-video`용 Python 3.11+
+
+선택적인 skill별 runtime:
+
+- `cx-analyze-video`: `ffmpeg`, `ffprobe`; 공개 URL에만 `yt-dlp` 필요
+- `cx-understand-codebase`: Node.js 22+, `npx`; 고정된 workspace package는
+  첫 실행 때 분석 대상 repository나 installer-managed skill source가 아닌
+  source-versioned user cache에 설치
+
+Installer 자체는 dependency-free입니다. `config.toml`이나 system package를
+수정하지 않으며 remote source archive가 필요할 때만 GitHub에 접속합니다.
 
 ## 보안
 
@@ -490,6 +519,10 @@ highfloor-codex/
   제한됩니다.
 - 충돌 항목은 교체 전에 백업합니다.
 - 업데이트는 관련 없는 스킬과 에이전트를 삭제하지 않습니다.
+- 외부 video transcription은 사용자가 해당 영상의 audio upload와 cost
+  boundary를 승인하기 전까지 비활성화됩니다.
+- Codebase dashboard는 `127.0.0.1`에만 bind하고 random token을 요구하며
+  자동으로 열리지 않습니다.
 - 취약점은 public issue가 아니라 [SECURITY.md](SECURITY.md)의 절차로
   보고하십시오.
 
@@ -516,12 +549,15 @@ highfloor-codex/
 Highfloor는 실질적으로 가져오거나 수정한 모든 component의 출처를
 보존합니다. 아래 표는 각 upstream이 제공한 기반과 Highfloor에서 다르게
 구성한 이유를 요약합니다. 정확한 source pin, 유지한 파일, license와
-수정 기록은 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md),
-[migration manifest](skills/CX_MIGRATION_MANIFEST.md), 각 skill의
-`references/upstream*.md`에 기록되어 있습니다.
+수정 기록은 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), 각 adapted
+skill의 `references/upstream*.md`, 그리고 `cx-*` 계열의
+[migration manifest](skills/CX_MIGRATION_MANIFEST.md)에 기록되어 있습니다.
 
 | Highfloor component | Upstream | Highfloor에서 적용한 방식 |
 |---|---|---|
+| `CODEX_AGENTS.md`와 동기화된 maintainer global instruction | [`multica-ai/andrej-karpathy-skills`](https://github.com/multica-ai/andrej-karpathy-skills) — upstream metadata의 MIT 표시 | 구현 전 사고, 단순성, 수술적 범위, 목표 중심 실행이라는 네 개념을 기존 Highfloor 구현 원칙 안에 독립적인 문장으로 녹였습니다. 중복 runtime skill이나 별도 checklist는 만들지 않았습니다. |
+| `cx-analyze-video` | [`bradautomates/claude-video`](https://github.com/bradautomates/claude-video) — MIT | Frame, caption, focus range, deduplication, transcription engine은 유지합니다. Claude slash command와 hook은 Codex skill routing으로 바꾸고, preflight-only setup, 명시적 upload 승인, guarded cleanup과 evidence lane을 추가했습니다. |
+| `cx-understand-codebase` | [`Egonex-AI/Understand-Anything`](https://github.com/Egonex-AI/Understand-Anything) — MIT | Scanner, semantic batching, graph schema, specialist prompt, incremental model과 interactive viewer를 보존합니다. 하나의 Codex skill과 action word, 정확한 worktree 분석, source-versioned runtime cache, partial-result boundary와 local token-gated serving을 적용했습니다. |
 | `cx-interview`, `cx-acceptance-qa`, `cx-scope-check`, `cx-unstuck` | [`Q00/ouroboros`](https://github.com/Q00/ouroboros) — MIT | 요구사항 명료화, acceptance, drift 확인과 reframing 방법을 보존합니다. 단순 리네임이나 복사본이 아니라, Ouroboros 전용 MCP, session, scoring, orchestration과 persona runtime을 제외하고 독립 실행 가능한 Codex skill로 재작성했습니다. |
 | `cx-coding-agent-sessions`, `cx-debugging`, `cx-programming`, `cx-ultraresearch`, `cx-visual-qa` | [`code-yeongyu/oh-my-openagent`](https://github.com/code-yeongyu/oh-my-openagent) — Sustainable Use License 1.0 | 원장의 skill을 Codex routing, permission boundary, 집중된 evidence와 Highfloor의 event-driven workflow에 맞게 압축·재구성하거나 수정했습니다. 문서에 표시된 일부 upstream 파일은 그대로 유지하거나 byte-identical 상태로 보존합니다. |
 | `cx-browser-automation` | [`microsoft/playwright-cli`](https://github.com/microsoft/playwright-cli) — Apache-2.0 | Browser interaction을 Codex에 맞게 수정하고 local wrapper와 evidence 지침을 추가했으며, browser 조작과 최종 visual 판정을 분리했습니다. `vercel-labs/agent-browser`는 번들하지 않고 runtime dependency로 호출합니다. |

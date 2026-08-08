@@ -18,6 +18,10 @@ MACHINE_HOME_RE = re.compile(
     r"[A-Za-z0-9._-]+(?:/|$)",
     re.MULTILINE,
 )
+OPENAI_INTERFACE_RE = re.compile(
+    r'''^  (?P<key>display_name|short_description|default_prompt): '''
+    r'''(?P<quote>["'])(?P<value>.*)(?P=quote)$'''
+)
 
 errors: list[str] = []
 
@@ -87,6 +91,8 @@ def validate_skills() -> None:
         )
 
     for entry in entries:
+        if not entry.startswith("cx-"):
+            fail(f"skill manifest entry must use the cx- namespace: {entry!r}")
         skill_file = skills_root / entry / "SKILL.md"
         if not skill_file.is_file():
             fail(f"missing skill entry point: {skill_file.relative_to(ROOT)}")
@@ -99,6 +105,46 @@ def validate_skills() -> None:
             )
         if not frontmatter.get("description"):
             fail(f"{skill_file.relative_to(ROOT)}: missing frontmatter description")
+
+        openai_config = skill_file.parent / "agents" / "openai.yaml"
+        if not openai_config.is_file():
+            fail(f"{entry}: missing agents/openai.yaml")
+            continue
+
+        openai_lines = openai_config.read_text(encoding="utf-8").splitlines()
+        if not openai_lines or openai_lines[0] != "interface:":
+            fail(
+                f"{openai_config.relative_to(ROOT)}: "
+                "must start with an interface mapping"
+            )
+
+        interface: dict[str, str] = {}
+        for line_number, raw in enumerate(
+            openai_lines, 1
+        ):
+            match = OPENAI_INTERFACE_RE.fullmatch(raw)
+            if not match:
+                continue
+            key = match.group("key")
+            if key in interface:
+                fail(
+                    f"{openai_config.relative_to(ROOT)}:{line_number}: "
+                    f"duplicate interface key {key!r}"
+                )
+            interface[key] = match.group("value")
+
+        for key in ("display_name", "short_description", "default_prompt"):
+            if not interface.get(key, "").strip():
+                fail(
+                    f"{openai_config.relative_to(ROOT)}: missing quoted, "
+                    f"non-empty interface.{key}"
+                )
+
+        if f"${entry}" not in interface.get("default_prompt", ""):
+            fail(
+                f"{openai_config.relative_to(ROOT)}: interface.default_prompt "
+                f"must mention ${entry}"
+            )
 
 
 def validate_agents() -> None:
@@ -188,6 +234,8 @@ def validate_required_files() -> None:
 def validate_repository_hygiene() -> None:
     for path in ROOT.rglob("*"):
         relative = path.relative_to(ROOT)
+        if ".git" in relative.parts:
+            continue
         if path.is_symlink():
             fail(f"symlink committed: {relative}")
             continue

@@ -24,6 +24,7 @@ detailed triggers, workflow, scripts, and fallbacks.
 
 | Current need | Primary owner |
 |---|---|
+| Analyze a public or local video from timestamped visual and spoken evidence | `cx-analyze-video` |
 | Turn an ambiguous product, feature, or improvement request into an approved contract | `cx-interview` |
 | Reframe a repeatedly failed planning, product, or architecture strategy | `cx-unstuck` |
 | Interact with and capture a real browser | `cx-browser-automation` |
@@ -35,6 +36,7 @@ detailed triggers, workflow, scripts, and fallbacks.
 | Compare current work with an approved contract for semantic scope | `cx-scope-check` |
 | Detect and remove explicitly requested AI slop | `cx-slopslap` |
 | Perform explicitly requested deep, source-backed research | `cx-ultraresearch` |
+| Map and explore an unfamiliar codebase or agent harness | `cx-understand-codebase` |
 | Issue a formal AC, QA, release, or handoff verdict | `cx-acceptance-qa` |
 | Issue the final visual verdict for rendered UI | `cx-visual-qa` |
 
@@ -81,6 +83,23 @@ Runtime contract: [`SKILL.md`](cx-acceptance-qa/SKILL.md)
 - **Routes:** UI verdict → `cx-visual-qa`; interaction →
   `cx-browser-automation`; failure cause → `cx-debugging`; specification gap →
   `cx-interview`.
+
+### `cx-analyze-video`
+
+Runtime contract: [`SKILL.md`](cx-analyze-video/SKILL.md)
+
+- **Owns:** a timestamped answer that separates visual, spoken, combined, and
+  inferred evidence from a public URL or local video file.
+- **Trigger:** a YouTube or other public video, local media file, screen
+  recording, named moment, or comparison between what is shown and said needs
+  analysis.
+- **Non-trigger:** ordinary webpage interaction, login-gated media, or the final
+  rendered-product UI verdict.
+- **Method:** align independent frame and transcript lanes, begin with the
+  smallest useful coverage, and treat external transcription as an explicit
+  per-video privacy and cost boundary.
+- **Routes:** page/session interaction → `cx-browser-automation`; final product
+  UI verdict → `cx-visual-qa`; runtime failure cause → `cx-debugging`.
 
 ### `cx-browser-automation`
 
@@ -237,6 +256,23 @@ Runtime contract: [`SKILL.md`](cx-ultraresearch/SKILL.md)
   rendered state → `cx-browser-automation`; apply the evidence contract in
   context for high-stakes or citation-heavy work, but materialize durable
   artifacts only when requested.
+
+### `cx-understand-codebase`
+
+Runtime contract: [`SKILL.md`](cx-understand-codebase/SKILL.md)
+
+- **Owns:** a reusable evidence-backed architecture knowledge graph, learning
+  path, and optional token-gated local interactive dashboard.
+- **Trigger:** repository onboarding, handoff, unfamiliar codebase study, agent
+  harness architecture tracing, graph refresh, change impact, or a graph-backed
+  explanation is requested.
+- **Non-trigger:** a narrow source lookup, runtime root-cause diagnosis, or a
+  formal acceptance verdict.
+- **Method:** establish deterministic file/import structure before semantic
+  synthesis, preserve partial work without advancing freshness, and verify
+  decisive graph claims against current source.
+- **Routes:** exact prior-task recovery → `cx-coding-agent-sessions`; runtime
+  cause → `cx-debugging`; formal completion proof → `cx-acceptance-qa`.
 
 ### `cx-unstuck`
 

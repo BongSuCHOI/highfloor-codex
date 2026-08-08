@@ -11,9 +11,31 @@ The project follows [Semantic Versioning](https://semver.org/).
 - Added `CODEX_AGENTS.md` as a portable English reference for the
   maintainer's global Codex instructions while keeping repository runtime
   rules in `AGENTS.md`.
+- Added `cx-analyze-video`, adapted from `bradautomates/claude-video`, for
+  timestamp-aligned frame and caption analysis with explicit external-upload
+  consent and guarded cleanup.
+- Added `cx-understand-codebase`, adapted from `Egonex-AI/Understand-Anything`,
+  with deterministic scanning, an evidence-backed architecture graph, and a
+  token-gated local interactive dashboard.
 
 ### Changed
 
+- Integrated the four `multica-ai/andrej-karpathy-skills` guidance concepts
+  into the existing implementation sections of `CODEX_AGENTS.md` and the
+  maintainer's synchronized global instructions without adding duplicate rules.
+- Standardized imported Claude slash-command surfaces on Codex skill invocation:
+  `$cx-analyze-video` and `$cx-understand-codebase` with trailing action words.
+- Canonicalized both new skills under the `cx-*` namespace before release;
+  their temporary staging names have no compatibility aliases.
+- Kept `cx-understand-codebase` runtime artifacts out of installer-managed skill
+  source by preparing its pinned workspace in a source-versioned user cache.
+- Excluded persistent `.ua/` and legacy `.understand-anything/` artifacts from
+  codebase scans so previous analysis cannot become source evidence.
+- Excluded local `.git` metadata from repository hygiene scanning while keeping
+  generated artifacts and machine-specific paths in repository content blocked.
+- Strengthened repository validation for the `cx-*` namespace,
+  `agents/openai.yaml`, exact catalog cards, live inventory counts, and
+  per-skill provenance coverage.
 - Separated the README language selector from its section navigation.
 - Strengthened `cx-interview` with conditional multi-surface coverage,
   non-monotonic readiness, and explicit approval for removing or substituting

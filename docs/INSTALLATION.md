@@ -100,6 +100,29 @@ explicitly pass that path through `--skills-dir` or
 `HIGHFLOOR_SKILLS_DIR`. If your Codex build uses another location, override it
 explicitly.
 
+## Skill-specific runtimes
+
+The Highfloor installer copies skill source; it does not install system or
+project dependencies.
+
+- `cx-analyze-video` requires Python 3.11+, `ffmpeg`, and `ffprobe`. Public URLs
+  also require `yt-dlp`; local video files do not. Its setup script reports
+  missing binaries and suggestions but never runs an installer.
+- `cx-understand-codebase` requires Node.js 22+ and `npx`. On first use, its
+  runtime wrapper resolves pinned `pnpm@10.6.2` packages from the vendored
+  frozen lockfile into
+  `${XDG_CACHE_HOME:-$HOME/.cache}/highfloor/cx-understand-codebase/<revision>`.
+  It never adds packages to the analyzed repository or installer-managed skill
+  source. Set `HIGHFLOOR_UNDERSTAND_RUNTIME_DIR` to an explicit absolute path
+  when a different cache location is required.
+
+The installer does not own or remove this optional runtime cache. Run
+`<skill>/scripts/prepare-runtime.sh path` to resolve the exact active path before
+performing a separate cache cleanup.
+
+Network, registry, cache, and build failures remain explicit runtime errors.
+They are not treated as proof that Node.js or another dependency is absent.
+
 ## Ownership boundary
 
 Only entries in these files are managed:

@@ -91,16 +91,54 @@ def check_catalogs_and_provenance() -> None:
     skill_catalog = read("skills/CX_SKILL_CATALOG.md")
     migration_manifest = read("skills/CX_MIGRATION_MANIFEST.md")
     agent_catalog = read("docs/AGENT_CATALOG.md")
+    third_party_notices = read("THIRD_PARTY_NOTICES.md")
+
+    catalog_cards = sorted(
+        re.findall(r"^### `(cx-[^`]+)`$", skill_catalog, re.MULTILINE)
+    )
+    if catalog_cards != skills:
+        fail(
+            "skills/CX_SKILL_CATALOG.md card set must equal skill manifest: "
+            f"cards={catalog_cards!r}, manifest={skills!r}"
+        )
+
+    inventory_match = re.search(
+        r"^## 2\. Live inventory$(?P<body>.*?)^## 3\.",
+        migration_manifest,
+        re.MULTILINE | re.DOTALL,
+    )
+    if not inventory_match:
+        fail("skills/CX_MIGRATION_MANIFEST.md: missing live inventory section")
+        live_inventory: list[str] = []
+    else:
+        inventory_body = inventory_match.group("body")
+        live_inventory = re.findall(
+            r"^- `(cx-[^`]+)`$", inventory_body, re.MULTILINE
+        )
+        count_match = re.search(
+            r"Current live `cx-\*` skills: (?P<count>\d+)\.",
+            inventory_body,
+        )
+        if not count_match or int(count_match.group("count")) != len(skills):
+            fail(
+                "skills/CX_MIGRATION_MANIFEST.md: live inventory count "
+                f"must equal {len(skills)}"
+            )
+    if live_inventory != skills:
+        fail(
+            "skills/CX_MIGRATION_MANIFEST.md live inventory must equal skill "
+            f"manifest: inventory={live_inventory!r}, manifest={skills!r}"
+        )
 
     for skill in skills:
         skill_root = ROOT / "skills" / skill
         provenance = sorted((skill_root / "references").glob("upstream*.md"))
         if not provenance:
             fail(f"{skill}: missing references/upstream*.md provenance record")
-        if f"`{skill}`" not in skill_catalog:
-            fail(f"{skill}: missing from skills/CX_SKILL_CATALOG.md")
-        if f"`{skill}`" not in migration_manifest:
-            fail(f"{skill}: missing from skills/CX_MIGRATION_MANIFEST.md")
+        if f"| `{skill}` |" not in migration_manifest:
+            fail(f"{skill}: missing provenance row in skills/CX_MIGRATION_MANIFEST.md")
+        if f"`{skill}`" not in third_party_notices:
+            fail(f"{skill}: missing from THIRD_PARTY_NOTICES.md")
 
     for agent_file in agents:
         agent = Path(agent_file).stem

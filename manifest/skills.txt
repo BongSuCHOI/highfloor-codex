@@ -1,4 +1,5 @@
 cx-acceptance-qa
+cx-analyze-video
 cx-browser-automation
 cx-coding-agent-sessions
 cx-debugging
@@ -9,5 +10,6 @@ cx-programming
 cx-scope-check
 cx-slopslap
 cx-ultraresearch
+cx-understand-codebase
 cx-unstuck
 cx-visual-qa

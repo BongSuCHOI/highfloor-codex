@@ -22,7 +22,7 @@ This document is a portable English copy of the maintainer's global Codex instru
 ## 1. Before Implementation
 
 - Inspect the current state first.
-- Ask only when ambiguity materially changes the result. For safe, reversible details that do not affect the outcome, state a reasonable assumption and proceed.
+- When multiple plausible interpretations would materially change the result, surface them instead of choosing silently. Ask only for the unresolved boundary; for safe, reversible details that do not affect the outcome, state a reasonable assumption and proceed.
 - Briefly surface a simpler solution or an important trade-off when one exists.
 - Do not install dependencies automatically into the system or project environment. Pinned isolated `uv`, `uvx`, and `npx` execution explicitly defined by a skill is allowed.
 - Retry once with `UV_CACHE_DIR=/tmp/codex-uv-cache` only when the default `uv` cache fails because of sandbox permissions.
@@ -30,7 +30,7 @@ This document is a portable English copy of the maintainer's global Codex instru
 
 ## 2. Simplicity and Directness
 
-- Choose the simplest implementation that completely satisfies the current requirements. Do not add unrequested features, configurability, or future extension points.
+- Choose the simplest implementation that completely satisfies the current requirements. If the result is materially longer or more complex than the problem warrants, simplify it before handoff. Do not add unrequested features, configurability, or future extension points.
 - The default budget for new abstractions is zero. Add one only when actual duplication, trust-boundary validation, or complex domain semantics justify it; otherwise keep logic near its use site.
 - Do not preserve backward compatibility unless the user request, project SSOT, generated contract, or confirmed live usage requires it. Remove dead paths instead of adding unnecessary compatibility layers, fallbacks, or migrations.
 - Build the smallest end-to-end vertical slice first, then add only the needed behavior on top of a working result.
@@ -40,13 +40,13 @@ This document is a portable English copy of the maintainer's global Codex instru
 
 ## 3. Minimal Change Scope
 
-- Modify only what directly serves the request and preserve the user's existing changes.
+- Every changed line must trace to the request, its governing contract, or cleanup made necessary by the change. Preserve the user's existing changes.
 - Preserve existing style and structure. Clean up only unused code and retired paths created by the current change.
 - Do not fix unrelated problems; mention them only when they affect the current work.
 
 ## 4. Execution and Verification
 
-- Match success criteria to the user request, SSOT, and change risk. Stop verification when those criteria are met.
+- For multi-step work, translate the request, SSOT, and change risk into observable success criteria and a short verification-bound plan. Iterate until those criteria are met or the remainder is explicitly `NOT_PROVEN`; stop verification once sufficient evidence proves them.
 - For every new abstraction in the diff, verify its responsibility, rationale, actual call sites, and evidence. Remove or inline it if any item is missing.
 - Select relevant type checks, lint, formatting, builds, and existing tests in proportion to risk. For small documentation or configuration changes, targeted searches and formatting checks are enough. Run full builds, full test suites, and browser QA only when the change requires them.
 - Do not add test code unless requested by the user or required by the project SSOT or acceptance contract.

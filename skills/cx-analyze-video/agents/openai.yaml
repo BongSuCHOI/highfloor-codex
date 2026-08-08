@@ -1,0 +1,4 @@
+interface:
+  display_name: "Analyze Video"
+  short_description: "Analyze video frames and transcripts"
+  default_prompt: "Use $cx-analyze-video to analyze this video with timestamped evidence."

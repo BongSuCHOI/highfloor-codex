@@ -30,7 +30,7 @@ runtime directories.
 ## Source-to-runtime mapping
 
 ```text
-skills/cx-*/  ───────────────→ $CODEX_HOME/skills/cx-*
+skills/*/     ───────────────→ $CODEX_HOME/skills/*
 agents/*.toml ───────────────→ $CODEX_HOME/agents/*.toml
 
 manifest/*.txt
@@ -77,7 +77,7 @@ how they should be judged.
 |---|---|
 | Repository contribution rules | root `AGENTS.md`, `CONTRIBUTING.md` |
 | Release procedure | `docs/RELEASING.md` |
-| CX family architecture and migration | `skills/CX_SKILLS.md` |
+| CX family architecture and migration only | `skills/CX_SKILLS.md` |
 | Runtime behavior | each `SKILL.md` or agent TOML |
 | Distribution ownership | `manifest/*.txt`, `install.sh` |
 | License and provenance | `LICENSE`, `THIRD_PARTY_NOTICES.md`, per-skill references |
@@ -95,3 +95,12 @@ Names are public interfaces:
 Runtime contracts may evolve compatibly when triggers, permission boundaries,
 and owned artifacts remain stable. Material behavior changes belong in the
 changelog.
+
+Skill-specific runtime ownership remains explicit. `cx-analyze-video` uses host
+`ffmpeg`/`ffprobe` and URL-only `yt-dlp`; external transcription is an explicit
+per-video privacy and cost boundary. `cx-understand-codebase` vendors its pinned
+source and lockfile in the skill, prepares resolved packages in a
+source-versioned user cache, and writes only `.ua/` or an existing legacy
+`.understand-anything/` directory in the analyzed target. Runtime artifacts
+therefore do not mutate either the analyzed repository or installer-managed
+skill source.
