@@ -22,4 +22,11 @@ Do not reproduce third-party logos, proprietary illustrations, brand copy, hidde
 - When working from a live URL, capture only the pages, breakpoints and states relevant to the requested surface.
 - Distinguish observed facts from inferred behavior.
 
+Before a screenshot or generated concept directs implementation, resolve the
+first-party semantic order, region responsibilities, scroll ownership,
+constraints and responsive transformation. A reference may propose those
+decisions but cannot silently override an active project contract. A generated
+image demonstrates a visual possibility; it does not prove usability,
+accessibility, brand fit or implementation feasibility.
+
 The extracted contract should be detailed enough to implement without repeatedly reopening every reference.

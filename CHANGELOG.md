@@ -20,6 +20,10 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Strengthened `cx-design-director` and `cx-visual-qa` with independently
+  worded layout ownership, interaction-continuity, stress-coverage and visual
+  claim boundaries after a research-only review of `changeroa/StyleGallery`;
+  no StyleGallery corpus, CLI or MCP is bundled.
 - Integrated the four `multica-ai/andrej-karpathy-skills` guidance concepts
   into the existing implementation sections of `CODEX_AGENTS.md` and the
   maintainer's synchronized global instructions without adding duplicate rules.

@@ -48,7 +48,7 @@ Relationships follow the licensing governance in `CX_SKILLS.md`.
 | `cx-browser-automation` | `microsoft/playwright-cli`; runtime: `vercel-labs/agent-browser@0.29.1` | Playwright commit `NOT_PROVEN`; agent-browser source not bundled | `modified derivative`; `runtime invocation` | Apache-2.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-coding-agent-sessions` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/coding-agent-sessions` | source archive `4.14.0`; commit `NOT_PROVEN` | `modified derivative` with retained byte-identical files | Sustainable Use License 1.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-debugging` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/debugging` | source archive `4.14.0`; commit `NOT_PROVEN` | `modified derivative` | Sustainable Use License 1.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
-| `cx-design-director` | current local references; optional `ibelick/ui-skills@0.2.4` | external CLI content not bundled | original content; `runtime invocation` | original content license; UI Skills MIT | `references/upstream.md` |
+| `cx-design-director` | current local references; research: `changeroa/StyleGallery`; optional `ibelick/ui-skills@0.2.4` | StyleGallery `e67b440147970c5d4f5b83f922d2593e12d09e74`; external content not bundled | original content; `research reference`; `runtime invocation` | original content license; StyleGallery license `NOT_PROVEN`; UI Skills MIT | `references/upstream.md` |
 | `cx-insane-search` | `fivetaku/insane-search`; method reference: `fivetaku/insane-research` | insane-search snapshot `NOT_PROVEN`; insane-research `68f7e59168a9c9b0a586bd4122cb7a229e119d9c` | `modified derivative`; engine and tests retained; independently worded retrieval-evidence adaptation | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt`, `references/LICENSE.insane-research.txt` |
 | `cx-interview` | `Q00/ouroboros` | `2dec0dbd01bb5b2243ea138af9d91f3583b92c5d` | `independently worded` | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-programming` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/programming` | source archive `4.14.0`; commit `NOT_PROVEN` | `modified derivative` | Sustainable Use License 1.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
@@ -67,7 +67,7 @@ Distribution boundary:
 - `oh-my-openagent` derivatives may be distributed only free of charge for non-commercial purposes and must retain the Sustainable Use License terms and prominent modification notice.
 - `code-yeongyu/lazycodex` and `Yeachan-Heo/gajae-code` remain research/comparison references, not current redistribution sources.
 
-## 4. 2026-08-09 video and codebase-analysis additions
+## 4. 2026-08-09 additions and design research refresh
 
 Added:
 
@@ -97,6 +97,14 @@ and one internal import edge.
 Public-URL download remained `NOT_PROVEN` on the validation host because
 `yt-dlp` was absent; setup stopped with an install suggestion and ran no
 installer.
+
+StyleGallery was reviewed at
+`e67b440147970c5d4f5b83f922d2593e12d09e74` as a research-only source for
+layout responsibility, motion continuity and visual-evidence boundaries.
+Highfloor added independently worded refinements to the existing
+`cx-design-director` and `cx-visual-qa` owners. It did not import the pattern
+corpus, CLI, MCP, governance runtime or visual defaults. Redistribution rights
+remain `NOT_PROVEN`, so no StyleGallery source is bundled.
 
 ## 5. 2026-07-30 guarded retrieval and research composition
 
