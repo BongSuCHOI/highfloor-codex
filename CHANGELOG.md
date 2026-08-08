@@ -20,6 +20,10 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Added a conditional Art Direction Loop to `cx-design-director` for producing
+  and converging on a few materially distinct, feasible visual directions
+  without imposing exploration on restoration, small polish or already-decided
+  first-party systems.
 - Strengthened `cx-design-director` and `cx-visual-qa` with independently
   worded layout ownership, interaction-continuity, stress-coverage and visual
   claim boundaries after a research-only review of `changeroa/StyleGallery`;

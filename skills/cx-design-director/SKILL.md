@@ -14,12 +14,19 @@ Establish a coherent first-party UI contract. Existing project rules and compone
 3. Greenfield UI: choose a small, concrete reference set and define the first-party contract before broad implementation.
 4. Concrete screenshot or URL: extract tokens, geometry, component anatomy, states and responsive intent; do not copy third-party assets or corpus text.
 
+Use the optional art-direction branch only when the user requests a new visual
+direction, a broad redesign needs meaningful alternatives, or a greenfield
+product lacks a sufficient first-party visual contract. Skip it when the active
+contract already determines the direction, a selected reference is already
+approved, or the task is restoration or small polish.
+
 Load only the matching reference:
 
 - Design tokens, components and `DESIGN.md`: `references/design-system-contract.md`
 - Page, flow and responsive structure: `references/product-ui-decisions.md`
 - Korean/CJK and mixed-script type: `references/cjk-typography.md`
 - Screenshot, URL or inspiration extraction: `references/reference-extraction.md`
+- Visual-direction exploration and convergence: `references/art-direction.md`
 - Intentional exceptions: `references/design-debt.md`
 - Motion behavior: `references/motion.md`
 
@@ -38,3 +45,7 @@ Prefer one selected skill; use two only for clearly independent concerns. Treat 
 ## Output and completion
 
 Translate selected inputs into first-party tokens, layout grammar, component anatomy, states, motion, responsive behavior, accessibility constraints and accepted debt. Update `DESIGN.md` only when these reusable rules change. Route rendered verification to `$cx-visual-qa` and browser interaction to `$cx-browser-automation`.
+
+When the art-direction branch is used, converge on one feasible direction
+before broad implementation. Keep user judgment at a material visual-identity
+boundary unless the user has explicitly delegated that choice.

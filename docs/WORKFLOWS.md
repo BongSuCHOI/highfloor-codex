@@ -60,6 +60,9 @@ rendered visual verdict, not runtime cause.
 
 1. Use `cx-design-director` to establish the direction from the existing
    design system and first-party references.
+   Use its optional art-direction branch only when a new visual identity,
+   meaningful alternatives, or a missing greenfield direction requires it;
+   converge on one feasible direction before broad implementation.
 2. Use `cx-browser-automation` only when the current product must be observed
    or operated in a browser.
 3. Implement the approved direction.
