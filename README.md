@@ -228,8 +228,8 @@ less install.sh
 For a reproducible install, pin a release:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/BongSuCHOI/highfloor-codex/v0.1.0/install.sh \
-  | HIGHFLOOR_REF=v0.1.0 sh
+curl -fsSL https://raw.githubusercontent.com/BongSuCHOI/highfloor-codex/v0.2.0/install.sh \
+  | HIGHFLOOR_REF=v0.2.0 sh
 ```
 
 ### What it changes
@@ -619,6 +619,6 @@ manifest that excludes Sustainable Use License material.
 
 ## Status
 
-`0.1.0` is the first public release. Interfaces may still evolve before
-`1.0.0`, but names and migration behavior follow semantic versioning from this
-first tagged release.
+`0.2.0` is the current release; `0.1.0` was the first public release.
+Interfaces may still evolve before `1.0.0`, but names and migration behavior
+follow semantic versioning from the first tagged release.

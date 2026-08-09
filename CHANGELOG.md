@@ -6,6 +6,13 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-10
+
+This is a compatible minor release from `0.1.0`. It adds two skills without
+removing or renaming existing managed skills or agents. Existing installations
+can update in place; global-instruction synchronization remains optional and
+conflict-aware.
+
 ### Added
 
 - Added `CODEX_AGENTS.md` as a portable English reference for the

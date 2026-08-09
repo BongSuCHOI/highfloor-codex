@@ -19,7 +19,7 @@ Review-first:
 ```sh
 git clone https://github.com/BongSuCHOI/highfloor-codex.git
 cd highfloor-codex
-git checkout v0.1.0
+git checkout v0.2.0
 less install.sh
 ./install.sh
 ```
@@ -27,8 +27,8 @@ less install.sh
 Pinned remote:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/BongSuCHOI/highfloor-codex/v0.1.0/install.sh \
-  | HIGHFLOOR_REF=v0.1.0 sh
+curl -fsSL https://raw.githubusercontent.com/BongSuCHOI/highfloor-codex/v0.2.0/install.sh \
+  | HIGHFLOOR_REF=v0.2.0 sh
 ```
 
 Latest remote:

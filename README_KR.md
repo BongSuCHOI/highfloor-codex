@@ -241,8 +241,8 @@ less install.sh
 재현 가능한 설치에는 릴리스 버전을 고정합니다.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/BongSuCHOI/highfloor-codex/v0.1.0/install.sh \
-  | HIGHFLOOR_REF=v0.1.0 sh
+curl -fsSL https://raw.githubusercontent.com/BongSuCHOI/highfloor-codex/v0.2.0/install.sh \
+  | HIGHFLOOR_REF=v0.2.0 sh
 ```
 
 ### 설치되는 위치
@@ -625,6 +625,6 @@ Sustainable Use License 1.0은 OSI-approved open-source license가 아니므로,
 
 ## 상태
 
-`0.1.0`은 첫 public release입니다. `1.0.0` 이전에는 interface가 발전할
-수 있지만, name과 migration behavior는 이 첫 tag부터 semantic
-versioning을 따릅니다.
+`0.2.0`이 현재 release이며 `0.1.0`은 첫 public release입니다. `1.0.0`
+이전에는 interface가 발전할 수 있지만, name과 migration behavior는 첫
+tag부터 semantic versioning을 따릅니다.
