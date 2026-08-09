@@ -140,6 +140,27 @@ def validate_skills() -> None:
                     f"non-empty interface.{key}"
                 )
 
+        display_name = interface.get("display_name", "")
+        if display_name and not display_name.startswith("CX "):
+            fail(
+                f"{openai_config.relative_to(ROOT)}: interface.display_name "
+                "must start with 'CX '"
+            )
+
+        for key in ("display_name", "short_description"):
+            if not interface.get(key, "").isascii():
+                fail(
+                    f"{openai_config.relative_to(ROOT)}: interface.{key} "
+                    "must use ASCII English UI text"
+                )
+
+        short_description = interface.get("short_description", "")
+        if short_description and not 25 <= len(short_description) <= 64:
+            fail(
+                f"{openai_config.relative_to(ROOT)}: "
+                "interface.short_description must be 25-64 characters"
+            )
+
         if f"${entry}" not in interface.get("default_prompt", ""):
             fail(
                 f"{openai_config.relative_to(ROOT)}: interface.default_prompt "

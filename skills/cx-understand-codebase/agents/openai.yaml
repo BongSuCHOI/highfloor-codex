@@ -1,4 +1,4 @@
 interface:
-  display_name: "Understand Codebase"
+  display_name: "CX Understand Codebase"
   short_description: "Map and explore unfamiliar codebases"
   default_prompt: "Use $cx-understand-codebase to map this repository and open its interactive architecture dashboard."
