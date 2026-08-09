@@ -238,14 +238,24 @@ curl -fsSL https://raw.githubusercontent.com/BongSuCHOI/highfloor-codex/v0.1.0/i
 |---|---|
 | Skills | `${CODEX_HOME:-$HOME/.codex}/skills` |
 | Custom agents | `${CODEX_HOME:-$HOME/.codex}/agents` |
+| Portable global instructions | `${CODEX_HOME:-$HOME/.codex}/AGENTS.md` |
 | Install state and backups | `${CODEX_HOME:-$HOME/.codex}/highfloor-codex` |
 
 With the default `CODEX_HOME`, skills go to `~/.codex/skills` and agents go to
 `~/.codex/agents`. The state directory is not loaded as a skill or agent. It
 records the installed version and source ref, the two destinations, and the
 exact managed manifests used by update, `doctor`, and uninstall. Timestamped
-backups appear there only when a managed entry is replaced, retired, or
-removed.
+backups remain there when a managed entry is replaced, retired, or removed.
+
+When global `AGENTS.md` is absent, the installer copies `CODEX_AGENTS.md` into
+place. When a different file already exists, the default `ask` mode offers an
+interactive replacement. An accepted conflict is backed up temporarily, the
+new copy is verified against `CODEX_AGENTS.md`, and the backup is then deleted.
+If copying or verification fails, the backup remains for recovery. Without a
+terminal, the installer preserves the existing file. Use
+`--global-instructions replace` for explicit non-interactive replacement or
+`--global-instructions keep` to disable synchronization. This optional file is
+not checked by `doctor` or removed by `uninstall`.
 
 Install and update use the same reconciliation. Every name in the selected
 release's manifest is compared with the installed copy. A changed copy is
@@ -256,6 +266,10 @@ does **not** preserve the local copy as unmanaged content, and the current
 installer has no per-entry opt-out. Keep local variants in a fork or under a
 different namespace. Entries that Highfloor has never managed remain
 untouched.
+
+The comparison unit is one complete managed skill directory or one custom-agent
+TOML file. If any file inside a skill differs, update backs up and replaces that
+whole skill directory; it does not patch only the changed files within it.
 
 See
 [Installation and updates](docs/INSTALLATION.md) for path overrides, offline
@@ -268,6 +282,13 @@ installation, update behavior, and recovery.
 ./install.sh doctor
 ./install.sh update --dry-run
 ./install.sh uninstall
+```
+
+Global-instruction choices:
+
+```sh
+./install.sh update --global-instructions keep
+./install.sh update --global-instructions replace
 ```
 
 Restart Codex after install, update, or uninstall so discovery state refreshes.
@@ -582,7 +603,8 @@ manifest that excludes Sustainable Use License material.
 - Workflows are examples to compose when useful, not stages every task must
   pass through.
 - The installer manages only the skills and agents listed in this repository.
-  Optional skill runtimes remain separate.
+  Optional global-instruction synchronization and skill runtimes remain outside
+  `doctor` and `uninstall` ownership.
 - Model availability depends on the user's Codex account and product surface.
 - Public-content tools stop at login, paywall, CAPTCHA, private-network, and
   permission boundaries.

@@ -251,14 +251,25 @@ curl -fsSL https://raw.githubusercontent.com/BongSuCHOI/highfloor-codex/v0.1.0/i
 |---|---|
 | 스킬 | `${CODEX_HOME:-$HOME/.codex}/skills` |
 | 전문 에이전트 | `${CODEX_HOME:-$HOME/.codex}/agents` |
+| Portable global instruction | `${CODEX_HOME:-$HOME/.codex}/AGENTS.md` |
 | 설치 상태와 백업 | `${CODEX_HOME:-$HOME/.codex}/highfloor-codex` |
 
 기본 `CODEX_HOME`을 사용하면 스킬은 `~/.codex/skills`, 에이전트는
 `~/.codex/agents`에 설치됩니다. 상태 디렉터리는 Codex가 불러오는
 스킬이나 에이전트가 아닙니다. 설치한 버전과 source ref, 두 설치 경로,
 업데이트·`doctor`·제거에서 사용할 정확한 관리 목록을 기록합니다. 관리
-항목을 교체하거나 은퇴시키거나 제거할 때만 이 안에 시간별 백업이
-생깁니다.
+항목을 교체하거나 은퇴시키거나 제거하면 시간별 백업이 이 안에
+남습니다.
+
+Global `AGENTS.md`가 없으면 installer가 `CODEX_AGENTS.md`를 복사합니다.
+다른 파일이 이미 있으면 기본 `ask` mode에서 교체 여부를 묻고, 승인된
+충돌 파일을 임시 백업합니다. 새 사본이 `CODEX_AGENTS.md`와 같은지
+검증한 뒤 임시 백업을 삭제하며, 복사나 검증에 실패하면 복구용으로
+남깁니다. Terminal이 없는 실행에서는 기존 파일을 보존합니다. 명시적인
+non-interactive 교체에는
+`--global-instructions replace`, 동기화 비활성화에는
+`--global-instructions keep`을 사용합니다. 이 선택 파일은 `doctor`가
+검사하거나 `uninstall`이 제거하지 않습니다.
 
 설치와 업데이트는 같은 방식으로 동작합니다. 선택한 릴리스의 manifest에
 있는 모든 이름을 설치된 사본과 비교합니다. 내용이 달라졌다면 먼저
@@ -270,6 +281,11 @@ manifest에서 이름을 제거하면 업데이트는 그 항목을 은퇴한 �
 사용해야 합니다. Highfloor가 한 번도 관리하지 않은 다른 스킬과
 에이전트는 건드리지 않습니다.
 
+비교 단위는 하나의 완전한 managed skill directory 또는 하나의 custom
+agent TOML 파일입니다. Skill 내부 파일 하나라도 다르면 update는 해당
+skill directory 전체를 백업하고 교체하며, 바뀐 내부 파일만 patch하지는
+않습니다.
+
 경로 지정, 오프라인 설치, 업데이트와 복구 방법은
 [설치와 업데이트](docs/INSTALLATION.md)를 참고하십시오.
 
@@ -280,6 +296,13 @@ manifest에서 이름을 제거하면 업데이트는 그 항목을 은퇴한 �
 ./install.sh doctor
 ./install.sh update --dry-run
 ./install.sh uninstall
+```
+
+Global instruction 선택:
+
+```sh
+./install.sh update --global-instructions keep
+./install.sh update --global-instructions replace
 ```
 
 설치·업데이트·제거 후에는 Codex를 재시작해 검색 상태를 갱신하십시오.
@@ -587,8 +610,8 @@ Sustainable Use License 1.0은 OSI-approved open-source license가 아니므로,
 - 워크플로는 유용할 때 조합하는 예시이며, 모든 작업이 거쳐야 하는
   단계가 아닙니다.
 - 설치 프로그램은 이 저장소의 manifest에 적힌 스킬과 에이전트만
-  관리합니다. 선택 기능에 필요한 별도 실행 환경은 자동 설치하지
-  않습니다.
+  관리합니다. 선택적인 global instruction 동기화와 skill runtime은
+  `doctor`와 `uninstall` 소유권 밖에 있습니다.
 - 사용할 수 있는 모델은 Codex 계정과 제품 환경에 따라 달라집니다.
 - 공개 콘텐츠 도구는 로그인, paywall, CAPTCHA, 사설 네트워크와 권한
   경계에서 멈춥니다.

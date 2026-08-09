@@ -49,6 +49,12 @@ trust-boundary prohibitions short and explicit.
 
 - The installer owns only entries listed in `manifest/skills.txt` and
   `manifest/agents.txt`.
+- Optional synchronization from `CODEX_AGENTS.md` to `$CODEX_HOME/AGENTS.md`
+  is outside the managed lifecycle. Install it when absent; replace an existing
+  regular file only after interactive confirmation or an explicit replace
+  option, use a temporary backup until the replacement is verified, preserve
+  it without a terminal, and never remove or judge it through `uninstall` or
+  `doctor`.
 - It must preserve unrelated user skills and agents.
 - Replaced or removed managed entries must be backed up first.
 - Destination paths must be explicit, validated, and overrideable.

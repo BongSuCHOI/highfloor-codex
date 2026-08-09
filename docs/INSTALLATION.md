@@ -56,6 +56,7 @@ installation and later reconciliation from drifting into different behavior.
 --ref BRANCH_OR_TAG_OR_COMMIT
 --skills-dir PATH
 --agents-dir PATH
+--global-instructions ask|replace|keep
 --dry-run
 -h, --help
 ```
@@ -76,6 +77,7 @@ curl -fsSL https://raw.githubusercontent.com/BongSuCHOI/highfloor-codex/main/ins
 | `HIGHFLOOR_REF` | Remote branch, tag, or commit | `main` |
 | `HIGHFLOOR_SKILLS_DIR` | Explicit skills destination | `$CODEX_HOME/skills` |
 | `HIGHFLOOR_AGENTS_DIR` | Explicit agents destination | `$CODEX_HOME/agents` |
+| `HIGHFLOOR_GLOBAL_INSTRUCTIONS` | Global instruction policy: `ask`, `replace`, or `keep` | `ask` |
 | `HIGHFLOOR_STATE_DIR` | Install state and backup root | `$CODEX_HOME/highfloor-codex` |
 
 Example with a fork:
@@ -92,6 +94,7 @@ The installer uses one predictable Codex root:
 ```text
 skills: $CODEX_HOME/skills
 agents: $CODEX_HOME/agents
+optional instructions: $CODEX_HOME/AGENTS.md
 ```
 
 With the default `CODEX_HOME`, those paths are `~/.codex/skills` and
@@ -99,6 +102,44 @@ With the default `CODEX_HOME`, those paths are `~/.codex/skills` and
 explicitly pass that path through `--skills-dir` or
 `HIGHFLOOR_SKILLS_DIR`. If your Codex build uses another location, override it
 explicitly.
+
+## Optional global instructions
+
+`CODEX_AGENTS.md` is the portable repository source for Codex global
+instructions. Install and update handle `$CODEX_HOME/AGENTS.md` according to
+`--global-instructions`:
+
+- `ask` (default): install when the target is absent; when a different regular
+  file exists, ask through the controlling terminal before replacement;
+- `replace`: install or replace without prompting, using a temporary backup for
+  an existing regular file;
+- `keep`: do not create or change the target.
+
+An identical target is left alone. In default `ask` mode, a non-interactive
+conflict preserves the existing file and prints the explicit opt-in command.
+Symlinks and other non-regular targets are preserved in `ask` mode and rejected
+in `replace` mode.
+
+Examples:
+
+```sh
+./install.sh update --global-instructions keep
+./install.sh update --global-instructions replace
+```
+
+For a pipeline:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/BongSuCHOI/highfloor-codex/main/install.sh \
+  | sh -s -- update --global-instructions replace
+```
+
+This copy is an explicit user-level configuration choice, not a manifest-owned
+runtime entry. `doctor` does not judge its content and `uninstall` does not
+remove or restore it. A replacement is compared with `CODEX_AGENTS.md` after
+copying. Its temporary `instructions/AGENTS.md` backup is deleted only after
+that verification succeeds; copy or verification failure leaves the backup for
+recovery.
 
 ## Skill-specific runtimes
 
@@ -125,19 +166,24 @@ They are not treated as proof that Node.js or another dependency is absent.
 
 ## Ownership boundary
 
-Only entries in these files are managed:
+Only entries in these files are lifecycle-managed:
 
 - `manifest/skills.txt`
 - `manifest/agents.txt`
 
-The installer never synchronizes an entire user directory. For each manifest
-entry it:
+The optional global-instruction copy described above is not added to either
+manifest. The installer never synchronizes an entire user directory. For each
+manifest entry it:
 
 1. validates the entry name;
 2. compares the source and installed target;
 3. skips an identical target;
 4. backs up a conflicting target;
 5. replaces only that exact target.
+
+For a skill, the exact target is the whole named skill directory. A difference
+in one internal file causes that directory to be backed up and replaced as a
+unit. Custom agents are compared and replaced as individual TOML files.
 
 When a release removes a previously managed entry, update backs up and removes
 that exact retired entry. Removing an entry from the repository manifest does
@@ -156,6 +202,8 @@ $CODEX_HOME/highfloor-codex/
 ├── backups/
 │   └── YYYYMMDDTHHMMSSZ-PID/
 │       ├── agents/
+│       ├── instructions/          # retained only after failed AGENTS replacement
+│       │   └── AGENTS.md
 │       └── skills/
 ├── ref
 ├── skills-dir
@@ -163,13 +211,15 @@ $CODEX_HOME/highfloor-codex/
 └── version
 ```
 
-Backups are not pruned automatically. This favors recoverability over hidden
-retention policy. Users may remove old timestamped backups after inspection.
+Managed skill and agent backups are not pruned automatically. This favors
+recoverability over hidden retention policy. Users may remove old timestamped
+backups after inspection. A successful optional `AGENTS.md` replacement is the
+exception: its temporary backup is removed after content verification.
 
 The state directory is not a third install destination. It records the
 installed version and source ref, the two destinations, and the exact
 manifests used by `doctor`, later updates, and uninstall. Timestamped backups
-are created there only when a managed entry is replaced, retired, or removed.
+remain there when a managed entry is replaced, retired, or removed.
 
 ## Updates
 
@@ -198,6 +248,8 @@ the selected repository ref. An identical entry is left alone. A different
 entry is backed up and replaced by the repository copy. An entry that appeared
 in the previous recorded manifest but no longer appears in the new one is
 backed up and removed. Files outside the recorded manifests are not touched.
+Global instructions follow the separate `ask`, `replace`, or `keep` choice and
+remain outside recorded uninstall ownership.
 
 ## Offline installation
 
@@ -236,6 +288,9 @@ Uninstall:
 - backs up existing managed entries;
 - removes only those exact entries;
 - retains install state and backups.
+
+It leaves `$CODEX_HOME/AGENTS.md` unchanged even when the installer previously
+copied or replaced it.
 
 To restore an entry, copy it from the latest timestamped backup into the
 recorded destination.

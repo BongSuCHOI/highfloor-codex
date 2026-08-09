@@ -27,11 +27,17 @@ Highfloor contains two runtime units:
 Repository governance, catalogs, CI, and artwork are not installed into the
 runtime directories.
 
+`CODEX_AGENTS.md` is a portable instruction source, not a third managed runtime
+unit. The installer may copy it to `$CODEX_HOME/AGENTS.md` when no target exists
+or after explicit conflict approval. `doctor` and `uninstall` do not own that
+user-level file.
+
 ## Source-to-runtime mapping
 
 ```text
 skills/*/     ───────────────→ $CODEX_HOME/skills/*
 agents/*.toml ───────────────→ $CODEX_HOME/agents/*.toml
+CODEX_AGENTS.md ── optional ─→ $CODEX_HOME/AGENTS.md
 
 manifest/*.txt
       │
@@ -40,6 +46,11 @@ manifest/*.txt
       ├── drives install/update
       └── is copied into install state for uninstall
 ```
+
+The manifest ownership arrows apply only to skills and custom agents. Optional
+global-instruction synchronization is conflict-aware, uses a temporary backup
+until replacement verification succeeds, and is intentionally excluded from
+recorded uninstall ownership.
 
 ## Why manifests instead of directory synchronization?
 

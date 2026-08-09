@@ -20,6 +20,11 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Added conflict-aware optional synchronization from `CODEX_AGENTS.md` to
+  `$CODEX_HOME/AGENTS.md`: install when absent, prompt before replacing an
+  existing file, preserve it in non-interactive mode, verify accepted
+  replacements before deleting their temporary backups, and leave it outside
+  `doctor` and `uninstall` ownership.
 - Added a conditional Art Direction Loop to `cx-design-director` for producing
   and converging on a few materially distinct, feasible visual directions
   without imposing exploration on restoration, small polish or already-decided

@@ -14,6 +14,8 @@ CODEX_ROOT="${CODEX_HOME:-$HOME/.codex}"
 STATE_ROOT="${HIGHFLOOR_STATE_DIR:-$CODEX_ROOT/$PROJECT_NAME}"
 SKILLS_DIR="${HIGHFLOOR_SKILLS_DIR:-$CODEX_ROOT/skills}"
 AGENTS_DIR="${HIGHFLOOR_AGENTS_DIR:-$CODEX_ROOT/agents}"
+GLOBAL_INSTRUCTIONS_MODE="${HIGHFLOOR_GLOBAL_INSTRUCTIONS:-ask}"
+GLOBAL_INSTRUCTIONS_FILE="$CODEX_ROOT/AGENTS.md"
 TEMP_ROOT=""
 BACKUP_ROOT=""
 SOURCE_ROOT=""
@@ -36,6 +38,9 @@ Options:
   --ref REF             Branch, tag, or commit to install.
   --skills-dir PATH     Override the skills destination.
   --agents-dir PATH     Override the custom agents destination.
+  --global-instructions MODE
+                        Handle $CODEX_HOME/AGENTS.md: ask on conflict,
+                        replace, or keep.
   --dry-run             Print mutations without applying them.
   -h, --help            Show this help.
 
@@ -45,11 +50,15 @@ Environment:
   HIGHFLOOR_REF
   HIGHFLOOR_SKILLS_DIR
   HIGHFLOOR_AGENTS_DIR
+  HIGHFLOOR_GLOBAL_INSTRUCTIONS
   HIGHFLOOR_STATE_DIR
 
 Destination policy:
   Custom agents default to "$CODEX_HOME/agents".
   Skills default to "$CODEX_HOME/skills".
+  Portable global instructions are installed when "$CODEX_HOME/AGENTS.md" is
+  absent. An existing different file requires interactive confirmation or
+  explicit --global-instructions replace.
   Pass --skills-dir or --agents-dir to choose another location explicitly.
 EOF
 }
@@ -94,6 +103,13 @@ validate_entry_name() {
   esac
 }
 
+validate_global_instructions_mode() {
+  case "$GLOBAL_INSTRUCTIONS_MODE" in
+    ask|replace|keep) ;;
+    *) die "--global-instructions must be ask, replace, or keep" ;;
+  esac
+}
+
 read_value_file() {
   if [ -f "$1" ]; then
     sed -n '1p' "$1"
@@ -116,7 +132,8 @@ ensure_backup_root() {
   if [ -z "$BACKUP_ROOT" ]; then
     stamp="$(date -u '+%Y%m%dT%H%M%SZ')-$$"
     BACKUP_ROOT="$STATE_ROOT/backups/$stamp"
-    run mkdir -p "$BACKUP_ROOT/skills" "$BACKUP_ROOT/agents"
+    run mkdir -p "$BACKUP_ROOT/skills" "$BACKUP_ROOT/agents" \
+      "$BACKUP_ROOT/instructions"
   fi
 }
 
@@ -128,6 +145,40 @@ backup_directory() {
 backup_file() {
   ensure_backup_root
   run cp "$1" "$BACKUP_ROOT/agents/$2"
+}
+
+backup_global_instructions() {
+  ensure_backup_root
+  run cp "$1" "$BACKUP_ROOT/instructions/AGENTS.md"
+}
+
+discard_global_instructions_backup() {
+  backup_path="$BACKUP_ROOT/instructions/AGENTS.md"
+  run rm -f "$backup_path"
+
+  if [ "$DRY_RUN" -eq 0 ]; then
+    rmdir "$BACKUP_ROOT/instructions" 2>/dev/null || true
+    rmdir "$BACKUP_ROOT/skills" 2>/dev/null || true
+    rmdir "$BACKUP_ROOT/agents" 2>/dev/null || true
+    if rmdir "$BACKUP_ROOT" 2>/dev/null; then
+      BACKUP_ROOT=""
+    fi
+  fi
+}
+
+confirm() {
+  prompt="$1"
+  if [ ! -t 1 ] || [ ! -r /dev/tty ] || [ ! -w /dev/tty ]; then
+    return 2
+  fi
+
+  printf '%s [y/N] ' "$prompt" > /dev/tty
+  reply=""
+  IFS= read -r reply < /dev/tty || true
+  case "$reply" in
+    y|Y|yes|YES|Yes) return 0 ;;
+    *) return 1 ;;
+  esac
 }
 
 resolve_local_source() {
@@ -171,8 +222,85 @@ validate_source() {
   [ -f "$source_root/VERSION" ] || die "source is missing VERSION"
   [ -f "$source_root/manifest/skills.txt" ] || die "source is missing manifest/skills.txt"
   [ -f "$source_root/manifest/agents.txt" ] || die "source is missing manifest/agents.txt"
+  [ -f "$source_root/CODEX_AGENTS.md" ] || die "source is missing CODEX_AGENTS.md"
+  [ ! -L "$source_root/CODEX_AGENTS.md" ] || die "CODEX_AGENTS.md cannot be a symlink"
   [ -d "$source_root/skills" ] || die "source is missing skills/"
   [ -d "$source_root/agents" ] || die "source is missing agents/"
+}
+
+sync_global_instructions() {
+  source_path="$1/CODEX_AGENTS.md"
+  target="$GLOBAL_INSTRUCTIONS_FILE"
+  backed_up=0
+
+  if [ "$GLOBAL_INSTRUCTIONS_MODE" = "keep" ]; then
+    log "Keeping global instructions: $target"
+    return
+  fi
+
+  if [ ! -L "$target" ] && [ -f "$target" ] && cmp -s "$source_path" "$target"; then
+    log "Unchanged global instructions: $target"
+    return
+  fi
+
+  if [ -L "$target" ] || { [ -e "$target" ] && [ ! -f "$target" ]; }; then
+    if [ "$GLOBAL_INSTRUCTIONS_MODE" = "replace" ]; then
+      die "refusing to replace non-regular global instructions target: $target"
+    fi
+    log "Keeping non-regular global instructions target: $target"
+    return
+  fi
+
+  if [ "$GLOBAL_INSTRUCTIONS_MODE" = "ask" ] && [ -f "$target" ]; then
+    if [ "$DRY_RUN" -eq 1 ]; then
+      log "Would ask before changing global instructions: $target"
+      return
+    fi
+
+    question="Replace existing $target with Highfloor CODEX_AGENTS.md?"
+
+    if confirm "$question"; then
+      :
+    else
+      answer_status="$?"
+      if [ "$answer_status" -eq 2 ]; then
+        log "Keeping existing global instructions in non-interactive mode; use --global-instructions replace to opt in."
+      else
+        log "Keeping global instructions: $target"
+      fi
+      return
+    fi
+  fi
+
+  if [ -f "$target" ]; then
+    log "Creating temporary global instructions backup: $target"
+    backup_global_instructions "$target"
+    backed_up=1
+  fi
+
+  run mkdir -p "$CODEX_ROOT"
+  log "Installing global instructions: $target"
+  run cp "$source_path" "$target"
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    if [ "$backed_up" -eq 1 ]; then
+      log "Removing temporary global instructions backup after verification"
+      discard_global_instructions_backup
+    fi
+    return
+  fi
+
+  if ! cmp -s "$source_path" "$target"; then
+    if [ "$backed_up" -eq 1 ]; then
+      die "global instructions verification failed; temporary backup retained at $BACKUP_ROOT/instructions/AGENTS.md"
+    fi
+    die "global instructions verification failed: $target"
+  fi
+
+  if [ "$backed_up" -eq 1 ]; then
+    log "Removing verified temporary global instructions backup"
+    discard_global_instructions_backup
+  fi
 }
 
 reconcile_removed_skills() {
@@ -313,6 +441,7 @@ install_all() {
   log "Installing Highfloor for Codex $version"
   install_skills "$source_root"
   install_agents "$source_root"
+  sync_global_instructions "$source_root"
   write_state "$source_root"
 
   log ""
@@ -419,6 +548,11 @@ while [ "$#" -gt 0 ]; do
       AGENTS_DIR="$2"
       shift 2
       ;;
+    --global-instructions)
+      [ "$#" -ge 2 ] || die "--global-instructions requires a value"
+      GLOBAL_INSTRUCTIONS_MODE="$2"
+      shift 2
+      ;;
     --dry-run)
       DRY_RUN=1
       shift
@@ -432,6 +566,8 @@ while [ "$#" -gt 0 ]; do
       ;;
   esac
 done
+
+validate_global_instructions_mode
 
 case "$ACTION" in
   install|update) install_all ;;
