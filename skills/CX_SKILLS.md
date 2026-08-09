@@ -222,6 +222,16 @@ Add a script only when it makes a fragile or repeated operation deterministic:
 Keep it aligned with the current `SKILL.md` name, responsibility, and default
 prompt.
 
+Keep the invocation handle and human-facing UI identity distinct but aligned:
+
+- the skill directory and frontmatter `name` stay lowercase `cx-*`;
+- `interface.display_name` starts with `CX ` and uses a readable title such as
+  `CX Analyze Video`, not the literal hyphenated handle;
+- `interface.short_description` is English ASCII text between 25 and 64
+  characters;
+- `interface.default_prompt` is English ASCII text and explicitly invokes the
+  matching `$cx-*` handle.
+
 Do not copy the same explanation into multiple files. Give information one
 authoritative owner and link to it elsewhere.
 
@@ -405,6 +415,7 @@ Stop rule:
 [ ] Are the exact upstream license and modification notice shipped with copied/modified material?
 [ ] Is the SKILL.md hot path short with references loaded selectively?
 [ ] Does agents/openai.yaml match the current role?
+[ ] Does its UI metadata follow the CX display, English description, and $cx-* prompt contract?
 [ ] Is there a baseline/treatment comparison or an appropriate forward test?
 [ ] Are catalog, manifest, and canonical/generated copies synchronized?
 ```

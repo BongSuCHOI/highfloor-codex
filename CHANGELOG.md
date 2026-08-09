@@ -21,7 +21,8 @@ The project follows [Semantic Versioning](https://semver.org/).
 ### Changed
 
 - Standardized every `cx-*` skill's UI metadata on an English `CX ...` display
-  name and English short description, with validator coverage to prevent drift.
+  name, 25–64 character English short description, and English `$cx-*` default
+  prompt, with canonical governance and validator coverage to prevent drift.
 - Added conflict-aware optional synchronization from `CODEX_AGENTS.md` to
   `$CODEX_HOME/AGENTS.md`: install when absent, prompt before replacing an
   existing file, preserve it in non-interactive mode, verify accepted
