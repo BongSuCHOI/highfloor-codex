@@ -49,8 +49,10 @@ manifest/*.txt
 
 The manifest ownership arrows apply only to skills and custom agents. Optional
 global-instruction synchronization is conflict-aware, uses a temporary backup
-until replacement verification succeeds, and is intentionally excluded from
-recorded uninstall ownership.
+until replacement verification succeeds, rolls back on failure, and is
+intentionally excluded from recorded uninstall ownership. Managed skill and
+agent replacements use the same verified temporary-backup boundary; persistent
+backups are reserved for removals or incomplete rollback and cleanup recovery.
 
 ## Why manifests instead of directory synchronization?
 

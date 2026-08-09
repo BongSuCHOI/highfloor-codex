@@ -56,6 +56,8 @@ Environment:
 Destination policy:
   Custom agents default to "$CODEX_HOME/agents".
   Skills default to "$CODEX_HOME/skills".
+  Changed managed entries are verified before their temporary backups are
+  removed; copy or verification failure restores the previous installed copy.
   Portable global instructions are installed when "$CODEX_HOME/AGENTS.md" is
   absent. An existing different file requires interactive confirmation or
   explicit --global-instructions replace.
@@ -133,29 +135,26 @@ ensure_backup_root() {
     stamp="$(date -u '+%Y%m%dT%H%M%SZ')-$$"
     BACKUP_ROOT="$STATE_ROOT/backups/$stamp"
     run mkdir -p "$BACKUP_ROOT/skills" "$BACKUP_ROOT/agents" \
-      "$BACKUP_ROOT/instructions"
+      "$BACKUP_ROOT/instructions" || return 1
   fi
 }
 
 backup_directory() {
-  ensure_backup_root
-  run cp -R "$1" "$BACKUP_ROOT/skills/$2"
+  ensure_backup_root || return 1
+  run cp -R "$1" "$BACKUP_ROOT/skills/$2" || return 1
 }
 
 backup_file() {
-  ensure_backup_root
-  run cp "$1" "$BACKUP_ROOT/agents/$2"
+  ensure_backup_root || return 1
+  run cp "$1" "$BACKUP_ROOT/agents/$2" || return 1
 }
 
 backup_global_instructions() {
-  ensure_backup_root
-  run cp "$1" "$BACKUP_ROOT/instructions/AGENTS.md"
+  ensure_backup_root || return 1
+  run cp "$1" "$BACKUP_ROOT/instructions/AGENTS.md" || return 1
 }
 
-discard_global_instructions_backup() {
-  backup_path="$BACKUP_ROOT/instructions/AGENTS.md"
-  run rm -f "$backup_path"
-
+prune_backup_root() {
   if [ "$DRY_RUN" -eq 0 ]; then
     rmdir "$BACKUP_ROOT/instructions" 2>/dev/null || true
     rmdir "$BACKUP_ROOT/skills" 2>/dev/null || true
@@ -163,6 +162,118 @@ discard_global_instructions_backup() {
     if rmdir "$BACKUP_ROOT" 2>/dev/null; then
       BACKUP_ROOT=""
     fi
+  fi
+}
+
+discard_backup() {
+  backup_kind="$1"
+  backup_name="$2"
+  run rm -rf "$BACKUP_ROOT/$backup_kind/$backup_name" || return 1
+  prune_backup_root
+}
+
+restore_skill_backup() {
+  restore_entry="$1"
+  restore_target="$2"
+  restore_reason="$3"
+  restore_backup="$BACKUP_ROOT/skills/$restore_entry"
+
+  if [ ! -L "$restore_target" ] &&
+     [ -e "$restore_target" ] &&
+     diff -qr "$restore_backup" "$restore_target" >/dev/null 2>&1; then
+    discard_backup skills "$restore_entry" ||
+      die "$restore_reason; previous skill remains but temporary backup cleanup failed: $restore_backup"
+    die "$restore_reason; previous skill remains installed: $restore_entry"
+  fi
+
+  rm -rf "$restore_target" ||
+    die "$restore_reason; rollback could not clear the partial skill and backup remains at $restore_backup"
+  cp -R "$restore_backup" "$restore_target" ||
+    die "$restore_reason; rollback copy failed and backup remains at $restore_backup"
+  diff -qr "$restore_backup" "$restore_target" >/dev/null 2>&1 ||
+    die "$restore_reason; rollback verification failed and backup remains at $restore_backup"
+  discard_backup skills "$restore_entry" ||
+    die "$restore_reason; previous skill was restored but temporary backup cleanup failed: $restore_backup"
+  die "$restore_reason; restored previous skill: $restore_entry"
+}
+
+restore_file_backup() {
+  restore_label="$1"
+  restore_display="$2"
+  restore_target="$3"
+  restore_kind="$4"
+  restore_name="$5"
+  restore_reason="$6"
+  restore_backup="$BACKUP_ROOT/$restore_kind/$restore_name"
+
+  if [ ! -L "$restore_target" ] &&
+     [ -f "$restore_target" ] &&
+     cmp -s "$restore_backup" "$restore_target"; then
+    discard_backup "$restore_kind" "$restore_name" ||
+      die "$restore_reason; previous $restore_label remains but temporary backup cleanup failed: $restore_backup"
+    die "$restore_reason; previous $restore_label remains installed: $restore_display"
+  fi
+
+  rm -f "$restore_target" ||
+    die "$restore_reason; rollback could not clear the partial $restore_label and backup remains at $restore_backup"
+  cp "$restore_backup" "$restore_target" ||
+    die "$restore_reason; rollback copy failed and backup remains at $restore_backup"
+  cmp -s "$restore_backup" "$restore_target" ||
+    die "$restore_reason; rollback verification failed and backup remains at $restore_backup"
+  discard_backup "$restore_kind" "$restore_name" ||
+    die "$restore_reason; previous $restore_label was restored but temporary backup cleanup failed: $restore_backup"
+  die "$restore_reason; restored previous $restore_label: $restore_display"
+}
+
+replace_file() {
+  replace_source="$1"
+  replace_target="$2"
+  replace_kind="$3"
+  replace_name="$4"
+  replace_label="$5"
+  replace_display="$6"
+  replace_backed_up="$7"
+
+  if [ "$replace_backed_up" -eq 1 ] && ! run rm -f "$replace_target"; then
+    restore_file_backup "$replace_label" "$replace_display" "$replace_target" \
+      "$replace_kind" "$replace_name" \
+      "could not remove existing $replace_label before replacement"
+  fi
+
+  log "Installing $replace_label: $replace_display"
+  if ! run cp "$replace_source" "$replace_target"; then
+    if [ "$replace_backed_up" -eq 1 ]; then
+      restore_file_backup "$replace_label" "$replace_display" \
+        "$replace_target" "$replace_kind" "$replace_name" \
+        "$replace_label copy failed"
+    fi
+    run rm -f "$replace_target" || true
+    die "$replace_label copy failed: $replace_display"
+  fi
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    if [ "$replace_backed_up" -eq 1 ]; then
+      log "Removing temporary $replace_label backup after verification: $replace_display"
+      discard_backup "$replace_kind" "$replace_name" ||
+        die "could not remove temporary $replace_label backup: $replace_display"
+    fi
+    return
+  fi
+
+  if ! cmp -s "$replace_source" "$replace_target"; then
+    if [ "$replace_backed_up" -eq 1 ]; then
+      restore_file_backup "$replace_label" "$replace_display" \
+        "$replace_target" "$replace_kind" "$replace_name" \
+        "$replace_label verification failed"
+    fi
+    rm -f "$replace_target" || true
+    die "$replace_label verification failed: $replace_display"
+  fi
+
+  if [ "$replace_backed_up" -eq 1 ]; then
+    log "Removing verified temporary $replace_label backup: $replace_display"
+    discard_backup "$replace_kind" "$replace_name" ||
+      die "$replace_label installed but temporary backup cleanup failed: $replace_display"
   fi
 }
 
@@ -274,33 +385,14 @@ sync_global_instructions() {
 
   if [ -f "$target" ]; then
     log "Creating temporary global instructions backup: $target"
-    backup_global_instructions "$target"
+    backup_global_instructions "$target" ||
+      die "could not create temporary global instructions backup: $target"
     backed_up=1
   fi
 
   run mkdir -p "$CODEX_ROOT"
-  log "Installing global instructions: $target"
-  run cp "$source_path" "$target"
-
-  if [ "$DRY_RUN" -eq 1 ]; then
-    if [ "$backed_up" -eq 1 ]; then
-      log "Removing temporary global instructions backup after verification"
-      discard_global_instructions_backup
-    fi
-    return
-  fi
-
-  if ! cmp -s "$source_path" "$target"; then
-    if [ "$backed_up" -eq 1 ]; then
-      die "global instructions verification failed; temporary backup retained at $BACKUP_ROOT/instructions/AGENTS.md"
-    fi
-    die "global instructions verification failed: $target"
-  fi
-
-  if [ "$backed_up" -eq 1 ]; then
-    log "Removing verified temporary global instructions backup"
-    discard_global_instructions_backup
-  fi
+  replace_file "$source_path" "$target" instructions AGENTS.md \
+    "global instructions" "$target" "$backed_up"
 }
 
 reconcile_removed_skills() {
@@ -366,14 +458,50 @@ install_skills() {
       continue
     fi
 
+    backed_up=0
     if [ -e "$target" ] || [ -L "$target" ]; then
-      log "Backing up existing skill: $entry"
-      backup_directory "$target" "$entry"
-      run rm -rf "$target"
+      log "Creating temporary skill backup: $entry"
+      backup_directory "$target" "$entry" ||
+        die "could not create temporary skill backup: $entry"
+      backed_up=1
+      if ! run rm -rf "$target"; then
+        restore_skill_backup "$entry" "$target" \
+          "could not remove existing skill before replacement"
+      fi
     fi
 
     log "Installing skill: $entry"
-    run cp -R "$source_path" "$target"
+    if ! run cp -R "$source_path" "$target"; then
+      if [ "$backed_up" -eq 1 ]; then
+        restore_skill_backup "$entry" "$target" "skill copy failed"
+      fi
+      run rm -rf "$target" || true
+      die "skill copy failed: $entry"
+    fi
+
+    if [ "$DRY_RUN" -eq 1 ]; then
+      if [ "$backed_up" -eq 1 ]; then
+        log "Removing temporary skill backup after verification: $entry"
+        discard_backup skills "$entry" ||
+          die "could not remove temporary skill backup: $entry"
+      fi
+      continue
+    fi
+
+    if ! diff -qr "$source_path" "$target" >/dev/null 2>&1; then
+      if [ "$backed_up" -eq 1 ]; then
+        restore_skill_backup "$entry" "$target" \
+          "skill verification failed"
+      fi
+      rm -rf "$target" || true
+      die "skill verification failed: $entry"
+    fi
+
+    if [ "$backed_up" -eq 1 ]; then
+      log "Removing verified temporary skill backup: $entry"
+      discard_backup skills "$entry" ||
+        die "skill installed but temporary backup cleanup failed: $entry"
+    fi
   done < "$manifest"
 }
 
@@ -399,13 +527,16 @@ install_agents() {
       continue
     fi
 
+    backed_up=0
     if [ -e "$target" ] || [ -L "$target" ]; then
-      log "Backing up existing agent: $entry"
-      backup_file "$target" "$entry"
+      log "Creating temporary agent backup: $entry"
+      backup_file "$target" "$entry" ||
+        die "could not create temporary agent backup: $entry"
+      backed_up=1
     fi
 
-    log "Installing agent: $entry"
-    run cp "$source_path" "$target"
+    replace_file "$source_path" "$target" agents "$entry" agent "$entry" \
+      "$backed_up"
   done < "$manifest"
 }
 

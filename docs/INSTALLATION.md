@@ -138,8 +138,9 @@ This copy is an explicit user-level configuration choice, not a manifest-owned
 runtime entry. `doctor` does not judge its content and `uninstall` does not
 remove or restore it. A replacement is compared with `CODEX_AGENTS.md` after
 copying. Its temporary `instructions/AGENTS.md` backup is deleted only after
-that verification succeeds; copy or verification failure leaves the backup for
-recovery.
+that verification succeeds. Copy or verification failure restores and verifies
+the previous file before reporting the error. The backup remains only when that
+rollback or subsequent backup cleanup cannot finish safely.
 
 ## Skill-specific runtimes
 
@@ -178,12 +179,15 @@ manifest entry it:
 1. validates the entry name;
 2. compares the source and installed target;
 3. skips an identical target;
-4. backs up a conflicting target;
-5. replaces only that exact target.
+4. creates a temporary backup for a conflicting target;
+5. replaces and verifies only that exact target;
+6. removes the temporary backup after success, or restores it after failure.
 
 For a skill, the exact target is the whole named skill directory. A difference
-in one internal file causes that directory to be backed up and replaced as a
-unit. Custom agents are compared and replaced as individual TOML files.
+in one internal file causes that directory to be replaced and verified as a
+unit. Custom agents are compared, replaced, and verified as individual TOML
+files. A verified replacement retains only the repository version; a failed
+replacement restores the previous installed copy.
 
 When a release removes a previously managed entry, update backs up and removes
 that exact retired entry. Removing an entry from the repository manifest does
@@ -201,25 +205,31 @@ $CODEX_HOME/highfloor-codex/
 ├── agents.txt
 ├── backups/
 │   └── YYYYMMDDTHHMMSSZ-PID/
-│       ├── agents/
-│       ├── instructions/          # retained only after failed AGENTS replacement
+│       ├── agents/                # removal backup or failed rollback recovery
+│       ├── instructions/          # retained only when rollback cannot finish
 │       │   └── AGENTS.md
-│       └── skills/
+│       └── skills/                # removal backup or failed rollback recovery
 ├── ref
 ├── skills-dir
 ├── skills.txt
 └── version
 ```
 
-Managed skill and agent backups are not pruned automatically. This favors
-recoverability over hidden retention policy. Users may remove old timestamped
-backups after inspection. A successful optional `AGENTS.md` replacement is the
-exception: its temporary backup is removed after content verification.
+Temporary replacement backups for managed skills, agents, and optional global
+instructions are removed after content verification. Copy or verification
+failure restores the prior target and then removes the verified rollback copy.
+A backup remains only if rollback or backup cleanup cannot finish safely.
+
+Retired-entry and uninstall backups are not pruned automatically because those
+operations intentionally remove their targets. Users may remove those old
+timestamped backups after inspection. Backups created by older installer
+versions are also left untouched because the state does not record whether each
+one came from replacement, retirement, or uninstall.
 
 The state directory is not a third install destination. It records the
 installed version and source ref, the two destinations, and the exact
 manifests used by `doctor`, later updates, and uninstall. Timestamped backups
-remain there when a managed entry is replaced, retired, or removed.
+normally remain there only for retired entries and uninstall removals.
 
 ## Updates
 
@@ -245,9 +255,11 @@ entries in an old location.
 
 For every name in the new manifest, update compares the installed entry with
 the selected repository ref. An identical entry is left alone. A different
-entry is backed up and replaced by the repository copy. An entry that appeared
-in the previous recorded manifest but no longer appears in the new one is
-backed up and removed. Files outside the recorded manifests are not touched.
+entry is replaced and verified through a temporary backup transaction. Success
+deletes the backup; copy or verification failure restores the prior installed
+copy and reports the rollback. An entry that appeared in the previous recorded
+manifest but no longer appears in the new one is backed up and removed. Files
+outside the recorded manifests are not touched.
 Global instructions follow the separate `ask`, `replace`, or `keep` choice and
 remain outside recorded uninstall ownership.
 

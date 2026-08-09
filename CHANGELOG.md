@@ -23,8 +23,14 @@ The project follows [Semantic Versioning](https://semver.org/).
 - Added conflict-aware optional synchronization from `CODEX_AGENTS.md` to
   `$CODEX_HOME/AGENTS.md`: install when absent, prompt before replacing an
   existing file, preserve it in non-interactive mode, verify accepted
-  replacements before deleting their temporary backups, and leave it outside
-  `doctor` and `uninstall` ownership.
+  replacements before deleting their temporary backups, restore the previous
+  file after replacement failure, and leave it outside `doctor` and `uninstall`
+  ownership.
+- Made managed skill and agent replacement transactional: verify the repository
+  copy, discard the temporary backup after success, and automatically restore
+  the previous installed copy after copy or verification failure. Persistent
+  backups remain limited to retirement, uninstall, or failed rollback and
+  cleanup recovery.
 - Added a conditional Art Direction Loop to `cx-design-director` for producing
   and converging on a few materially distinct, feasible visual directions
   without imposing exploration on restoration, small polish or already-decided

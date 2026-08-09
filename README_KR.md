@@ -257,34 +257,38 @@ curl -fsSL https://raw.githubusercontent.com/BongSuCHOI/highfloor-codex/v0.1.0/i
 기본 `CODEX_HOME`을 사용하면 스킬은 `~/.codex/skills`, 에이전트는
 `~/.codex/agents`에 설치됩니다. 상태 디렉터리는 Codex가 불러오는
 스킬이나 에이전트가 아닙니다. 설치한 버전과 source ref, 두 설치 경로,
-업데이트·`doctor`·제거에서 사용할 정확한 관리 목록을 기록합니다. 관리
-항목을 교체하거나 은퇴시키거나 제거하면 시간별 백업이 이 안에
-남습니다.
+업데이트·`doctor`·제거에서 사용할 정확한 관리 목록을 기록합니다. 영구
+timestamp 백업은 retired entry, uninstall 또는 안전하게 완료되지 못한
+rollback·cleanup 복구에만 남습니다. 이전 installer가 만든 기존 백업은
+생성 목적이 기록되지 않았으므로 자동 정리하지 않습니다.
 
 Global `AGENTS.md`가 없으면 installer가 `CODEX_AGENTS.md`를 복사합니다.
 다른 파일이 이미 있으면 기본 `ask` mode에서 교체 여부를 묻고, 승인된
 충돌 파일을 임시 백업합니다. 새 사본이 `CODEX_AGENTS.md`와 같은지
-검증한 뒤 임시 백업을 삭제하며, 복사나 검증에 실패하면 복구용으로
-남깁니다. Terminal이 없는 실행에서는 기존 파일을 보존합니다. 명시적인
-non-interactive 교체에는
+검증한 뒤 임시 백업을 삭제합니다. 복사나 검증에 실패하면 이전 파일로
+자동 원복하고 실패를 알리며, rollback 자체가 안전하게 끝나지 못한
+경우나 backup cleanup이 실패한 경우에만 백업을 남깁니다. Terminal이
+없는 실행에서는 기존 파일을 보존합니다. 명시적인 non-interactive 교체에는
 `--global-instructions replace`, 동기화 비활성화에는
 `--global-instructions keep`을 사용합니다. 이 선택 파일은 `doctor`가
 검사하거나 `uninstall`이 제거하지 않습니다.
 
 설치와 업데이트는 같은 방식으로 동작합니다. 선택한 릴리스의 manifest에
-있는 모든 이름을 설치된 사본과 비교합니다. 내용이 달라졌다면 먼저
-백업하고 저장소 버전으로 교체하며, 같다면 그대로 둡니다. 이후 릴리스가
-manifest에서 이름을 제거하면 업데이트는 그 항목을 은퇴한 것으로 보고
-백업한 뒤 제거합니다. Manifest에서 항목을 빼도 설치된 사본이 관리되지
-않는 상태로 보존되는 것은 아닙니다. 현재 installer에는 항목별 제외
-기능이 없으므로, 로컬 변형은 fork에서 관리하거나 다른 namespace를
-사용해야 합니다. Highfloor가 한 번도 관리하지 않은 다른 스킬과
-에이전트는 건드리지 않습니다.
+있는 모든 이름을 설치된 사본과 비교합니다. 내용이 다르면 임시 백업,
+교체, 정확한 검증, 실패 시 자동 원복을 하나의 transaction으로 수행하며,
+같으면 그대로 둡니다. 검증에 성공하면 임시 백업을 삭제하므로 설치
+위치에는 최신본만 남습니다. 이후 릴리스가 manifest에서 이름을 제거하면
+업데이트는 그 항목을 retired entry로 보고 복구용 백업을 남긴 뒤
+제거합니다. Manifest에서 항목을 빼도 설치된 사본이 관리되지 않는 상태로
+보존되는 것은 아닙니다. 현재 installer에는 항목별 제외 기능이 없으므로,
+로컬 변형은 fork에서 관리하거나 다른 namespace를 사용해야 합니다.
+Highfloor가 한 번도 관리하지 않은 다른 스킬과 에이전트는 건드리지
+않습니다.
 
 비교 단위는 하나의 완전한 managed skill directory 또는 하나의 custom
 agent TOML 파일입니다. Skill 내부 파일 하나라도 다르면 update는 해당
-skill directory 전체를 백업하고 교체하며, 바뀐 내부 파일만 patch하지는
-않습니다.
+skill directory 전체를 하나의 transaction으로 교체·검증하며, 바뀐 내부
+파일만 patch하지는 않습니다.
 
 경로 지정, 오프라인 설치, 업데이트와 복구 방법은
 [설치와 업데이트](docs/INSTALLATION.md)를 참고하십시오.
@@ -540,7 +544,8 @@ Installer 자체는 dependency-free입니다. `config.toml`이나 system package
 - 재현 가능한 설치는 release tag를 고정하십시오.
 - 설치 프로그램이 관리하는 대상은 두 개의 일반 텍스트 manifest로
   제한됩니다.
-- 충돌 항목은 교체 전에 백업합니다.
+- 충돌 항목은 검증된 교체와 자동 원복을 사용하며, 성공한 교체는 이전
+  사본을 남기지 않습니다.
 - 업데이트는 관련 없는 스킬과 에이전트를 삭제하지 않습니다.
 - 외부 video transcription은 사용자가 해당 영상의 audio upload와 cost
   boundary를 승인하기 전까지 비활성화됩니다.

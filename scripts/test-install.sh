@@ -17,6 +17,25 @@ trap cleanup EXIT HUP INT TERM
 
 mkdir -p "$TEST_HOME" "$TEST_CODEX" "$TEST_SKILLS" "$TEST_AGENTS"
 
+REAL_CP="$(command -v cp)"
+FAIL_BIN="$TEST_ROOT/fail-bin"
+mkdir -p "$FAIL_BIN"
+printf '%s\n' \
+  '#!/bin/sh' \
+  'if [ "$#" -eq 3 ] && [ "$1" = "-R" ] &&' \
+  '   [ "$2" = "$HIGHFLOOR_TEST_FAIL_SOURCE" ] &&' \
+  '   [ "$3" = "$HIGHFLOOR_TEST_FAIL_TARGET" ]; then' \
+  '  exit 73' \
+  'fi' \
+  'if [ "$#" -eq 2 ] &&' \
+  '   [ "$1" = "$HIGHFLOOR_TEST_FAIL_SOURCE" ] &&' \
+  '   [ "$2" = "$HIGHFLOOR_TEST_FAIL_TARGET" ]; then' \
+  '  exit 73' \
+  'fi' \
+  'exec "$HIGHFLOOR_TEST_REAL_CP" "$@"' \
+  > "$FAIL_BIN/cp"
+chmod +x "$FAIL_BIN/cp"
+
 HOME="$TEST_HOME" \
 CODEX_HOME="$TEST_CODEX" \
 "$ROOT/install.sh" install \
@@ -49,7 +68,8 @@ CODEX_HOME="$TEST_CODEX" \
 "$ROOT/install.sh" update \
   --skills-dir "$TEST_SKILLS" \
   --agents-dir "$TEST_AGENTS" \
-  --global-instructions keep
+  --global-instructions keep \
+  > "$TEST_ROOT/skill-replace.log"
 
 cmp -s "$ROOT/skills/cx-interview/SKILL.md" "$TEST_SKILLS/cx-interview/SKILL.md" || {
   printf 'managed skill was not reconciled\n' >&2
@@ -65,13 +85,148 @@ cmp -s "$ROOT/skills/cx-interview/SKILL.md" "$TEST_SKILLS/cx-interview/SKILL.md"
   exit 1
 }
 
-find "$STATE_ROOT/backups" -path '*/skills/cx-interview/SKILL.md' -type f \
-  | grep -q . || {
-    printf 'changed managed skill was not backed up\n' >&2
+grep -Fq 'Creating temporary skill backup: cx-interview' \
+  "$TEST_ROOT/skill-replace.log" || {
+    printf 'managed skill replacement did not create a temporary backup\n' >&2
     exit 1
   }
+grep -Fq 'Removing verified temporary skill backup: cx-interview' \
+  "$TEST_ROOT/skill-replace.log" || {
+    printf 'managed skill replacement did not clean its temporary backup\n' >&2
+    exit 1
+  }
+if find "$STATE_ROOT/backups" -path '*/skills/cx-interview' -print \
+  | grep -q .; then
+  printf 'successful managed skill replacement retained its temporary backup\n' >&2
+  exit 1
+fi
+
+printf '\n# local agent mutation\n' >> "$TEST_AGENTS/planner.toml"
+
+HOME="$TEST_HOME" \
+CODEX_HOME="$TEST_CODEX" \
+"$ROOT/install.sh" update \
+  --skills-dir "$TEST_SKILLS" \
+  --agents-dir "$TEST_AGENTS" \
+  --global-instructions keep \
+  > "$TEST_ROOT/agent-replace.log"
+
+cmp -s "$ROOT/agents/planner.toml" "$TEST_AGENTS/planner.toml" || {
+  printf 'managed agent was not reconciled\n' >&2
+  exit 1
+}
+grep -Fq 'Creating temporary agent backup: planner.toml' \
+  "$TEST_ROOT/agent-replace.log" || {
+    printf 'managed agent replacement did not create a temporary backup\n' >&2
+    exit 1
+  }
+grep -Fq 'Removing verified temporary agent backup: planner.toml' \
+  "$TEST_ROOT/agent-replace.log" || {
+    printf 'managed agent replacement did not clean its temporary backup\n' >&2
+    exit 1
+  }
+if find "$STATE_ROOT/backups" -path '*/agents/planner.toml' -print \
+  | grep -q .; then
+  printf 'successful managed agent replacement retained its temporary backup\n' >&2
+  exit 1
+fi
+
+printf '\n# rollback skill sentinel\n' >> "$TEST_SKILLS/cx-interview/SKILL.md"
+
+if HOME="$TEST_HOME" \
+  CODEX_HOME="$TEST_CODEX" \
+  PATH="$FAIL_BIN:$PATH" \
+  HIGHFLOOR_TEST_REAL_CP="$REAL_CP" \
+  HIGHFLOOR_TEST_FAIL_SOURCE="$ROOT/skills/cx-interview" \
+  HIGHFLOOR_TEST_FAIL_TARGET="$TEST_SKILLS/cx-interview" \
+  "$ROOT/install.sh" update \
+    --skills-dir "$TEST_SKILLS" \
+    --agents-dir "$TEST_AGENTS" \
+    --global-instructions keep \
+    > "$TEST_ROOT/skill-rollback.log" 2>&1; then
+  printf 'forced managed skill replacement failure unexpectedly succeeded\n' >&2
+  exit 1
+fi
+
+grep -Fq '# rollback skill sentinel' \
+  "$TEST_SKILLS/cx-interview/SKILL.md" || {
+    printf 'failed managed skill replacement did not restore the prior copy\n' >&2
+    exit 1
+  }
+grep -Fq 'skill copy failed; restored previous skill: cx-interview' \
+  "$TEST_ROOT/skill-rollback.log" || {
+    printf 'managed skill rollback was not reported\n' >&2
+    exit 1
+  }
+if find "$STATE_ROOT/backups" -path '*/skills/cx-interview' -print \
+  | grep -q .; then
+  printf 'verified managed skill rollback retained its temporary backup\n' >&2
+  exit 1
+fi
+
+printf '\n# rollback agent sentinel\n' >> "$TEST_AGENTS/planner.toml"
+
+if HOME="$TEST_HOME" \
+  CODEX_HOME="$TEST_CODEX" \
+  PATH="$FAIL_BIN:$PATH" \
+  HIGHFLOOR_TEST_REAL_CP="$REAL_CP" \
+  HIGHFLOOR_TEST_FAIL_SOURCE="$ROOT/agents/planner.toml" \
+  HIGHFLOOR_TEST_FAIL_TARGET="$TEST_AGENTS/planner.toml" \
+  "$ROOT/install.sh" update \
+    --skills-dir "$TEST_SKILLS" \
+    --agents-dir "$TEST_AGENTS" \
+    --global-instructions keep \
+    > "$TEST_ROOT/agent-rollback.log" 2>&1; then
+  printf 'forced managed agent replacement failure unexpectedly succeeded\n' >&2
+  exit 1
+fi
+
+grep -Fq '# rollback agent sentinel' "$TEST_AGENTS/planner.toml" || {
+  printf 'failed managed agent replacement did not restore the prior copy\n' >&2
+  exit 1
+}
+grep -Fq 'agent copy failed; restored previous agent: planner.toml' \
+  "$TEST_ROOT/agent-rollback.log" || {
+    printf 'managed agent rollback was not reported\n' >&2
+    exit 1
+  }
+if find "$STATE_ROOT/backups" -path '*/agents/planner.toml' -print \
+  | grep -q .; then
+  printf 'verified managed agent rollback retained its temporary backup\n' >&2
+  exit 1
+fi
 
 printf '# existing user instructions\n' > "$TEST_CODEX/AGENTS.md"
+
+if HOME="$TEST_HOME" \
+  CODEX_HOME="$TEST_CODEX" \
+  PATH="$FAIL_BIN:$PATH" \
+  HIGHFLOOR_TEST_REAL_CP="$REAL_CP" \
+  HIGHFLOOR_TEST_FAIL_SOURCE="$ROOT/CODEX_AGENTS.md" \
+  HIGHFLOOR_TEST_FAIL_TARGET="$TEST_CODEX/AGENTS.md" \
+  "$ROOT/install.sh" update \
+    --skills-dir "$TEST_SKILLS" \
+    --agents-dir "$TEST_AGENTS" \
+    --global-instructions replace \
+    > "$TEST_ROOT/global-rollback.log" 2>&1; then
+  printf 'forced global instructions replacement failure unexpectedly succeeded\n' >&2
+  exit 1
+fi
+
+grep -Fqx '# existing user instructions' "$TEST_CODEX/AGENTS.md" || {
+  printf 'failed global instructions replacement did not restore the prior copy\n' >&2
+  exit 1
+}
+grep -Fq 'global instructions copy failed; restored previous global instructions' \
+  "$TEST_ROOT/global-rollback.log" || {
+    printf 'global instructions rollback was not reported\n' >&2
+    exit 1
+  }
+if find "$STATE_ROOT/backups" -path '*/instructions/AGENTS.md' -type f \
+  | grep -q .; then
+  printf 'verified global instructions rollback retained its temporary backup\n' >&2
+  exit 1
+fi
 
 HOME="$TEST_HOME" \
 CODEX_HOME="$TEST_CODEX" \
@@ -138,6 +293,17 @@ grep -Fqx '# preserved after explicit keep' "$TEST_CODEX/AGENTS.md" || {
 HOME="$TEST_HOME" CODEX_HOME="$TEST_CODEX" "$ROOT/install.sh" doctor
 
 HOME="$TEST_HOME" CODEX_HOME="$TEST_CODEX" "$ROOT/install.sh" uninstall
+
+find "$STATE_ROOT/backups" -path '*/skills/cx-interview/SKILL.md' -type f \
+  | grep -q . || {
+    printf 'uninstall did not retain a recoverable managed skill backup\n' >&2
+    exit 1
+  }
+find "$STATE_ROOT/backups" -path '*/agents/planner.toml' -type f \
+  | grep -q . || {
+    printf 'uninstall did not retain a recoverable managed agent backup\n' >&2
+    exit 1
+  }
 
 while IFS= read -r entry || [ -n "$entry" ]; do
   [ ! -e "$TEST_SKILLS/$entry" ] || {

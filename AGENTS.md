@@ -52,11 +52,14 @@ trust-boundary prohibitions short and explicit.
 - Optional synchronization from `CODEX_AGENTS.md` to `$CODEX_HOME/AGENTS.md`
   is outside the managed lifecycle. Install it when absent; replace an existing
   regular file only after interactive confirmation or an explicit replace
-  option, use a temporary backup until the replacement is verified, preserve
-  it without a terminal, and never remove or judge it through `uninstall` or
-  `doctor`.
+  option, use a temporary backup until the replacement is verified, restore it
+  automatically on replacement failure, preserve it without a terminal, and
+  never remove or judge it through `uninstall` or `doctor`.
 - It must preserve unrelated user skills and agents.
-- Replaced or removed managed entries must be backed up first.
+- Managed replacements must use a temporary backup, verify the new copy, remove
+  the backup after success, and restore the previous copy after failure. Retired
+  entries, uninstall removals, and incomplete rollback or cleanup retain
+  recoverable backups.
 - Destination paths must be explicit, validated, and overrideable.
 - Remote installation must use HTTPS, fail closed on download errors, and avoid
   executing files from outside the selected repository archive.

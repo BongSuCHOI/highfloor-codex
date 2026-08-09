@@ -244,32 +244,38 @@ curl -fsSL https://raw.githubusercontent.com/BongSuCHOI/highfloor-codex/v0.1.0/i
 With the default `CODEX_HOME`, skills go to `~/.codex/skills` and agents go to
 `~/.codex/agents`. The state directory is not loaded as a skill or agent. It
 records the installed version and source ref, the two destinations, and the
-exact managed manifests used by update, `doctor`, and uninstall. Timestamped
-backups remain there when a managed entry is replaced, retired, or removed.
+exact managed manifests used by update, `doctor`, and uninstall. Persistent
+timestamped backups remain for retired entries, uninstall, or rollback and
+cleanup that could not complete safely. Existing backups from older installer
+versions are not auto-pruned because their original purpose was not recorded.
 
 When global `AGENTS.md` is absent, the installer copies `CODEX_AGENTS.md` into
 place. When a different file already exists, the default `ask` mode offers an
 interactive replacement. An accepted conflict is backed up temporarily, the
 new copy is verified against `CODEX_AGENTS.md`, and the backup is then deleted.
-If copying or verification fails, the backup remains for recovery. Without a
-terminal, the installer preserves the existing file. Use
+If copying or verification fails, the previous file is restored and the
+failure is reported. The backup remains only if rollback or backup cleanup
+cannot finish safely. Without a terminal, the installer preserves the existing
+file. Use
 `--global-instructions replace` for explicit non-interactive replacement or
 `--global-instructions keep` to disable synchronization. This optional file is
 not checked by `doctor` or removed by `uninstall`.
 
 Install and update use the same reconciliation. Every name in the selected
 release's manifest is compared with the installed copy. A changed copy is
-backed up and replaced with the repository version; an identical copy is left
-alone. If a later release removes a name from its manifest, update treats that
-name as retired and backs it up before removing it. Removing a manifest entry
-does **not** preserve the local copy as unmanaged content, and the current
-installer has no per-entry opt-out. Keep local variants in a fork or under a
-different namespace. Entries that Highfloor has never managed remain
-untouched.
+replaced through a temporary backup, exact verification, and automatic rollback
+on failure; an identical copy is left alone. The temporary backup is deleted
+after successful verification, so only the latest installed version remains.
+If a later release removes a name from its manifest, update treats that name as
+retired and keeps a backup before removing it. Removing a manifest entry does
+**not** preserve the local copy as unmanaged content, and the current installer
+has no per-entry opt-out. Keep local variants in a fork or under a different
+namespace. Entries that Highfloor has never managed remain untouched.
 
 The comparison unit is one complete managed skill directory or one custom-agent
-TOML file. If any file inside a skill differs, update backs up and replaces that
-whole skill directory; it does not patch only the changed files within it.
+TOML file. If any file inside a skill differs, update replaces and verifies that
+whole skill directory as one transaction; it does not patch only the changed
+files within it.
 
 See
 [Installation and updates](docs/INSTALLATION.md) for path overrides, offline
@@ -529,9 +535,10 @@ when a remote source archive is needed.
 - Review remote scripts before piping them to `sh`.
 - Prefer release-tag pinning for reproducible installation.
 - Managed entries are defined by two plain-text manifests.
-- Existing conflicting entries are backed up before replacement.
+- Existing conflicting entries use verified replacement with automatic
+  rollback; successful replacement does not retain the legacy copy.
 - Updates do not delete unrelated skills or agents.
-- Uninstall uses recorded state and retains backups.
+- Retired-entry removal and uninstall use recorded state and retain backups.
 - Skills may invoke external runtimes or browser tools when their contracts say
   so; review each skill and its provenance before use.
 - External video transcription stays disabled until the user authorizes that
