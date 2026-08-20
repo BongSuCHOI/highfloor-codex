@@ -196,6 +196,11 @@ domain knowledge, and AI.
 
 ## Working principles
 
+Runtime guidance adapts to the current task state, evidence, risk, and
+execution conditions. Provider and model names or reasoning-effort settings
+may be recorded to evaluate behavior, but they do not select a different
+runtime contract.
+
 - Evidence over confident narration.
 - State-based routing over model-name branching.
 - One skill, one clear responsibility.
@@ -583,10 +588,10 @@ skill's `references/upstream*.md`, and, for the `cx-*` family, the
 | `cx-interview`, `cx-acceptance-qa`, `cx-scope-check`, `cx-unstuck` | [`Q00/ouroboros`](https://github.com/Q00/ouroboros) — MIT | Preserves its clarification, acceptance, drift-checking, and reframing methods while independently rewriting them as standalone Codex skills without the Ouroboros-specific MCP, session, scoring, orchestration, or persona runtime. |
 | `cx-coding-agent-sessions`, `cx-debugging`, `cx-programming`, `cx-ultraresearch`, `cx-visual-qa` | [`code-yeongyu/oh-my-openagent`](https://github.com/code-yeongyu/oh-my-openagent) — Sustainable Use License 1.0 | Condenses, reorganizes, or adapts the original skills for Codex routing, permission boundaries, focused evidence, and Highfloor's event-driven workflow. Some upstream files remain retained or byte-identical where documented. |
 | `cx-browser-automation` | [`microsoft/playwright-cli`](https://github.com/microsoft/playwright-cli) — Apache-2.0 | Adapts browser interaction for Codex, adds local wrappers and evidence guidance, and separates browser operation from final visual judgment. `vercel-labs/agent-browser` is invoked as a runtime dependency and is not bundled. |
-| `cx-insane-search` | [`fivetaku/insane-search`](https://github.com/fivetaku/insane-search) — MIT | Retains adapted engine and test material while rewriting public-content, permission, fallback, and failure boundaries for Codex. |
+| `cx-insane-search` | [`fivetaku/insane-search`](https://github.com/fivetaku/insane-search) — MIT | Retains adapted engine and test material while rewriting public-content, permission, fallback, and failure boundaries for Codex. A selective refresh adds challenge-marker false-positive corrections and installed `curl_cffi` target filtering without importing the upstream browser, persistence or installation surface. |
 | `cx-insane-search`, `cx-ultraresearch` | [`fivetaku/insane-research`](https://github.com/fivetaku/insane-research) — MIT | Independently adapts selected retrieval-metadata, source-map, claim-map, countersearch, contradiction, and temporal-evidence concepts. It excludes the fixed seven-phase orchestration, automatic agent fan-out, permission bypass, mandatory artifacts, claim validator, and report evaluator. |
 | `cx-slopslap` | [`vibedesignlab/slopslap`](https://github.com/vibedesignlab/slopslap) — MIT | Preserves the upstream taxonomy, data, references, and scripts while adapting host discovery, concurrency, Git behavior, report serving, and browser resolution. |
-| `cx-design-director` | Original Highfloor content; optional [`ibelick/ui-skills`](https://github.com/ibelick/ui-skills) runtime lookup — MIT | The skill itself is original Highfloor material. UI Skills may be invoked as an external reference source; its content is not bundled or presented as Highfloor-owned material. |
+| `cx-design-director` | Original Highfloor content; selected method source [`fivetaku/insane-design`](https://github.com/fivetaku/insane-design) — MIT; optional [`ibelick/ui-skills`](https://github.com/ibelick/ui-skills) runtime lookup — MIT | Independently adapts token-provenance, variable-chain and known-gap concepts into the local reference-evidence contract. No insane-design parser, runtime, corpus, template, screenshot or wording is bundled; UI Skills remains an external optional lookup. |
 
 ### License boundary
 

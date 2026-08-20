@@ -209,6 +209,11 @@ Human-in-the-loop는 단순한 안전장치가 아니라, 사람의 도메인 �
 
 ## 작업 원칙
 
+Runtime guidance는 현재 작업 상태, 증거, 위험과 실행 조건에 맞춰
+달라집니다. Provider·model 이름과 reasoning-effort 설정은 행동을 평가하기
+위해 기록할 수 있지만, 서로 다른 runtime contract를 선택하는 조건으로
+사용하지 않습니다.
+
 - 자신감 있는 서술보다 증거
 - 모델 이름보다 현재 상태에 따른 선택
 - 하나의 스킬, 하나의 분명한 책임
@@ -589,10 +594,10 @@ skill의 `references/upstream*.md`, 그리고 `cx-*` 계열의
 | `cx-interview`, `cx-acceptance-qa`, `cx-scope-check`, `cx-unstuck` | [`Q00/ouroboros`](https://github.com/Q00/ouroboros) — MIT | 요구사항 명료화, acceptance, drift 확인과 reframing 방법을 보존합니다. 단순 리네임이나 복사본이 아니라, Ouroboros 전용 MCP, session, scoring, orchestration과 persona runtime을 제외하고 독립 실행 가능한 Codex skill로 재작성했습니다. |
 | `cx-coding-agent-sessions`, `cx-debugging`, `cx-programming`, `cx-ultraresearch`, `cx-visual-qa` | [`code-yeongyu/oh-my-openagent`](https://github.com/code-yeongyu/oh-my-openagent) — Sustainable Use License 1.0 | 원장의 skill을 Codex routing, permission boundary, 집중된 evidence와 Highfloor의 event-driven workflow에 맞게 압축·재구성하거나 수정했습니다. 문서에 표시된 일부 upstream 파일은 그대로 유지하거나 byte-identical 상태로 보존합니다. |
 | `cx-browser-automation` | [`microsoft/playwright-cli`](https://github.com/microsoft/playwright-cli) — Apache-2.0 | Browser interaction을 Codex에 맞게 수정하고 local wrapper와 evidence 지침을 추가했으며, browser 조작과 최종 visual 판정을 분리했습니다. `vercel-labs/agent-browser`는 번들하지 않고 runtime dependency로 호출합니다. |
-| `cx-insane-search` | [`fivetaku/insane-search`](https://github.com/fivetaku/insane-search) — MIT | 수정한 engine과 test material을 유지하면서 공개 콘텐츠 접근, permission, fallback과 failure boundary를 Codex에 맞게 다시 작성했습니다. |
+| `cx-insane-search` | [`fivetaku/insane-search`](https://github.com/fivetaku/insane-search) — MIT | 수정한 engine과 test material을 유지하면서 공개 콘텐츠 접근, permission, fallback과 failure boundary를 Codex에 맞게 다시 작성했습니다. 선택적 refresh로 challenge marker 오탐 교정과 설치된 `curl_cffi` target filtering을 추가하되 upstream의 browser, persistence, installation surface는 가져오지 않았습니다. |
 | `cx-insane-search`, `cx-ultraresearch` | [`fivetaku/insane-research`](https://github.com/fivetaku/insane-research) — MIT | Retrieval metadata, source map, claim map, countersearch, contradiction, temporal evidence 개념 중 선택한 부분을 독립적인 문장으로 반영했습니다. 고정 7단계 orchestration, automatic agent fan-out, permission bypass, mandatory artifact, claim validator와 report evaluator는 포함하지 않습니다. |
 | `cx-slopslap` | [`vibedesignlab/slopslap`](https://github.com/vibedesignlab/slopslap) — MIT | Upstream taxonomy, data, reference와 script를 보존하면서 host discovery, concurrency, Git behavior, report serving과 browser resolution을 수정했습니다. |
-| `cx-design-director` | Original Highfloor content; optional [`ibelick/ui-skills`](https://github.com/ibelick/ui-skills) runtime lookup — MIT | Skill 자체는 Highfloor original material입니다. UI Skills는 외부 reference source로 호출할 수 있지만 그 내용을 번들하거나 Highfloor 소유로 표시하지 않습니다. |
+| `cx-design-director` | Original Highfloor content; selected method source [`fivetaku/insane-design`](https://github.com/fivetaku/insane-design) — MIT; optional [`ibelick/ui-skills`](https://github.com/ibelick/ui-skills) runtime lookup — MIT | Token provenance, variable chain과 known gap 개념을 local reference-evidence contract에 독립적인 문장으로 반영했습니다. insane-design의 parser, runtime, corpus, template, screenshot과 wording은 번들하지 않으며 UI Skills는 선택적인 외부 lookup으로 유지합니다. |
 
 ### License 경계
 

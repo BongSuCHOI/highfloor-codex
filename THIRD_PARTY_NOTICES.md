@@ -18,7 +18,8 @@ third-party or derivative component.
 | `cx-acceptance-qa`, `cx-interview`, `cx-scope-check`, `cx-unstuck` | `Q00/ouroboros` at `2dec0dbd01bb5b2243ea138af9d91f3583b92c5d` | independently worded adaptations with preserved method provenance | MIT | `LICENSES/MIT-Q00-ouroboros.txt` |
 | `cx-browser-automation` | `microsoft/playwright-cli` | modified derivative | Apache-2.0 | `LICENSES/Apache-2.0-microsoft-playwright-cli.txt` |
 | `cx-coding-agent-sessions`, `cx-debugging`, `cx-programming`, `cx-ultraresearch`, `cx-visual-qa` | `code-yeongyu/oh-my-openagent`, source archive version `4.14.0`, exact commit `NOT_PROVEN` | modified derivatives | Sustainable Use License 1.0 | `LICENSES/SUL-1.0-oh-my-openagent.txt` |
-| `cx-insane-search` | `fivetaku/insane-search`, exact commit `NOT_PROVEN` | modified derivative | MIT | `LICENSES/MIT-fivetaku-insane-search.txt` |
+| `cx-design-director` | `fivetaku/insane-design` at `a5eb1d976d29309092170ff7ba475a487df0b683` | independently worded adaptation of selected reference-evidence concepts; no upstream runtime or corpus redistributed | MIT | `LICENSES/MIT-fivetaku-insane-design.txt` |
+| `cx-insane-search` | `fivetaku/insane-search`, original conversion commit `NOT_PROVEN`; selective refresh at `019ee16bbf471595f9b67b164e4a92208183af2d` | modified derivative | MIT | `LICENSES/MIT-fivetaku-insane-search.txt` |
 | `cx-insane-search`, `cx-ultraresearch` | `fivetaku/insane-research` at `68f7e59168a9c9b0a586bd4122cb7a229e119d9c` | independently worded adaptations of selected access-evidence and research-method concepts | MIT | `LICENSES/MIT-fivetaku-insane-research.txt` |
 | `cx-slopslap` | `vibedesignlab/slopslap` version `1.3.0`, exact commit `NOT_PROVEN` | modified derivative with vendored taxonomy, data, references, and scripts | MIT | `LICENSES/MIT-vibedesignlab-slopslap.txt` |
 
@@ -77,7 +78,21 @@ They were condensed, reorganized, or adapted for Codex. Some session and visual 
 
 ### Insane Search
 
-`cx-insane-search` adapts `fivetaku/insane-search` for Codex, rewrites public-content and permission boundaries, and retains modified engine and test material.
+`cx-insane-search` adapts `fivetaku/insane-search` for Codex, rewrites
+public-content and permission boundaries, and retains modified engine and test
+material. The selective refresh adds challenge-classification corrections and
+installed `curl_cffi` target filtering while retaining Highfloor's guarded
+transport, opt-in persistence and browser-handoff boundaries.
+
+Copyright (c) 2026 fivetaku.
+
+### Insane Design
+
+`cx-design-director` independently expresses selected evidence-separation
+ideas reviewed in `fivetaku/insane-design`: token provenance, raw and resolved
+CSS-variable chains, scoped declarations, and explicit known gaps. It does not
+bundle the upstream parser, apply or verification runtime, report corpus,
+templates, screenshots, brand data, generated examples or wording.
 
 Copyright (c) 2026 fivetaku.
 

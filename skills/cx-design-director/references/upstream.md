@@ -22,3 +22,16 @@ Research comparison:
 Highfloor independently words its layout-responsibility, motion-continuity and
 visual-evidence refinements. The comparison does not make StyleGallery a
 runtime dependency or a source of visual defaults.
+
+Selected method source:
+
+- Project: [`fivetaku/insane-design`](https://github.com/fivetaku/insane-design)
+- Inspected commit: `a5eb1d976d29309092170ff7ba475a487df0b683`
+- Relationship: `independently worded`
+- License: MIT; see `LICENSE.insane-design.txt`
+
+Highfloor independently adapted only the evidence-separation ideas relevant to
+reference extraction: source provenance for extracted tokens, raw and resolved
+CSS-variable chains, scoped declarations, and explicit known gaps. No parser,
+apply or verification runtime, report corpus, templates, screenshots, brand
+data, generated examples, command surface or upstream wording is bundled.

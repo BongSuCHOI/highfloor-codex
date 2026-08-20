@@ -6,6 +6,31 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Strengthened the portable instructions and existing CX contracts around
+  constraint-preserving fallbacks, terminal artifacts and critical gates for
+  persistent work, failure-topology evidence, repeated-symptom diagnosis,
+  destructive-cleanup proof, restoration fidelity, first-party source use,
+  and quantitative evidence basis. Runtime routing remains based on task
+  state, evidence, risk, and execution conditions rather than model names.
+- Extended `cx-coding-agent-sessions` with recorded model and reasoning-effort
+  history, `--reasoning-effort`, root/subagent/internal labels, default
+  filtering of host-internal sessions with `excluded_internal_count`, and lazy
+  rollout hydration when older SQLite metadata is stale. The finder now keeps
+  the rollout's first `session_meta.payload.id` authoritative so inherited
+  parent metadata cannot collapse child sessions into the root.
+- Hardened `cx-insane-search` challenge classification with identifier-boundary
+  matching, decisive Cloudflare structure markers, large-document soft-mention
+  handling, and filtering against the installed `curl_cffi` impersonation set;
+  recorded the exact selective-refresh commit without mislabeling the original
+  conversion snapshot.
+- Strengthened `cx-design-director` reference extraction with explicit lanes
+  for observed facts, inferred behavior, new first-party decisions and
+  unresolved gaps, including scoped CSS declaration and variable-chain
+  provenance. The selected `fivetaku/insane-design` method source is pinned and
+  licensed without importing its runtime or corpus.
+
 ## [0.2.0] - 2026-08-10
 
 This is a compatible minor release from `0.1.0`. It adds two skills without

@@ -1,6 +1,6 @@
 # CX Skill Catalog
 
-- Snapshot date: 2026-07-28
+- Snapshot date: 2026-08-19
 - Canonical catalog: `skills/CX_SKILL_CATALOG.md`
 - Runtime contracts: `skills/cx-*/SKILL.md`
 - Governance: `skills/CX_SKILLS.md`
@@ -64,7 +64,9 @@ materially ambiguous request
 
 `cx-scope-check` and `cx-unstuck` are not fixed stages. They enter only when
 their drift or genuine-deadlock triggers occur. Create a Codex Goal only when
-the user explicitly selects long-running objective tracking.
+the user explicitly selects long-running objective tracking. Persistent work
+keeps one terminal artifact and its required gates visible; the Goal preserves
+the objective but does not redefine success or justify adjacent expansion.
 
 ## 4. Skill cards
 
@@ -79,7 +81,8 @@ Runtime contract: [`SKILL.md`](cx-acceptance-qa/SKILL.md)
 - **Non-trigger:** a small change already proven by basic verification, cause
   diagnosis, or the final verdict for rendered UI alone.
 - **Method:** treat each AC as an observable promise and prove it with the
-  smallest sufficient mechanical, observable, and semantic evidence.
+  smallest sufficient mechanical, observable, and semantic evidence matched
+  to the relevant failure topology.
 - **Routes:** UI verdict → `cx-visual-qa`; interaction →
   `cx-browser-automation`; failure cause → `cx-debugging`; specification gap →
   `cx-interview`.
@@ -125,8 +128,10 @@ Runtime contract: [`SKILL.md`](cx-coding-agent-sessions/SKILL.md)
   work evidence must be recovered.
 - **Non-trigger:** semantic interpretation of the current diff, ordinary
   repository search, or a low-stakes conversation where memory is sufficient.
-- **Method:** use the bundled finder first and treat the raw transcript path as
-  the source of truth for exact claims.
+- **Method:** use the bundled finder first, hide host-internal traces from
+  ordinary results, expose recorded model and reasoning-effort history for
+  evaluation, and treat the raw transcript path as the source of truth for
+  exact claims.
 - **Routes:** recovered contracts can be consumed by `cx-scope-check` or
   `cx-interview`; this skill does not issue a drift verdict.
 
@@ -141,7 +146,8 @@ Runtime contract: [`SKILL.md`](cx-debugging/SKILL.md)
 - **Non-trigger:** routine review, requirement clarification, a planned
   refactor, or an acceptance verdict.
 - **Method:** use the smallest reproduction and discriminating hypotheses to
-  test whether the cause predicts the failure.
+  test whether the cause predicts the failure; if the exact symptom survives a
+  fix, reopen the cause or scope before stacking another change.
 - **Routes:** browser-only reproduction → `cx-browser-automation`; formal
   verdict → `cx-acceptance-qa`.
 
@@ -156,7 +162,9 @@ Runtime contract: [`SKILL.md`](cx-design-director/SKILL.md)
 - **Non-trigger:** a small style, copy, or single-component edit, or a request
   limited to AI-slop removal.
 - **Method:** prefer the existing first-party system and translate references
-  into tokens, geometry, states, responsiveness, and accessibility contracts.
+  into tokens, geometry, states, responsiveness, and accessibility contracts;
+  restoration preserves the approved composition, behavior, and tuned
+  parameters unless that boundary is reopened.
 - **Routes:** interaction → `cx-browser-automation`; rendered verdict →
   `cx-visual-qa`; explicit AI-slop constraint → `cx-slopslap`.
 
@@ -189,7 +197,8 @@ Runtime contract: [`SKILL.md`](cx-interview/SKILL.md)
   decision already settled by project rules.
 - **Method:** expose hidden assumptions through Socratic questions; for
   materially multi-surface requests, confirm top-level coverage before
-  converging through restatement, explicit review of reductions, and approval.
+  converging through restatement, explicit review of reductions, and approval;
+  persistent contracts may name the terminal artifact and required gates.
 - **Routes:** UI/product-flow discovery → `cx-design-director`; external
   comparison → `cx-ultraresearch`; implementation drift, deadlock, or formal
   proof → the corresponding owner.
@@ -251,7 +260,9 @@ Runtime contract: [`SKILL.md`](cx-ultraresearch/SKILL.md)
   reading one accessible page.
 - **Method:** define only the necessary evidence axes, keep claim-relative
   source and material-claim maps, distinguish source lineage from domain, and
-  classify claims as `supported`, `unresolved`, or `refuted`.
+  classify claims as `supported`, `unresolved`, or `refuted`; distinguish
+  direct measurement, first-principles bounds, transferred estimates, and
+  scenarios for material quantitative claims.
 - **Routes:** blocked public URL → `cx-insane-search`; real page interaction or
   rendered state → `cx-browser-automation`; apply the evidence contract in
   context for high-stakes or citation-heavy work, but materialize durable
