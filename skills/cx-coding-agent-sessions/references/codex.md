@@ -14,7 +14,18 @@ uv run --isolated python "<skill-root>/scripts/find-agent-sessions.py" search --
 uv run --isolated python "<skill-root>/scripts/find-agent-sessions.py" get <session-id> --platform codex
 ```
 
-Important filters: `--from`, `--to`, `--cwd`, `--model`, `--root`, `--limit`, and `--include-subagents`.
+Important filters: `--from`, `--to`, `--cwd`, `--model`,
+`--reasoning-effort`, `--root`, `--limit`, `--include-subagents`, and
+`--include-internal`. Model and effort filters match any recorded value in the
+ordered session history. When old SQLite rows do not contain that history, the
+finder reads their rollout lazily after applying date and cwd filters; narrow a
+large store with those filters when possible.
+
+Codex list and search results hide internal host sessions such as
+`codex-auto-review`, built-in review, and memory-consolidation side threads by
+default. The payload reports `excluded_internal_count`; use
+`--include-internal` when those traces are themselves evidence. Direct
+`read <session-id>` remains available regardless of the default filter.
 
 ## Spawned (subagent) threads
 
@@ -28,3 +39,9 @@ Codex subagent threads are ordinary rows in `threads` with their own rollout fil
 `threads` also carries `agent_nickname`, `agent_role`, `model`, `first_user_message`, `tokens_used`. Without the SQLite DB, the same linkage is in each rollout file's first line: `type: "session_meta"` whose `payload` has `id`, `cwd`, `model_provider`, `forked_from_id`, and the same `source.subagent.thread_spawn` object.
 
 The finder maps these to `parent_id` and `agent = "nickname (role)"`; `get <parent-thread-id>` lists children under `subagents`, and `get <child-thread-id>` returns the child's rollout events.
+
+Codex rollout events may change model or reasoning effort during a task. The
+finder preserves ordered, deduplicated `models` and `reasoning_efforts` arrays
+and labels each result as `root`, `subagent`, or `internal`. These fields expose
+recorded settings and available reasoning summaries; they do not reconstruct
+hidden chain of thought.

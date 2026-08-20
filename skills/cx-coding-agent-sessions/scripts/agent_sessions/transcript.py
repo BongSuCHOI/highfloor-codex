@@ -37,14 +37,19 @@ def flat_parallel(paths: list[Path], workers: int, read: Callable[[Path], list[S
 
 def jsonl_session(platform: str, path: Path, fallback_id: str) -> Session:
     sid = fallback_id
+    authoritative_sid: str | None = None
     cwd = provider = model = first_user = parent = agent = None
+    source: Json | None = None
     last_user = ""
     created = updated = None
     usage: JsonMap = {}
+    models: list[str] = []
+    reasoning_efforts: list[str] = []
     for data in iter_jsonl(path):
         event_type = data.get("type")
         session_line_id = text(data.get("id")) if event_type == "session" else None
-        sid = text(data.get("sessionId")) or session_line_id or sid
+        if authoritative_sid is None:
+            sid = text(data.get("sessionId")) or session_line_id or sid
         cwd = cwd or text(data.get("cwd"))
         created = created or text(data.get("timestamp"))
         updated = text(data.get("timestamp")) or updated
@@ -52,21 +57,86 @@ def jsonl_session(platform: str, path: Path, fallback_id: str) -> Session:
         model = model or text(data.get("modelId")) or text(data.get("model"))
         payload = as_map(data.get("payload"))
         if event_type == "session_meta" and payload is not None:
-            sid = text(payload.get("id")) or sid
+            authoritative_sid = authoritative_sid or text(payload.get("id"))
+            sid = authoritative_sid or sid
             cwd = cwd or text(payload.get("cwd"))
             provider = provider or text(payload.get("model_provider"))
+            source = source if source is not None else payload.get("source")
             source_parent, source_agent = spawn_info(payload.get("source"))
             parent = parent or source_parent
             agent = agent or source_agent or nick_role(text(payload.get("agent_nickname")), text(payload.get("agent_role")))
         message = as_map(data.get("message")) or payload or {}
         provider = provider or text(message.get("provider"))
         model = model or text(message.get("model"))
+        _extend_unique(models, _model_values(data, payload, message))
+        _extend_unique(reasoning_efforts, _reasoning_effort_values(data, payload))
         prompt = user_text(data, message)
         if prompt:
             first_user = first_user or prompt
             last_user = prompt
         merge_usage(usage, as_map(message.get("usage")) or as_map(data.get("usage")))
-    return Session(platform, sid, str(path), cwd, created or file_time(path), updated or created or file_time(path), provider, model, first_user or "", usage, parent, agent, last_user)
+    current_model = models[-1] if models else model
+    internal, internal_kind = internal_info(current_model, source)
+    return Session(
+        platform,
+        sid,
+        str(path),
+        cwd,
+        created or file_time(path),
+        updated or created or file_time(path),
+        provider,
+        current_model,
+        first_user or "",
+        usage,
+        parent,
+        agent,
+        last_user,
+        tuple(models),
+        tuple(reasoning_efforts),
+        internal,
+        internal_kind,
+    )
+
+
+def _model_values(data: JsonMap, payload: JsonMap | None, message: JsonMap) -> tuple[str | None, ...]:
+    thread_settings = as_map(payload.get("thread_settings")) if payload is not None else None
+    return (
+        text(data.get("modelId")),
+        text(data.get("model")),
+        text(payload.get("model")) if payload is not None else None,
+        text(thread_settings.get("model")) if thread_settings is not None else None,
+        text(message.get("model")),
+    )
+
+
+def _reasoning_effort_values(data: JsonMap, payload: JsonMap | None) -> tuple[str | None, ...]:
+    thread_settings = as_map(payload.get("thread_settings")) if payload is not None else None
+    collaboration = as_map(payload.get("collaboration_mode")) if payload is not None else None
+    collaboration_settings = as_map(collaboration.get("settings")) if collaboration is not None else None
+    return (
+        text(data.get("reasoning_effort")),
+        text(data.get("effort")),
+        text(payload.get("reasoning_effort")) if payload is not None else None,
+        text(payload.get("effort")) if payload is not None else None,
+        text(thread_settings.get("reasoning_effort")) if thread_settings is not None else None,
+        text(collaboration_settings.get("reasoning_effort")) if collaboration_settings is not None else None,
+    )
+
+
+def _extend_unique(target: list[str], values: tuple[str | None, ...]) -> None:
+    for value in values:
+        if value and value not in target:
+            target.append(value)
+
+
+def internal_info(model: str | None, source: Json | None) -> tuple[bool, str | None]:
+    if (model or "").lower() == "codex-auto-review":
+        return True, "auto_review"
+    data = as_map(parse_json_text(source) if isinstance(source, str) else source)
+    subagent = data.get("subagent") if data is not None else None
+    if isinstance(subagent, str):
+        return True, subagent
+    return False, None
 
 
 def spawn_info(source: Json | None) -> tuple[str | None, str | None]:

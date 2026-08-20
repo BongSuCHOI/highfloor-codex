@@ -83,10 +83,17 @@ def _dedupe(sessions: list[Session]) -> list[Session]:
     for session in sessions:
         key = (session.platform, session.id)
         current = found.get(key)
-        if current is None or _linkage_score(session) > _linkage_score(current):
+        if current is None or _detail_score(session) > _detail_score(current):
             found[key] = session
     return list(found.values())
 
 
-def _linkage_score(session: Session) -> int:
-    return int(session.parent_id is not None) + int(session.agent is not None)
+def _detail_score(session: Session) -> tuple[int, int, int, int, int]:
+    linkage = int(session.parent_id is not None) + int(session.agent is not None)
+    return (
+        linkage,
+        int(bool(session.reasoning_efforts)),
+        int(session.path.endswith(".jsonl")),
+        len(session.models),
+        len(session.first_user_message),
+    )

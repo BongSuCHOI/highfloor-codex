@@ -21,7 +21,7 @@ from agent_sessions import cli, scanners
 from agent_sessions.opencode import scan_opencode
 from agent_sessions.scanners import scan_claude, scan_codex
 from agent_sessions.transcript import MAX_PLATFORM_FILES, recent
-from agent_sessions.types import Json, JsonMap, Session
+from agent_sessions.types import Json, JsonMap, Options, Session
 
 
 def _map(value: Json) -> JsonMap:
@@ -49,8 +49,35 @@ def _claude_line(session_id: str, content: str, agent_id: str | None = None) -> 
     return json.dumps(data)
 
 
-def _session(platform: str, sid: str, parent_id: str | None = None, agent: str | None = None, path: str = "/tmp/x.x") -> Session:
-    return Session(platform, sid, path, "/tmp/work", "2026-06-10T00:00:00+00:00", None, None, None, "hello world", {}, parent_id, agent)
+def _session(
+    platform: str,
+    sid: str,
+    parent_id: str | None = None,
+    agent: str | None = None,
+    path: str = "/tmp/x.x",
+    *,
+    model: str | None = None,
+    reasoning_efforts: tuple[str, ...] = (),
+    internal: bool = False,
+) -> Session:
+    return Session(
+        platform,
+        sid,
+        path,
+        "/tmp/work",
+        "2026-06-10T00:00:00+00:00",
+        None,
+        None,
+        model,
+        "hello world",
+        {},
+        parent_id,
+        agent,
+        models=(model,) if model else (),
+        reasoning_efforts=reasoning_efforts,
+        internal=internal,
+        internal_kind="auto_review" if internal else None,
+    )
 
 
 @pytest.fixture
@@ -167,9 +194,17 @@ def test_codex_rollout_session_meta_recovers_id_and_parent(codex_home: Path) -> 
     user: JsonMap = {
         "timestamp": "2026-06-01T00:00:01.000Z",
         "type": "response_item",
+        "sessionId": "parent-9",
         "payload": {"type": "message", "role": "user", "content": [{"type": "input_text", "text": "spawned task prompt"}]},
     }
-    (day / "rollout-2026-06-01T00-00-00-child-9.jsonl").write_text(json.dumps(meta) + "\n" + json.dumps(user) + "\n")
+    inherited_meta: JsonMap = {
+        "timestamp": "2026-06-01T00:00:00.500Z",
+        "type": "session_meta",
+        "payload": {"id": "parent-9", "cwd": "/tmp/work", "model_provider": "openai", "source": "cli"},
+    }
+    (day / "rollout-2026-06-01T00-00-00-child-9.jsonl").write_text(
+        json.dumps(meta) + "\n" + json.dumps(inherited_meta) + "\n" + json.dumps(user) + "\n"
+    )
 
     sessions = {item.id: item for item in scan_codex((), 4)}
 
@@ -178,6 +213,68 @@ def test_codex_rollout_session_meta_recovers_id_and_parent(codex_home: Path) -> 
     assert sessions["child-9"].agent == "Tesla (explorer)"
     assert sessions["child-9"].cwd == "/tmp/work"
     assert "spawned task prompt" in sessions["child-9"].first_user_message
+
+
+def test_codex_rollout_tracks_model_and_reasoning_effort_history(codex_home: Path) -> None:
+    day = codex_home / "sessions" / "2026" / "06" / "02"
+    day.mkdir(parents=True)
+    rows: list[JsonMap] = [
+        {
+            "timestamp": "2026-06-02T00:00:00.000Z",
+            "type": "session_meta",
+            "payload": {
+                "id": "root-effort",
+                "cwd": "/tmp/work",
+                "model_provider": "openai",
+                "model": "gpt-5.6-sol",
+                "effort": "xhigh",
+                "source": "cli",
+            },
+        },
+        {
+            "timestamp": "2026-06-02T00:00:01.000Z",
+            "type": "event_msg",
+            "payload": {
+                "type": "thread_settings_applied",
+                "thread_settings": {"model": "gpt-5.6-sol", "reasoning_effort": "ultra"},
+            },
+        },
+    ]
+    (day / "rollout-2026-06-02T00-00-00-root-effort.jsonl").write_text("\n".join(json.dumps(row) for row in rows) + "\n")
+
+    session = {item.id: item for item in scan_codex((), 4)}["root-effort"]
+
+    assert session.model == "gpt-5.6-sol"
+    assert session.models == ("gpt-5.6-sol",)
+    assert session.reasoning_efforts == ("xhigh", "ultra")
+    assert session.internal is False
+
+
+def test_codex_auto_review_rollout_is_internal(codex_home: Path) -> None:
+    day = codex_home / "sessions" / "2026" / "06" / "03"
+    day.mkdir(parents=True)
+    meta: JsonMap = {
+        "timestamp": "2026-06-03T00:00:00.000Z",
+        "type": "session_meta",
+        "payload": {
+            "id": "review-1",
+            "cwd": "/tmp/work",
+            "model_provider": "openai",
+            "model": "codex-auto-review",
+            "source": "cli",
+        },
+    }
+    inherited_meta: JsonMap = {
+        "timestamp": "2026-06-03T00:00:00.500Z",
+        "type": "session_meta",
+        "payload": {"id": "root-1", "cwd": "/tmp/work", "model_provider": "openai", "source": "cli"},
+    }
+    (day / "rollout-2026-06-03T00-00-00-review-1.jsonl").write_text(json.dumps(meta) + "\n" + json.dumps(inherited_meta) + "\n")
+
+    session = {item.id: item for item in scan_codex((), 4)}["review-1"]
+
+    assert session.internal is True
+    assert session.internal_kind == "auto_review"
 
 
 OPENCODE_SCHEMA = (
@@ -287,6 +384,68 @@ def test_cli_list_include_subagents_keeps_children(family: list[Session]) -> Non
     payload = cli._list_payload(family, family, 10, include_subagents=True)
 
     assert {item["id"] for item in _rows(payload, "results") if isinstance(item["id"], str)} == {"ses_main", "ses_child1", "ses_child2"}
+
+
+def test_cli_list_hides_internal_sessions_and_reports_count() -> None:
+    sessions = [
+        _session("codex", "root"),
+        _session("codex", "review", model="codex-auto-review", internal=True),
+    ]
+
+    default_payload = cli._list_payload(sessions, sessions, 10)
+    included_payload = cli._list_payload(sessions, sessions, 10, include_internal=True)
+
+    assert [item["id"] for item in _rows(default_payload, "results")] == ["root"]
+    assert default_payload["excluded_internal_count"] == 1
+    assert {item["id"] for item in _rows(included_payload, "results")} == {"root", "review"}
+    review = next(item for item in _rows(included_payload, "results") if item["id"] == "review")
+    assert review["session_kind"] == "internal"
+
+
+def test_cli_filter_matches_reasoning_effort_history() -> None:
+    sessions = [
+        _session("codex", "ultra", reasoning_efforts=("xhigh", "ultra")),
+        _session("codex", "medium", reasoning_efforts=("medium",)),
+    ]
+    opts = Options(frozenset({"codex"}), (), (), None, None, None, None, "ultra", 10, 2, False, False)
+
+    assert [item.id for item in cli._filter(sessions, opts)] == ["ultra"]
+
+
+def test_cli_filter_hydrates_stale_codex_db_runtime_history(tmp_path: Path) -> None:
+    rollout = tmp_path / "rollout-stale-root.jsonl"
+    rows: list[JsonMap] = [
+        {
+            "timestamp": "2026-06-10T00:00:00.000Z",
+            "type": "session_meta",
+            "payload": {
+                "id": "stale-root",
+                "cwd": "/tmp/work",
+                "model_provider": "openai",
+                "model": "gpt-5.6-sol",
+                "effort": "xhigh",
+                "source": "cli",
+            },
+        },
+        {
+            "timestamp": "2026-06-10T00:00:01.000Z",
+            "type": "event_msg",
+            "payload": {
+                "type": "thread_settings_applied",
+                "thread_settings": {"model": "gpt-5.6-sol", "reasoning_effort": "ultra"},
+            },
+        },
+    ]
+    rollout.write_text("\n".join(json.dumps(row) for row in rows) + "\n")
+    stale_db_session = _session("codex", "stale-root", path=str(rollout), model="gpt-5.6-terra")
+    opts = Options(frozenset({"codex"}), (), (), None, None, None, "gpt-5.6-sol", "ultra", 10, 2, False, False)
+
+    results = cli._filter([stale_db_session], opts)
+
+    assert len(results) == 1
+    assert results[0].model == "gpt-5.6-sol"
+    assert results[0].models == ("gpt-5.6-sol",)
+    assert results[0].reasoning_efforts == ("xhigh", "ultra")
 
 
 def test_cli_get_main_includes_children(family: list[Session]) -> None:

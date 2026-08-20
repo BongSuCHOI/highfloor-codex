@@ -18,9 +18,11 @@ class Options:
     date_to: str | None
     cwd: str | None
     model: str | None
+    reasoning_effort: str | None
     limit: int
     workers: int
     include_subagents: bool
+    include_internal: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -38,6 +40,10 @@ class Session:
     parent_id: str | None = None
     agent: str | None = None
     last_user_message: str = ""
+    models: tuple[str, ...] = ()
+    reasoning_efforts: tuple[str, ...] = ()
+    internal: bool = False
+    internal_kind: str | None = None
 
     def to_json(self) -> JsonMap:
         return {
@@ -49,9 +55,13 @@ class Session:
             "updated_at": self.updated_at,
             "provider": self.provider,
             "model": self.model,
+            "models": list(self.models or ((self.model,) if self.model else ())),
+            "reasoning_efforts": list(self.reasoning_efforts),
             "first_user_message": self.first_user_message[:300],
             "last_user_message": (self.last_user_message or self.first_user_message)[:300],
             "usage": self.usage,
             "parent_id": self.parent_id,
             "agent": self.agent,
+            "internal": self.internal,
+            "internal_kind": self.internal_kind,
         }

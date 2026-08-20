@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import TypeAlias
 
 from .timeparse import unix_seconds
-from .transcript import env_path, existing, flat_parallel, jsonl_parallel, nick_role, recent, spawn_info, stem_id
+from .transcript import env_path, existing, flat_parallel, internal_info, jsonl_parallel, nick_role, recent, spawn_info, stem_id
 from .types import Json, Session
 
 THREADS_SQL = (
@@ -73,7 +73,10 @@ def _spawn_edges(conn: sqlite3.Connection) -> dict[str, str]:
 
 def _codex_row(path: Path, row: CodexRow, edges: dict[str, str]) -> Session:
     thread_id = str(_row_value(row, 0))
-    source_parent, source_agent = spawn_info(_row_text(_row_value(row, 9)))
+    source = _row_text(_row_value(row, 9))
+    model = _row_text(_row_value(row, 6))
+    source_parent, source_agent = spawn_info(source)
+    internal, internal_kind = internal_info(model, source)
     return Session(
         "codex",
         thread_id,
@@ -82,11 +85,14 @@ def _codex_row(path: Path, row: CodexRow, edges: dict[str, str]) -> Session:
         unix_seconds(_row_number(_row_value(row, 3))),
         unix_seconds(_row_number(_row_value(row, 4))),
         _row_text(_row_value(row, 5)),
-        _row_text(_row_value(row, 6)),
+        model,
         _row_text(_row_value(row, 7)) or "",
         {"total_tokens": _row_number(_row_value(row, 8))},
         edges.get(thread_id) or source_parent,
         nick_role(_row_text(_row_value(row, 10)), _row_text(_row_value(row, 11))) or source_agent,
+        models=(model,) if model else (),
+        internal=internal,
+        internal_kind=internal_kind,
     )
 
 

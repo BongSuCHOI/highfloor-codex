@@ -29,6 +29,14 @@ uv run --isolated python "<skill-root>/scripts/find-agent-sessions.py" read <ses
 
 Resolve `<skill-root>` to this skill's actual absolute path. For vague recall, use a few discriminative aliases, repository names, exact errors, IDs or Korean/English variants with repeated `--query`. Narrow with `--platform`, `--cwd`, `--model`, `--from` and `--to`; add `--include-subagents` when delegated work may contain the only evidence. Run the result's absolute-path `detail_hint` or `read` command before ad hoc filesystem digging.
 
-`list` and `find` hide child sessions by default but report `subagent_count`; `read` shows the child tree. The finder normalizes formats, while each result's raw `path` remains the source of truth for exact claims.
+For Codex comparisons, narrow with `--reasoning-effort <level>` when effort is
+material. List and search hide internal host sessions such as
+`codex-auto-review` by default and report `excluded_internal_count`; add
+`--include-internal` only when approval, retry, or host-review traces are part
+of the question. Exact-ID `read` remains available for internal sessions.
+`--model` and `--reasoning-effort` match any recorded value in the session's
+ordered history, not only its final setting.
+
+`list` and `find` hide child sessions by default but report `subagent_count`; `read` shows the child tree. Codex results label `root`, `subagent`, and `internal` session kinds and expose observed model and reasoning-effort histories. These are recorded settings and stored reasoning summaries, not hidden token-by-token chain of thought. The finder normalizes formats, while each result's raw `path` remains the source of truth for exact claims.
 
 The finder uses only the Python standard library. Run it with `uv run --isolated`. If the default `uv` cache fails specifically with a sandbox permission error, retry once with `UV_CACHE_DIR=/tmp/codex-uv-cache`; do not relabel package resolution, network, script, or target failures as cache failures. If `uv` is missing, propose the exact installation command and wait for approval. Treat ordinary finder failures as execution errors, not missing dependencies.

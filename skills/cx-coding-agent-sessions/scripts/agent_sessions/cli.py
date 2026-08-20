@@ -3,12 +3,13 @@ from __future__ import annotations
 import os
 import shlex
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import replace
 from pathlib import Path
 
 from .jsonio import as_map, dumps, iter_jsonl
 from .scanners import DEFAULT_PLATFORMS, scan
 from .timeparse import date_bound, parse_stamp
-from .transcript import user_text
+from .transcript import jsonl_session, user_text
 from .types import Json, JsonMap, Options, Session
 
 
@@ -16,12 +17,12 @@ def main() -> int:
     command, opts, rest = _parse()
     sessions = sorted(scan(opts.platforms, opts.roots, opts.workers), key=lambda item: item.created_at or "", reverse=True)
     if command == "list":
-        _emit(_list_payload(_filter(sessions, opts), sessions, opts.limit, include_subagents=opts.include_subagents))
+        _emit(_list_payload(_filter(sessions, opts), sessions, opts.limit, include_subagents=opts.include_subagents, include_internal=opts.include_internal))
         return 0
     if command == "search":
         queries = _queries(opts, rest)
         _require(list(queries), "search requires a query")
-        _emit(_search_payload(_filter(sessions, opts), sessions, queries, opts.limit, opts.workers, include_subagents=opts.include_subagents))
+        _emit(_search_payload(_filter(sessions, opts), sessions, queries, opts.limit, opts.workers, include_subagents=opts.include_subagents, include_internal=opts.include_internal))
         return 0
     if command == "get":
         _require(rest, "read requires at least one session id")
@@ -38,7 +39,8 @@ def _parse() -> tuple[str, Options, list[str]]:
         usage = (
             "Usage: find-agent-sessions.py list|find|search|read|get [query|ids...] [--query TEXT ...] "
             "[--platform NAME ...] [--root PATH] [--from DATE] [--to DATE] [--cwd TEXT] "
-            "[--model TEXT] [--limit N] [--workers N] [--include-subagents]"
+            "[--model TEXT] [--reasoning-effort TEXT] [--limit N] [--workers N] "
+            "[--include-subagents] [--include-internal]"
         )
         print(usage)
         raise SystemExit(0)
@@ -50,10 +52,11 @@ def _parse() -> tuple[str, Options, list[str]]:
     roots: list[Path] = []
     queries: list[str] = []
     platforms: list[str] = []
-    date_from = date_to = cwd = model = None
+    date_from = date_to = cwd = model = reasoning_effort = None
     limit = 20
     workers = _default_workers()
     include_subagents = False
+    include_internal = False
     rest: list[str] = []
     index = 0
     while index < len(args):
@@ -82,6 +85,9 @@ def _parse() -> tuple[str, Options, list[str]]:
         elif arg == "--model":
             model = args[index + 1].lower()
             index += 2
+        elif arg in {"--reasoning-effort", "--effort"}:
+            reasoning_effort = args[index + 1].lower()
+            index += 2
         elif arg == "--limit":
             limit = int(args[index + 1])
             index += 2
@@ -91,11 +97,14 @@ def _parse() -> tuple[str, Options, list[str]]:
         elif arg == "--include-subagents":
             include_subagents = True
             index += 1
+        elif arg == "--include-internal":
+            include_internal = True
+            index += 1
         else:
             rest.append(arg)
             index += 1
     selected_platforms = frozenset(platforms) if platforms else DEFAULT_PLATFORMS
-    return command, Options(selected_platforms, tuple(roots), tuple(queries), date_from, date_to, cwd, model, limit, workers, include_subagents), rest
+    return command, Options(selected_platforms, tuple(roots), tuple(queries), date_from, date_to, cwd, model, reasoning_effort, limit, workers, include_subagents, include_internal), rest
 
 
 def _filter(sessions: list[Session], opts: Options) -> list[Session]:
@@ -110,10 +119,32 @@ def _filter(sessions: list[Session], opts: Options) -> list[Session]:
             continue
         if opts.cwd is not None and opts.cwd not in (item.cwd or "").lower():
             continue
-        if opts.model is not None and opts.model not in (item.model or "").lower():
+        candidate = _hydrate_runtime_settings(item) if opts.model is not None or opts.reasoning_effort is not None else item
+        models = " ".join(candidate.models or ((candidate.model,) if candidate.model else ())).lower()
+        if opts.model is not None and opts.model not in models:
             continue
-        result.append(item)
+        efforts = " ".join(candidate.reasoning_efforts).lower()
+        if opts.reasoning_effort is not None and opts.reasoning_effort not in efforts:
+            continue
+        result.append(candidate)
     return result
+
+
+def _hydrate_runtime_settings(item: Session) -> Session:
+    path = Path(item.path)
+    if item.platform != "codex" or path.suffix != ".jsonl" or not path.is_file():
+        return item
+    parsed = jsonl_session("codex", path, item.id)
+    return replace(
+        item,
+        provider=parsed.provider or item.provider,
+        model=parsed.model or item.model,
+        last_user_message=parsed.last_user_message or item.last_user_message,
+        models=parsed.models or item.models,
+        reasoning_efforts=parsed.reasoning_efforts or item.reasoning_efforts,
+        internal=parsed.internal or item.internal,
+        internal_kind=parsed.internal_kind or item.internal_kind,
+    )
 
 
 def _child_counts(sessions: list[Session]) -> dict[tuple[str, str], int]:
@@ -128,20 +159,42 @@ def _child_counts(sessions: list[Session]) -> dict[tuple[str, str], int]:
 def _annotate(item: Session, counts: dict[tuple[str, str], int]) -> JsonMap:
     data = item.to_json()
     data["subagent_count"] = counts.get((item.platform, item.id), 0)
+    data["session_kind"] = "internal" if item.internal else ("subagent" if item.parent_id is not None else "root")
     data["detail_hint"] = _detail_hint(item)
     return data
 
 
-def _list_payload(filtered: list[Session], all_sessions: list[Session], limit: int, include_subagents: bool = False) -> JsonMap:
+def _candidates(filtered: list[Session], include_subagents: bool, include_internal: bool) -> tuple[list[Session], int]:
+    scoped = filtered if include_subagents else [item for item in filtered if item.parent_id is None]
+    excluded_internal = 0 if include_internal else sum(1 for item in scoped if item.internal)
+    visible = scoped if include_internal else [item for item in scoped if not item.internal]
+    return visible, excluded_internal
+
+
+def _list_payload(
+    filtered: list[Session],
+    all_sessions: list[Session],
+    limit: int,
+    include_subagents: bool = False,
+    include_internal: bool = False,
+) -> JsonMap:
     counts = _child_counts(all_sessions)
-    candidates = filtered if include_subagents else [item for item in filtered if item.parent_id is None]
+    candidates, excluded_internal = _candidates(filtered, include_subagents, include_internal)
     results: list[Json] = [_annotate(item, counts) for item in candidates[:limit]]
-    return {"count": len(results), "results": results}
+    return {"count": len(results), "excluded_internal_count": excluded_internal, "results": results}
 
 
-def _search_payload(filtered: list[Session], all_sessions: list[Session], queries: tuple[str, ...], limit: int, workers: int, include_subagents: bool = False) -> JsonMap:
+def _search_payload(
+    filtered: list[Session],
+    all_sessions: list[Session],
+    queries: tuple[str, ...],
+    limit: int,
+    workers: int,
+    include_subagents: bool = False,
+    include_internal: bool = False,
+) -> JsonMap:
     counts = _child_counts(all_sessions)
-    candidates = filtered if include_subagents else [item for item in filtered if item.parent_id is None]
+    candidates, excluded_internal = _candidates(filtered, include_subagents, include_internal)
     per_query: list[Json] = []
     merged: dict[tuple[str, str], tuple[Session, list[JsonMap]]] = {}
     with ThreadPoolExecutor(max_workers=min(workers, max(len(queries), 1))) as pool:
@@ -154,7 +207,7 @@ def _search_payload(filtered: list[Session], all_sessions: list[Session], querie
                 if key not in merged:
                     merged[key] = (item, reasons)
     results: list[Json] = [_annotate_search(item, counts, reasons) for item, reasons in list(merged.values())[:limit]]
-    return {"count": len(results), "queries": per_query, "results": results}
+    return {"count": len(results), "excluded_internal_count": excluded_internal, "queries": per_query, "results": results}
 
 
 def _get_payload(sessions: list[Session], ids: list[str]) -> JsonMap:
@@ -163,13 +216,14 @@ def _get_payload(sessions: list[Session], ids: list[str]) -> JsonMap:
     for item in sessions:
         if item.id not in ids and not any(item.id.startswith(prefix) for prefix in ids):
             continue
+        item = _hydrate_runtime_settings(item)
         events = _events(item)
         first_prompt, last_prompt = _prompt_edges(item, events)
         session = _annotate(item, counts)
         session["first_user_message"] = first_prompt[:300]
         session["last_user_message"] = last_prompt[:300]
         children = sorted(
-            (child for child in sessions if child.platform == item.platform and child.parent_id == item.id),
+            (_hydrate_runtime_settings(child) for child in sessions if child.platform == item.platform and child.parent_id == item.id),
             key=lambda child: child.created_at or "",
         )
         results.append(
@@ -242,6 +296,9 @@ def _search_fields(item: Session) -> tuple[tuple[str, str], ...]:
         ("cwd", item.cwd or ""),
         ("provider", item.provider or ""),
         ("model", item.model or ""),
+        ("models", " ".join(item.models)),
+        ("reasoning_efforts", " ".join(item.reasoning_efforts)),
+        ("internal_kind", item.internal_kind or ""),
         ("agent", item.agent or ""),
         ("first_user_message", item.first_user_message),
         ("last_user_message", item.last_user_message),
