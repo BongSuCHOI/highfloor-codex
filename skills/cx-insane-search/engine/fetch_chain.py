@@ -509,7 +509,15 @@ def _is_mobile_tls(t: str) -> bool:
 def _plan_for_profile(
     url: str, profile_id: str, profile: dict, device_class: str
 ) -> list[_Cand]:
-    groups: list[list[str]] = [list(g) for g in (profile.get("tls_impersonate_candidates") or [["safari", "chrome"]])]
+    from .transport import filter_available, select_available
+
+    groups: list[list[str]] = [
+        filter_available(list(group))
+        for group in (
+            profile.get("tls_impersonate_candidates")
+            or [["safari", "chrome"]]
+        )
+    ]
     avoid = set(profile.get("tls_impersonate_avoid") or [])
     referer_order = list(profile.get("referer_strategies") or ["self_root"])
     transform_order = list(profile.get("url_transform_order") or ["original"])
@@ -532,7 +540,15 @@ def _plan_for_profile(
 
     groups = [_reorder(g) for g in groups if g]
     if not groups:
-        groups = [["safari", "chrome"]]
+        defaults = (
+            ["safari_ios", "chrome_android", "chrome"]
+            if device_class == "mobile"
+            else ["safari", "chrome", "firefox"]
+        )
+        fallback = select_available(defaults)
+        if fallback is None:
+            return []
+        groups = [[fallback]]
 
     transforms = iter_transformed(url, transform_order) or [("original", url)]
 
@@ -845,6 +861,12 @@ def _fetch_core(
     # -------- Phase 1: probe -------------------------------------------------
     base_impersonate = user_hint.get("impersonate_first") or (
         "safari_ios" if device_class == "mobile" else "safari")
+    from .transport import select_available
+    supported_impersonate = select_available(
+        [base_impersonate, "chrome", "safari", "firefox"]
+    )
+    if supported_impersonate is not None:
+        base_impersonate = supported_impersonate
     base_referer = user_hint.get("referer_strategy") or "self_root"
 
     # Root warmup (deep URLs only): let a WAF sensor set a resolved cookie on

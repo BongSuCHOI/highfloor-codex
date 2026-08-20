@@ -20,8 +20,43 @@ import os
 import threading
 import time
 from dataclasses import dataclass, field
+from functools import lru_cache
 from typing import Any, Optional
 from urllib.parse import urlsplit
+
+
+@lru_cache(maxsize=1)
+def available_impersonates() -> Optional[frozenset[str]]:
+    """Return targets supported by the installed curl_cffi, when inspectable."""
+    try:
+        from curl_cffi import requests as cffi_requests
+        from curl_cffi.requests.impersonate import REAL_TARGET_MAP
+        return frozenset(browser.value for browser in cffi_requests.BrowserType) | frozenset(
+            REAL_TARGET_MAP.keys()
+        )
+    except Exception:
+        return None
+
+
+def filter_available(targets: list[str]) -> list[str]:
+    """Remove known-unsupported targets without failing on older runtimes."""
+    available = available_impersonates()
+    if available is None:
+        return targets
+    return [target for target in targets if target in available]
+
+
+def select_available(targets: list[str]) -> Optional[str]:
+    """Choose a supported target, preserving order and a visible fallback."""
+    if not targets:
+        return None
+    available = available_impersonates()
+    if available is None:
+        return targets[0]
+    for target in targets:
+        if target in available:
+            return target
+    return min(available) if available else None
 
 
 # Transient statuses worth an in-place retry on the SAME identity — rotating

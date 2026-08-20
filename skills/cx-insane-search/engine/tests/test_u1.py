@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import os
 import sys
+from unittest.mock import patch
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
@@ -21,6 +22,7 @@ sys.path.insert(0, ROOT)
 from engine.validators import validate, Verdict  # noqa: E402
 from engine.waf_detector import _load_profiles  # noqa: E402
 from engine.fetch_chain import _build_plan, _family  # noqa: E402
+from engine.transport import select_available  # noqa: E402
 
 
 class _Ck:
@@ -51,8 +53,9 @@ class _Hit:
 # ---------- scheduler ----------
 def t_scheduler_diversity_under_cap():
     profiles = _load_profiles()
-    plan = _build_plan("https://www.example.com/p", [_Hit("akamai_bot_manager")],
-                       profiles, "auto", "safari", "self_root")
+    with patch("engine.transport.available_impersonates", return_value=None):
+        plan = _build_plan("https://www.example.com/p", [_Hit("akamai_bot_manager")],
+                           profiles, "auto", "safari", "self_root")
     budget = 11  # max_attempts 12 - probe
     head = plan[:budget]
     fams = set(_family(c.impersonate) for c in head)
@@ -64,8 +67,9 @@ def t_scheduler_diversity_under_cap():
 
 def t_scheduler_avoid_deprioritized_not_deleted():
     profiles = _load_profiles()
-    plan = _build_plan("https://www.example.com/p", [_Hit("akamai_bot_manager")],
-                       profiles, "auto", "safari", "self_root")
+    with patch("engine.transport.available_impersonates", return_value=None):
+        plan = _build_plan("https://www.example.com/p", [_Hit("akamai_bot_manager")],
+                           profiles, "auto", "safari", "self_root")
     imps = [c.impersonate for c in plan]
     # chrome145/146 are in avoid; must still be present (exhaustive) but late.
     assert "chrome145" in imps and "chrome146" in imps, "avoid targets were deleted!"
@@ -77,13 +81,28 @@ def t_scheduler_avoid_deprioritized_not_deleted():
 
 def t_scheduler_desktop_drops_mobile_transform():
     profiles = _load_profiles()
-    plan = _build_plan("https://www.example.com/p", [_Hit("akamai_bot_manager")],
-                       profiles, "desktop", "safari", "self_root")
+    with patch("engine.transport.available_impersonates", return_value=None):
+        plan = _build_plan("https://www.example.com/p", [_Hit("akamai_bot_manager")],
+                           profiles, "desktop", "safari", "self_root")
     transforms = set(c.transform for c in plan)
     fams = set(_family(c.impersonate) for c in plan)
     assert "mobile_subdomain" not in transforms, transforms
     assert "safari_ios" not in fams and "chrome_android" not in fams, fams
     print(f"  ✓ desktop drops mobile transform & mobile TLS (transforms={sorted(transforms)})")
+
+
+def t_scheduler_filters_unavailable_impersonates():
+    profiles = _load_profiles()
+    available = frozenset({"safari", "safari_ios", "chrome", "chrome_android", "edge"})
+    with patch("engine.transport.available_impersonates", return_value=available):
+        plan = _build_plan("https://www.example.com/p", [_Hit("akamai_bot_manager")],
+                           profiles, "auto", "safari", "self_root")
+        fallback = select_available(["chrome146", "chrome"])
+    impersonates = {candidate.impersonate for candidate in plan}
+    assert impersonates <= available, impersonates - available
+    assert "safari15_3" not in impersonates and "chrome146" not in impersonates
+    assert fallback == "chrome", fallback
+    print(f"  ✓ planner keeps only installed curl_cffi targets: {sorted(impersonates)}")
 
 
 # ---------- validator v2 ----------
@@ -114,6 +133,35 @@ def t_validator_hard_marker_still_challenge():
     v = validate(_Resp(200, "<html>" + "x" * 5000 + " sec-if-cpt-container </html>"))
     assert v.verdict == Verdict.CHALLENGE, v.verdict
     print(f"  ✓ hard marker still → {v.verdict.value}")
+
+
+def t_validator_identifier_suffix_is_not_marker():
+    body = "<html><body>" + "x" * 5000 + " octocaptcha </body></html>"
+    v = validate(_Resp(200, body))
+    assert v.verdict == Verdict.WEAK_OK, (v.verdict, v.reasons)
+    print(f"  ✓ marker suffix in a longer identifier → {v.verdict.value}")
+
+
+def t_validator_single_soft_mention_in_large_body():
+    body = "<html><body>" + "x" * 21000 + " captcha </body></html>"
+    v = validate(_Resp(200, body))
+    assert v.verdict == Verdict.WEAK_OK, (v.verdict, v.reasons)
+    assert v.reasons == ["soft_mention:captcha"], v.reasons
+    print(f"  ✓ one soft marker in a large document → {v.verdict.value}")
+
+
+def t_validator_multiple_soft_markers_still_challenge():
+    body = "<html><body>" + "x" * 21000 + " captcha datadome </body></html>"
+    v = validate(_Resp(200, body))
+    assert v.verdict == Verdict.CHALLENGE, (v.verdict, v.reasons)
+    print(f"  ✓ multiple soft markers in a large document → {v.verdict.value}")
+
+
+def t_validator_cloudflare_structure_is_hard_marker():
+    body = "<html><script>window._cf_chl_opt = {}</script></html>"
+    v = validate(_Resp(200, body))
+    assert v.verdict == Verdict.CHALLENGE, (v.verdict, v.reasons)
+    print(f"  ✓ Cloudflare structural token → {v.verdict.value}")
 
 
 def t_validator_status_semantics():
@@ -167,10 +215,15 @@ ALL = [
     ("scheduler_diversity_under_cap", t_scheduler_diversity_under_cap),
     ("scheduler_avoid_deprioritized_not_deleted", t_scheduler_avoid_deprioritized_not_deleted),
     ("scheduler_desktop_drops_mobile_transform", t_scheduler_desktop_drops_mobile_transform),
+    ("scheduler_filters_unavailable_impersonates", t_scheduler_filters_unavailable_impersonates),
     ("validator_small_json_ok", t_validator_small_json_ok),
     ("validator_abck_unresolved_is_non_terminal", t_validator_abck_unresolved_is_non_terminal),
     ("validator_soft_marker_overridden_by_selector", t_validator_soft_marker_overridden_by_selector),
     ("validator_hard_marker_still_challenge", t_validator_hard_marker_still_challenge),
+    ("validator_identifier_suffix_is_not_marker", t_validator_identifier_suffix_is_not_marker),
+    ("validator_single_soft_mention_in_large_body", t_validator_single_soft_mention_in_large_body),
+    ("validator_multiple_soft_markers_still_challenge", t_validator_multiple_soft_markers_still_challenge),
+    ("validator_cloudflare_structure_is_hard_marker", t_validator_cloudflare_structure_is_hard_marker),
     ("validator_status_semantics", t_validator_status_semantics),
     ("validator_byte_size_not_char_count", t_validator_byte_size_not_char_count),
     ("validator_small_complete_page_is_weak_ok", t_validator_small_complete_page_is_weak_ok),
