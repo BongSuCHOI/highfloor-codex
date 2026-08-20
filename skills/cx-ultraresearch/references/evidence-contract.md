@@ -68,6 +68,29 @@ Execution proves only the observed behavior in the recorded environment. It
 does not establish general product behavior, future behavior, or source
 credibility.
 
+## Quantitative claim basis
+
+For a material numeric claim, add one of these bases to the claim record:
+
+```json
+{
+  "quantitative_basis": "direct_measurement|first_principles_bound|transferred_estimate|scenario",
+  "measurement_context": "hardware, software, input, workload, and method when applicable",
+  "transfer_assumption": "why evidence from another context is expected to apply, or empty"
+}
+```
+
+- `direct_measurement`: observed in the recorded target environment;
+- `first_principles_bound`: derived from stated constraints and equations;
+- `transferred_estimate`: projected from another environment, workload, or
+  source measurement and limited by an explicit transfer assumption;
+- `scenario`: a target, sensitivity case, or planning input rather than an
+  empirical prediction.
+
+Do not present a bound, transferred estimate, or scenario as measured target
+performance. Keep the label in the prose only when the number is material to
+the user's decision; do not make ordinary answers caveat-heavy.
+
 ## Mechanical checks
 
 If artifacts are created, mechanically check only what a deterministic process

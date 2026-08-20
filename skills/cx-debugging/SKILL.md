@@ -15,6 +15,12 @@ Diagnose before fixing unless the user explicitly requests implementation.
 
 Confirm a root cause by showing that it predicts the failure or that changing the suspected condition changes the result. If asked to fix, make the smallest change and run the closest regression check. Remove temporary instrumentation, restore modified runtime state and report remaining uncertainty. Use a journal only for repeated rounds or multiple temporary artifacts.
 
+If the same exact symptom remains after the proposed fix, treat the previous
+cause or its claimed scope as incomplete. Reproduce that counterexample under
+the same runtime identity, revise the distinguishable hypotheses, and gather
+new separating evidence before changing another parameter or stacking another
+fix.
+
 ## Runtime references
 
 Load only the matching runtime card:

@@ -161,6 +161,28 @@ state that remains `NOT_PROVEN`.
 5. Reuse `ask`, `explain`, `diff`, `onboard`, or `domain` actions while checking
    the graph against current committed and working-tree state.
 
+## Recipe K: Persistent multi-stage work
+
+Use only when the user explicitly selected a Codex Goal or the approved work
+otherwise spans continued execution across material stages.
+
+1. Start from the approved outcome and define one terminal artifact plus the
+   required gates that prove it. Goal persistence does not redefine success.
+2. Track each required gate as `OPEN`, `BLOCKED`, or `CLOSED`, and identify the
+   critical open gate before starting another continuation.
+3. Map each investigation, implementation step, verification, or delegation to
+   one open gate. Integrate its result before expanding work elsewhere.
+4. Prefer the smallest end-to-end vertical slice that closes gates across the
+   path over deeper completeness inside one stage.
+5. If the critical gate requires missing user authority, dependency,
+   environment, credential, or external state, report that exact blocker and
+   stop adjacent expansion.
+6. Complete the work only when the terminal artifact satisfies its acceptance
+   criteria with current evidence; activity, elapsed time, and Goal status are
+   not completion evidence.
+
+Do not impose this ledger on an ordinary narrow task.
+
 ## Anti-patterns
 
 - Running every skill because it exists.
@@ -168,6 +190,7 @@ state that remains `NOT_PROVEN`.
   value.
 - Treating a Plan as permission to expand scope.
 - Treating a Goal as the definition of success.
+- Continuing adjacent work while a required critical gate is blocked.
 - Asking `cx-acceptance-qa` to diagnose a failure.
 - Asking `cx-visual-qa` to infer UI quality from source alone.
 - Using `cx-insane-search` before ordinary public web access fails.

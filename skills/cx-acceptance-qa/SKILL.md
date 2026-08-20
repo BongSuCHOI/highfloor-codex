@@ -31,8 +31,9 @@ Prove the requested outcome with the smallest sufficient evidence set. Do not re
    - **Mechanical**: nearest relevant test, typecheck, lint, build, schema, or diff check.
    - **Observable**: actual command effect, file, API response, persisted state, interaction, or rendered surface.
    - **Semantic**: whether the observed evidence satisfies the criterion's meaning.
+   - **Failure topology**: when behavior depends on state, thresholds, asynchronous downstream work, repetition, runtime identity, or cleanup footprint, select the smallest partition that could materially change the verdict.
 3. Reuse qualifying evidence from the current state. Otherwise execute the applicable path with bounded commands. Record command, result, artifact path, observation, and any validity limitation.
-4. Map each criterion to `PASS`, `FAIL`, or `NOT_PROVEN`.
+4. Map each criterion to `PASS`, `FAIL`, or `NOT_PROVEN`. Keep the verdict within the states and failure paths actually covered; a passing happy path does not prove a broader behavior claim.
 5. Set the overall verdict:
    - `PASS` only when every required criterion passes.
    - `FAIL` when any required criterion is contradicted by evidence.

@@ -20,6 +20,12 @@ product lacks a sufficient first-party visual contract. Skip it when the active
 contract already determines the direction, a selected reference is already
 approved, or the task is restoration or small polish.
 
+Treat restoration as fidelity work. The first-party target is the active
+contract: preserve its composition, behavior, content hierarchy, and tuned
+visual or motion parameters unless the user explicitly reopens one of those
+boundaries. A scanner candidate or generic best practice is not authority to
+redesign the target.
+
 Load only the matching reference:
 
 - Design tokens, components and `DESIGN.md`: `references/design-system-contract.md`

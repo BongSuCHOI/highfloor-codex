@@ -36,7 +36,8 @@ Create the minimum approved contract needed for implementation. Do not force a f
    - **Implement now (Recommended)** for bounded work likely to finish in the current task.
    - **Save contract (Recommended)** when the user requested planning or execution prerequisites are missing.
    - **Start Codex Goal (Recommended)** for multi-workstream, multi-repository, migration, deployment, monitoring, or multi-session work.
-8. Never create a Codex Goal from the recommendation alone. Wait for the user to select it. If the user selects implementation, continue in the same task and create a plan only when complexity warrants one.
+8. Before recommending a Codex Goal, add the optional persistent-execution block from the task-contract reference when terminal-artifact and gate visibility will materially improve continued execution.
+9. Never create a Codex Goal from the recommendation alone. Wait for the user to select it. If the user selects implementation, continue in the same task and create a plan only when complexity warrants one.
 
 ## Adaptive freedom
 

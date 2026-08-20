@@ -53,6 +53,27 @@ Do not average criteria. Do not convert uncertainty into a numeric score.
 
 ## Scope-proportional paths
 
+### Failure-topology selection
+
+For behavior-bearing criteria, identify the smallest partition whose outcomes
+could differ materially. Use only the applicable shapes:
+
+- state transition: before, transition, settled state, and reversal or recovery;
+- threshold: below, at, and above the decisive boundary;
+- asynchronous work: immediate success, downstream failure, retry, and
+  idempotent or persisted effect;
+- periodic or hot path: repeated callback ownership, cleanup, and measured
+  behavior under the relevant loop;
+- runtime identity: the process, build, commit, configuration, or artifact that
+  actually produced the observation;
+- destructive cleanup: confirmed pre-removal footprint, active recreators, and
+  the same scoped post-removal inventory.
+
+Do not test every combination. Select the minimum partition that can disprove
+the criterion, and stop when current evidence covers it. If the evidence covers
+only one state or path, narrow the `PASS` claim or return `NOT_PROVEN` for the
+remainder.
+
 ### Small documentation or configuration change
 
 - inspect affected content;
@@ -82,6 +103,15 @@ Do not average criteria. Do not convert uncertainty into a numeric score.
 - verify local and static claims;
 - mark the unavailable requirement `NOT_PROVEN`;
 - state the exact missing authority, environment, credential, or state.
+
+### Destructive cleanup
+
+- establish the named installation, runtime, cache, process, autostart, and
+  package-manager surfaces that are actually in scope;
+- remove only confirmed targets;
+- repeat the same scoped inventory after removal;
+- report remaining artifacts or unchecked surfaces instead of broadening
+  `clean` beyond the observation.
 
 ## Simulation: invite-link feature
 

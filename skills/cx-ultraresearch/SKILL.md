@@ -25,6 +25,8 @@ repetition.
    counterevidence.
 6. Run code only when an executable claim benefits from direct observation.
    Record the environment and do not generalize beyond what the run proves.
+   Classify material quantitative claims using the basis in the evidence
+   contract; a transferred estimate is not a direct measurement.
 7. Classify material claims as `supported`, `unresolved`, or `refuted`.
    Unresolved conflicts and vendor-only high-risk claims do not become facts.
 8. Stop when sufficient claim-relative evidence answers the question, or

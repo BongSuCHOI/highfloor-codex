@@ -64,6 +64,10 @@ workflow, implementation strategy, or expression.
 What remains consistent is not artifact shape, but the minimum floor for
 correctness, authority, and evidence.
 
+Adaptation is driven by the current task state, evidence, risk, and execution
+conditions. Model names and reasoning-effort labels are evaluation dimensions,
+not runtime branches.
+
 ## 3. Hard Floor / Soft Scaffold / Open Ceiling
 
 ```text
@@ -82,9 +86,13 @@ Open Ceiling
 
 - Do not arbitrarily change user requirements, approved scope, constraints, or
   non-goals.
+- Treat a fallback that changes the requested outcome or a hard constraint as a
+  conflict, not an equivalent implementation method.
 - Distinguish exact fact, user decision, external evidence, model inference, and
   default.
 - Do not claim completion or `PASS` without observed evidence.
+- Keep the breadth of a completion claim within the surface and failure shape
+  covered by its evidence.
 - Leave unobservable requirements as `NOT_PROVEN`.
 - Respect the applicable approval boundary for destructive actions,
   publication, deployment, credentials, cost, and authority changes.
@@ -109,6 +117,8 @@ Examples:
 - scope classification
 - reasoning lens
 - artifact-specific verification candidates
+- terminal artifact and open-gate ledger for persistent work
+- failure-topology selection for behavior-bearing claims
 
 Use the scaffold only when needed. Skip a step already resolved by
 authoritative evidence or irrelevant to the current work.
@@ -148,6 +158,12 @@ Are the required information and evidence sufficient?
 
 The same model may need different guardrails depending on the task domain,
 repository familiarity, context quality, and tool state.
+
+A failure observed in a named model is an evaluation hypothesis, not a runtime
+condition. Promote it into shared guidance only when it can be expressed as a
+task, state, evidence, or risk condition and improves held-out behavior without
+materially constraining unaffected work. Otherwise keep it in the evaluation
+record rather than borrowing a model-specific prompt fragment.
 
 ## 5. One skill, one clear responsibility
 
@@ -356,13 +372,21 @@ routing actually raises the floor without constraining the ceiling.
 - Compare a baseline without the skill against a treatment with the skill.
 - Within a cell, hold model, reasoning effort, prompt, project snapshot, tools,
   and permissions constant.
-- Preserve results by `model × reasoning effort × task`.
+- Preserve results by `model × reasoning effort × task × execution state`,
+  including ordinary, resumed or compacted, persistent, and delegated work when
+  those states are relevant.
 - Lower-performing region: critical omissions, invented requirements, scope
-  violations, false `PASS`, and first-pass success.
+  violations, false `PASS`, artifact or evidence mismatch, and first-pass
+  success.
 - Stronger-performing region: token use, latency, unnecessary questions, false
-  blocks, and restrictions on valid judgment or action.
+  blocks, unnecessary continuations or delegation, time to the first
+  end-to-end artifact, open-gate reduction, and restrictions on valid judgment
+  or action.
 - Inspect worst cases and per-task regressions, not only averages.
 - Do not offset regression in one model with improvement in another.
+- Do not promote a rule from a familiar example alone. Use held-out tasks and
+  retain the rule only when its trigger and benefit survive paraphrase and
+  artifact changes.
 
 Adoption order:
 

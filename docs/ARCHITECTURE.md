@@ -10,6 +10,9 @@ Anything built under the Highfloor name should preserve the same design test:
 
 - maintain a small hard floor for authority, evidence, safety, cost, and
   provenance;
+- adapt scaffolding to task state, evidence, risk, and execution conditions;
+  model names and reasoning-effort labels remain evaluation dimensions, not
+  runtime branches;
 - guide less capable models with clear positive actions rather than a maze of
   prohibitions;
 - leave stronger models room to reason beyond the default path;

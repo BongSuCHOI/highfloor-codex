@@ -29,6 +29,26 @@ assumptions:
 
 Add actors, data, permissions, rollout, compatibility, risk, or operations only when the task needs them. Do not require an ontology for ordinary work.
 
+## Persistent execution extension
+
+Add this only when the user selects or is considering a Codex Goal and the work
+will continue across material stages:
+
+```yaml
+persistent_execution:
+  terminal_artifact: The observable artifact or state that ends the objective
+  required_gates:
+    - outcome: A required intermediate state on the path to the artifact
+      verification: Evidence that closes this gate
+      status: OPEN | BLOCKED | CLOSED
+  blocking_boundaries:
+    - Missing authority, dependency, environment, credential, or external state
+```
+
+The extension keeps execution live without turning activity into success. It
+does not add scope, authorize blocked work, or require every implementation
+detail to be planned in advance. Omit it for an ordinary bounded task.
+
 ## Decision ledger
 
 Track material entries with:
@@ -96,6 +116,10 @@ Recommend when the user requested planning or handoff, prerequisites or authorit
 ### Start Codex Goal
 
 Recommend when work spans multiple independent workstreams, repositories, services, migrations, deployment or monitoring, or likely multiple tasks or sessions. A recommendation is not permission to create a Goal; wait for explicit user selection.
+
+Before this recommendation, make the terminal artifact and required gates
+observable. If a material gate cannot yet be defined because intent or
+authority is unresolved, recommend saving the contract instead.
 
 ## Simulation: greenfield alarm app
 

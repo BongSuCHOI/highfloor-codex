@@ -14,6 +14,8 @@ This document is a portable English copy of the maintainer's global Codex instru
 
 - The user request defines the goal and scope. Implementation follows the repository SSOT, generated API or schema contracts, and actual call sites.
 - If a user requirement and a project contract conflict in a way that changes the result, do not silently ignore or reinterpret either one; ask the user.
+- A substitute method or fallback must preserve the requested outcome and hard constraints. If it changes either one, surface the conflict instead of treating the substitute as equivalent.
+- Adapt execution guidance to the current task state, evidence, risk, and execution conditions. Treat model and reasoning-effort names as evaluation dimensions, not runtime branches.
 - Do not infer requirements. Verify them from code, configuration, documentation, generated contracts, and actual usage. Mark anything unverified as an assumption.
 - The nearest project rules override global rules. When instructions serve the same purpose, apply the project rule without repeating the global procedure.
 
@@ -47,8 +49,11 @@ This document is a portable English copy of the maintainer's global Codex instru
 ## 4. Execution and Verification
 
 - For multi-step work, translate the request, SSOT, and change risk into observable success criteria and a short verification-bound plan. Iterate until those criteria are met or the remainder is explicitly `NOT_PROVEN`; stop verification once sufficient evidence proves them.
+- For persistent multi-stage work, keep the terminal artifact and required gates visible. Prefer the next action that closes the critical open gate; when that gate is blocked by missing authority, dependency, environment, or external state, report the blocker instead of expanding adjacent work.
 - For every new abstraction in the diff, verify its responsibility, rationale, actual call sites, and evidence. Remove or inline it if any item is missing.
 - Select relevant type checks, lint, formatting, builds, and existing tests in proportion to risk. For small documentation or configuration changes, targeted searches and formatting checks are enough. Run full builds, full test suites, and browser QA only when the change requires them.
+- Match verification to the failure shape and keep the claim within the observed surface. A passing happy path does not prove materially different states, thresholds, downstream failures, repeated callbacks, or cleanup footprints.
+- For destructive cleanup, inventory the confirmed target footprint and active recreators before removal, then repeat the same scoped inventory afterward. Claim `clean` only for the named surfaces actually rechecked.
 - Do not add test code unless requested by the user or required by the project SSOT or acceptance contract.
 - Do not verify the same fact repeatedly with different commands or tools. Reuse evidence that already proves the current state.
 - Do not claim completion or `PASS` for anything unobserved. Separate the verified scope from blocked items and label the latter `NOT_PROVEN`.
@@ -69,6 +74,7 @@ This document is a portable English copy of the maintainer's global Codex instru
 
 - Delegate only when the user, project instructions, or a skill requires it. Use the minimum number of agents when independent read-heavy research or non-overlapping work provides more parallel benefit than integration cost.
 - Give each agent a concrete task, scope, ownership, expected result, and exit condition. Keep write ownership disjoint; use one agent when the shared surface is large.
+- In persistent work, map each delegation to a distinct open required gate and integrate its result before expanding the fan-out.
 - Do not delegate small or sequentially dependent tasks. Delegation does not expand scope, permissions, or external-action authority.
 - The main agent retains requirements and decisions and integrates the result.
 
@@ -84,6 +90,7 @@ This document is a portable English copy of the maintainer's global Codex instru
 - Use `$cx-design-director` for broad UI direction, redesign, UX structure, or critique. Do not apply the full workflow to a small style, copy, or single-component change.
 - Use `$cx-slopslap` only when the user explicitly requests AI-slop detection or removal.
 - Prefer the existing `DESIGN.md` and component system. Create or update the system only when the work actually needs a new token, layout grammar, component pattern, or important UX rule.
+- Treat restoration as fidelity work, not a redesign. Preserve the first-party composition, behavior, and tuned parameters unless the user explicitly reopens that visual or interaction boundary.
 - Convert references into first-party tokens, layout, components, states, motion, responsive behavior, and accessibility rules. Do not include a third-party corpus, screenshot, brand guide, or prompt pack without explicit provenance and a materialization plan.
 - Use `$cx-visual-qa` only when rendered UI changed, and inspect current, scope-proportional evidence. Treat broken semantic line wrapping across CJK and Latin text as blocking within the changed area.
 - Preserve ANSI evidence when a terminal or TUI visual change requires it.
