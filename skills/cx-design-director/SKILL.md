@@ -24,7 +24,8 @@ Treat restoration as fidelity work. The first-party target is the active
 contract: preserve its composition, behavior, content hierarchy, and tuned
 visual or motion parameters unless the user explicitly reopens one of those
 boundaries. A scanner candidate or generic best practice is not authority to
-redesign the target.
+redesign the target. When a replacement direction was selected, commit to the
+new world; never soften the change by polishing the discarded look.
 
 Load only the matching reference:
 

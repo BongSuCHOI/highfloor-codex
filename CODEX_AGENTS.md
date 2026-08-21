@@ -60,7 +60,7 @@ This document is a portable English copy of the maintainer's global Codex instru
 
 # CX Skill Governance
 
-- Before creating, modifying, evaluating, integrating, renaming, migrating, or deleting a `cx-*` skill, read `~/.codex/skills/CX_SKILLS.md` and follow its governance.
+- Before creating, modifying, evaluating, integrating, renaming, migrating, or deleting a `cx-*` skill, read `skills/CX_SKILLS.md` from the nearest Highfloor repository checkout and follow its governance. When no checkout exists on this machine, state that constraint, follow the rules in this section, and avoid making governance claims you cannot verify.
 - Do not apply the full governance document as a runtime workflow for ordinary tasks. Follow each skill's `SKILL.md` for triggers and execution.
 
 # Optional Workflow Routing

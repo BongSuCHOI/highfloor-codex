@@ -464,7 +464,11 @@ Owner by change type:
   `cx-*/references/` directory
 
 The three canonical public governance documents live under this repository's
-`skills/` directory. Installed copies are generated runtime artifacts. If a
+`skills/` directory. The installer does not distribute them: it manages only
+the manifest-listed `cx-*` skill directories and agent files, so no installed
+copy exists unless someone deliberately copies one outside the managed
+lifecycle. Reference the canonical repository path and, when no checkout is
+available, state that constraint instead of guessing an installed path. If a
 separate working or archive copy is needed, generate it from the canonical
 source and verify equality without turning the temporary path into a governance
 contract.

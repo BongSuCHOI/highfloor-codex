@@ -1,6 +1,6 @@
 ---
 name: cx-interview
-description: "Clarify materially ambiguous product, feature, workflow, or brownfield improvement requests into an approved task contract before implementation. Use when the user asks for an interview, requirements, a specification, or help deciding what to build, or when unresolved goals, constraints, non-goals, acceptance criteria, or product decisions would materially change the result. Do not use for a narrow already-specified edit, pure diagnosis, or a decision already settled by project rules."
+description: "Clarify materially ambiguous product, feature, workflow, or brownfield improvement requests into an approved task contract before implementation. Use when the user asks for an interview, requirements, a specification, help deciding what to build, or asks you to grill or stress-test their idea, plan, or design, or when unresolved goals, constraints, non-goals, acceptance criteria, or product decisions would materially change the result. Do not use for a narrow already-specified edit, pure diagnosis, or a decision already settled by project rules."
 ---
 
 # Interview
@@ -29,7 +29,7 @@ Create the minimum approved contract needed for implementation. Do not force a f
 1. Classify the request as greenfield, brownfield, or mixed. Read the nearest project rules and relevant current state.
 2. Start a decision ledger covering goal, users or actors, constraints, non-goals, outcomes, verification, unknowns, and assumptions with provenance. If the request spans multiple material surfaces, enumerate the top-level shape and mark each surface active, deferred, or out of scope before deep questioning.
 3. Resolve exact facts from code, configuration, documentation, or current research. Label product hypotheses as hypotheses.
-4. Ask only questions whose answers materially change the result. Prefer the highest-impact unresolved decision and one question at a time.
+4. Ask only questions whose answers materially change the result. Prefer the highest-impact unresolved decision and one question at a time; when several independent material decisions are pending, use the batched-round scaffold in `references/task-contract.md`.
 5. Draft a task contract using `references/task-contract.md`. Keep optional sections optional.
 6. Close only when no material item remains `MISSING`, `CONFLICTING`, or `BLOCKED` and every confirmed material item is represented or has an explicitly approved reduction or substitution. Then present the complete contract for explicit approval.
 7. After approval, recommend one exit based on scope and explain why:
@@ -53,4 +53,4 @@ Create the minimum approved contract needed for implementation. Do not force a f
 - Route current external comparisons or contested facts to `$cx-ultraresearch`, then return with sourced options.
 - After approval: implementation may invoke `$cx-scope-check` on a drift trigger, `$cx-unstuck` on a genuine deadlock, and `$cx-acceptance-qa` for final proof.
 
-Load `references/task-contract.md` for the contract schema, readiness rules, exit recommendation, and examples. Load `references/upstream.md` only for provenance or maintenance work.
+Load `references/task-contract.md` for the contract schema, readiness rules, batched questioning scaffold, durable decision records, exit recommendation, and examples. Load `references/upstream.md` only for provenance or maintenance work.

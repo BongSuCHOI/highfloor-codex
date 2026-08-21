@@ -12,6 +12,23 @@ Choose structure from user tasks and information relationships, not from a prefe
 - Master-detail or split view: useful when users repeatedly compare a collection with one selected item.
 - Feed/timeline: appropriate when recency and sequence are the main organizing principles.
 
+## Surface intent
+
+Classify what success looks like on the requested surface, and let that intent
+set the emphasis. Classification follows the surface, not the product: a
+tool's landing page still persuades, and a fashion house's documentation is
+still for reading.
+
+- Persuade: the visitor decides and acts; landing, marketing, pricing. Earn
+  attention and action.
+- Operate: the visitor completes a task; app UI, dashboards, editors,
+  settings. Scanability, consistency and native expectations outrank
+  expression.
+- Read: the visitor understands something; docs, articles, guides. Structure
+  for comprehension first.
+- Experience: the visitor is inside the work itself; portfolios, galleries.
+  Let the artifact lead and the interface recede.
+
 Map the full task flow, including entry, success, empty, loading, partial failure, permission denial, destructive confirmation and recovery.
 
 ## Layout and responsive transformation

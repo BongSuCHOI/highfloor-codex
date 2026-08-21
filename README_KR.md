@@ -610,6 +610,8 @@ skill의 `references/upstream*.md`, 그리고 `cx-*` 계열의
 | `cx-insane-search`, `cx-ultraresearch` | [`fivetaku/insane-research`](https://github.com/fivetaku/insane-research) — MIT | Retrieval metadata, source map, claim map, countersearch, contradiction, temporal evidence 개념 중 선택한 부분을 독립적인 문장으로 반영했습니다. 고정 7단계 orchestration, automatic agent fan-out, permission bypass, mandatory artifact, claim validator와 report evaluator는 포함하지 않습니다. |
 | `cx-slopslap` | [`vibedesignlab/slopslap`](https://github.com/vibedesignlab/slopslap) — MIT | Upstream taxonomy, data, reference와 script를 보존하면서 host discovery, concurrency, Git behavior, report serving과 browser resolution을 수정했습니다. |
 | `cx-design-director` | Original Highfloor content; selected method source [`fivetaku/insane-design`](https://github.com/fivetaku/insane-design) — MIT; optional [`ibelick/ui-skills`](https://github.com/ibelick/ui-skills) runtime lookup — MIT | Token provenance, variable chain과 known gap 개념을 local reference-evidence contract에 독립적인 문장으로 반영했습니다. insane-design의 parser, runtime, corpus, template, screenshot과 wording은 번들하지 않으며 UI Skills는 선택적인 외부 lookup으로 유지합니다. |
+| `cx-interview`, `architect` agent | [`mattpocock/skills`](https://github.com/mattpocock/skills) — MIT | Batch questioning, durable decision record, deep-module 리뷰 개념 중 선택한 부분을 기존 owner에 압축해 반영했습니다. upstream skill, 실행 코드, sub-agent orchestration, HTML report 도구와 companion skill은 번들하지 않습니다. |
+| `cx-design-director`, `cx-visual-qa`, workflow recipe | [`uizze/uizze`](https://github.com/uizze/uizze) `anti-ui-slop` — MIT | Surface intent 분류와 검증 예산 개념을 압축해 반영했습니다. upstream command suite, script, hook, 광고 문구, 은폐된 runtime metadata, 유료 catalogue integration은 제외합니다. |
 
 ### License 경계
 
