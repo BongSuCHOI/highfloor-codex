@@ -8,6 +8,13 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Added managed `default` and `worker` custom-agent overrides at
+  `gpt-5.6-luna` / `xhigh`, preserving the user's `config.toml` while making
+  Highfloor's fallback profile portable through install, update, doctor, and
+  uninstall. Rebalanced `reviewer` to `gpt-5.6-terra` / `high`,
+  `technical-writer` to `gpt-5.6-terra` / `medium`, and `test-engineer` to
+  `gpt-5.6-luna` / `xhigh`; other specialist profiles retain their existing
+  model and reasoning settings.
 - Strengthened the portable instructions and existing CX contracts around
   constraint-preserving fallbacks, terminal artifacts and critical gates for
   persistent work, failure-topology evidence, repeated-symptom diagnosis,

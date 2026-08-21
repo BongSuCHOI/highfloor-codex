@@ -37,8 +37,8 @@ Today, Highfloor contains the skills and agents I use in my own Codex setup:
 - **15 focused `cx-*` skills** for clarification, diagnosis, research, scope
   control, browser work, design direction, verification, video analysis, and
   unfamiliar-codebase mapping.
-- **27 specialist custom agents** for focused investigation, review,
-  implementation, and documentation.
+- **29 custom agent profiles** for focused investigation, review,
+  implementation, documentation, and bounded fallback work.
 
 It is a kit, not a standalone agent harness or an automatic pipeline. Each
 skill and agent has a specific job, and you combine only the parts the current
@@ -347,6 +347,18 @@ and modifications in their own `references/upstream.md` and in
 Custom agents are narrow specialists for delegated Codex work. The set separates
 read-heavy analysis from scoped implementation so authority is visible.
 
+Highfloor deliberately supplies custom definitions named `default`, `worker`,
+and `explorer`. Codex gives a matching custom agent precedence over its built-in
+definition, so installation applies the Highfloor model, reasoning, and role
+boundaries without editing the user's `config.toml`.
+
+### Built-in fallbacks
+
+| Agent | Mode | Role |
+|---|---|---|
+| `default` | workspace-write | Handles bounded delegated work only when no specialist owns it. |
+| `worker` | workspace-write | Implements bounded changes only when no specialist owns them. |
+
 ### Discovery and decisions
 
 | Agent | Mode | Role |
@@ -502,7 +514,7 @@ materially matters.
 ```text
 highfloor-codex/
 ├── .github/              issue forms, PR template, CI
-├── agents/               27 installable custom-agent TOML files
+├── agents/               29 installable custom-agent TOML files
 ├── assets/               repository artwork
 ├── docs/                 installation, catalogs, workflows, architecture
 ├── LICENSES/             bundled upstream license texts

@@ -189,10 +189,29 @@ def validate_agents() -> None:
             fail(f"{path.relative_to(ROOT)}: invalid TOML: {exc}")
             continue
 
-        for key in ("name", "description", "developer_instructions"):
+        for key in (
+            "name",
+            "description",
+            "model",
+            "developer_instructions",
+        ):
             value = data.get(key)
             if not isinstance(value, str) or not value.strip():
                 fail(f"{path.relative_to(ROOT)}: missing non-empty {key!r}")
+
+        reasoning_effort = data.get("model_reasoning_effort")
+        if reasoning_effort not in {
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max",
+            "ultra",
+        }:
+            fail(
+                f"{path.relative_to(ROOT)}: unsupported "
+                f"model_reasoning_effort {reasoning_effort!r}"
+            )
 
         name = data.get("name")
         if isinstance(name, str):

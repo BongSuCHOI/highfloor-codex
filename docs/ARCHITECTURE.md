@@ -57,6 +57,12 @@ intentionally excluded from recorded uninstall ownership. Managed skill and
 agent replacements use the same verified temporary-backup boundary; persistent
 backups are reserved for removals or incomplete rollback and cleanup recovery.
 
+The managed agent set intentionally includes `default`, `worker`, and
+`explorer`. Codex gives matching custom definitions precedence over its
+built-in agents, so Highfloor can distribute portable fallback and exploration
+profiles through the normal manifest lifecycle. The installer does not edit
+`config.toml` or replace the user's unrelated global subagent defaults.
+
 ## Why manifests instead of directory synchronization?
 
 A user's skills and agents directories are shared extension surfaces. Deleting
