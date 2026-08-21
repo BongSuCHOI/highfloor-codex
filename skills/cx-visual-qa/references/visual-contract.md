@@ -1,6 +1,10 @@
 # Visual Evidence Contract
 
 - Currency: evidence must represent the current relevant source and rendered state. Reuse it when source, state, viewport, theme, and criterion are unchanged; otherwise recapture after the final relevant edit.
+- Recapture bound: do not repeat an equivalent capture round on an unchanged
+  surface more than once after fixes. A new relevant edit resets currency and
+  requires fresh evidence; otherwise report `NOT_PROVEN` rather than
+  re-capturing without cause.
 - Coverage: include every changed route/state/breakpoint required to exercise the request, but do not expand into unrelated screens.
 - Fidelity: compare against the active first-party design contract and any explicit reference.
 - Reproducibility: record viewport, theme, state and artifact path when they affect the result.

@@ -37,6 +37,27 @@ The project follows [Semantic Versioning](https://semver.org/).
   unresolved gaps, including scoped CSS declaration and variable-chain
   provenance. The selected `fivetaku/insane-design` method source is pinned and
   licensed without importing its runtime or corpus.
+- Fixed the portable governance pointer: global instructions now read
+  `skills/CX_SKILLS.md` from a Highfloor repository checkout and state the
+  constraint when no checkout exists, instead of referencing an installed path
+  that install-managed setups never create. Corrected the governance
+  document's claim about installed copies to match installer behavior.
+- Added optional batched questioning rounds with per-question recommended
+  answers and an opt-in durable decision-record handoff to `cx-interview`,
+  and recorded grill/stress-test triggers in its description.
+- Compressed hot-spot-first scoping, shallow-module friction signals, the
+  deletion test, Strong/Worth exploring/Speculative grading, domain-vocabulary
+  seam naming, and decision-record non-re-litigation into the `architect`
+  agent's instructions.
+- Added surface-intent classification and a no-polish-on-discarded-direction
+  rule to `cx-design-director`, a post-fix evidence recapture bound to
+  `cx-visual-qa`, and a batched UI verification pass budget plus an
+  open-ended polish-loop anti-pattern to the workflow recipes.
+- Recorded `mattpocock/skills` and `uizze/uizze` (`anti-ui-slop`) as pinned
+  method sources whose selected concepts are condensed into existing owners
+  (modified derivative), with MIT license texts bundled at the repository root
+  and inside each affected skill; no executable upstream source is
+  redistributed.
 
 ## [0.2.0] - 2026-08-10
 

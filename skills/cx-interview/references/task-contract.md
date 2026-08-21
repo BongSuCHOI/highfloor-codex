@@ -101,6 +101,32 @@ Trade-off or non-goal    → user
 Implementation detail    → model, inside approved boundaries
 ```
 
+## Batched questioning (optional scaffold)
+
+Use the one-question default for a single decisive unknown. When several
+independent material decisions are already answerable, batch them instead of
+walking one at a time:
+
+- Sketch a small decision tree: each material decision may hang off earlier
+  answers. A question is askable now when its prerequisites are settled.
+- Ask every currently askable question in one numbered round, each with a
+  recommended answer, then wait for the user's answers.
+- A question that depends on an answer still open in this round belongs to a
+  later round. After each round, recompute what became askable and continue.
+- Readiness rules do not change: the contract closes when no material entry
+  remains `MISSING`, `CONFLICTING`, or `BLOCKED`. Optional implementation
+  detail never blocks readiness, and an unasked optional question is not a
+  gap.
+
+## Durable decision records
+
+The interview records intent; it does not edit repository documentation on its
+own authority. When the user settles or rejects a decision with a load-bearing
+reason that a future session would otherwise re-litigate, offer to record that
+decision in the repository's decision documentation, for example an ADR under
+`docs/adr/` or a domain glossary entry. Perform the write only after explicit
+user approval, and skip ephemeral or self-evident reasons.
+
 ## Exit recommendation
 
 Recommend exactly one option and attach `(Recommended)` to its label. The user retains final control.

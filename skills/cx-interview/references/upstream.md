@@ -31,6 +31,34 @@ Independently absorbed ideas:
 - treat readiness as non-monotonic when later answers contradict earlier decisions;
 - require explicit review when a proposed contract removes, merges, or substitutes a confirmed material item.
 
+## Method source additions
+
+- Reference: [`mattpocock/skills`](https://github.com/mattpocock/skills)
+- Inspected commit: `5b15a47f2d7150f545fbcacbfe381787fc0230dc`
+- Relevant sources: `skills/productivity/grilling/SKILL.md`,
+  `skills/engineering/grill-with-docs/SKILL.md`,
+  `skills/engineering/improve-codebase-architecture/SKILL.md`
+- License: MIT; see `LICENSES/MIT-mattpocock-skills.txt` at the repository root
+  and the bundled copy `LICENSE.mattpocock-skills.txt` in this directory
+- Relationship: `modified derivative` (condensed); retains upstream method
+  structure and terminology where noted; no executable source is bundled
+
+Absorbed ideas (condensed):
+
+- batch currently answerable material questions into numbered rounds with a
+  recommended answer each, while dependency-blocked questions wait for later
+  rounds;
+- offer durable decision records, such as an ADR or glossary entry, when a
+  load-bearing rejection reason would otherwise be re-litigated by a future
+  session.
+
+Deliberately not migrated:
+
+- the fixed design-tree/frontier-empty completion rule, which conflicts with
+  this skill's material-unknown readiness boundary;
+- alias skills and any automatic documentation side effects during
+  questioning.
+
 Deliberate changes:
 
 - combine interview and seed into one compact task-contract skill;
@@ -40,4 +68,6 @@ Deliberate changes:
 - preserve topology and reduction checks as conditional scaffolds rather than mandatory ceremony;
 - preserve an adaptive ceiling so stronger models may compress or extend the scaffold while meeting the hard floor.
 
-This implementation is independently worded. Preserve this provenance record if the skill is redistributed.
+The Ouroboros-derived implementation remains independently worded; the
+condensed Matt Pocock material above is a modified derivative as recorded.
+Preserve this provenance record if the skill is redistributed.

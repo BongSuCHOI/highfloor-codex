@@ -66,8 +66,14 @@ rendered visual verdict, not runtime cause.
 2. Use `cx-browser-automation` only when the current product must be observed
    or operated in a browser.
 3. Implement the approved direction.
-4. Use `accessibility-tester` when interaction or semantics changed.
-5. Use `cx-visual-qa` to judge the result from current rendered evidence.
+4. Inspect the implemented surface in one batched pass across the required
+   viewports or device classes, fix everything that pass reveals in one
+   editing pass, and confirm with at most one more equivalent round. Bound
+   repeated polishing, not necessary evidence: a newly revealed material
+   defect starts a fresh fix-and-proof cycle.
+5. Use `accessibility-tester` when interaction or semantics changed.
+6. Use `cx-visual-qa` for the formal rendered verdict, reusing current
+   evidence from the batched pass instead of recapturing unchanged surfaces.
 
 If the request is specifically about common AI UI patterns, add
 `cx-slopslap` as a constraint owner. Do not use it as a generic redesign phase.
@@ -196,5 +202,7 @@ Do not impose this ledger on an ordinary narrow task.
 - Using `cx-insane-search` before ordinary public web access fails.
 - Running `cx-slopslap` on any UI task without an explicit slop-removal request.
 - Re-verifying an unchanged fact with equivalent tools.
+- Running open-ended visual polish rounds after the affected surface already
+  passed its batched verification.
 - Treating a transcript as proof of visuals, or a graph as fresher than its
   recorded source state.

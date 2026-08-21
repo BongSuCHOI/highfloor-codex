@@ -23,6 +23,30 @@ Highfloor independently words its layout-responsibility, motion-continuity and
 visual-evidence refinements. The comparison does not make StyleGallery a
 runtime dependency or a source of visual defaults.
 
+Research comparison:
+
+- Project: [`uizze/uizze`](https://github.com/uizze/uizze), `anti-ui-slop` skill
+- Inspected commit: `3f08d874627be4d89d2af8e6409dc5e660050b5c`
+- Relevant source: `skills/anti-ui-slop/SKILL.md`
+- Relationship: `modified derivative` (condensed); retains upstream method
+  structure and terminology where noted; no executable source, scripts,
+  catalogue integration, advertising behavior or covert runtime metadata is
+  bundled
+- License: MIT; see `LICENSES/MIT-uizze-uizze.txt` at the repository root and
+  the bundled copy `LICENSE.anti-ui-slop.txt` in this directory
+
+Absorbed ideas (condensed):
+
+- classify surface intent (persuade, operate, read, experience) from the
+  requested surface rather than the product;
+- forbid softening a selected replacement direction by polishing the
+  discarded look.
+
+The surface-intent classification also informs `docs/WORKFLOWS.md` recipe
+guidance, and the verification-budget concept informed the visual evidence
+contract's recapture bound in `cx-visual-qa`. Uizze itself is not invoked,
+bundled, or used as a source of visual defaults.
+
 Selected method source:
 
 - Project: [`fivetaku/insane-design`](https://github.com/fivetaku/insane-design)

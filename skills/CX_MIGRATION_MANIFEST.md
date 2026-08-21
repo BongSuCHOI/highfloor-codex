@@ -1,6 +1,6 @@
 # CX Skills Migration Manifest
 
-- Updated: 2026-08-09
+- Updated: 2026-08-22
 - Repository root: `skills/`
 - Installed root: selected by `install.sh` (`$CODEX_HOME/skills` by default,
   unless explicitly overridden)
@@ -48,16 +48,16 @@ Relationships follow the licensing governance in `CX_SKILLS.md`.
 | `cx-browser-automation` | `microsoft/playwright-cli`; runtime: `vercel-labs/agent-browser@0.29.1` | Playwright commit `NOT_PROVEN`; agent-browser source not bundled | `modified derivative`; `runtime invocation` | Apache-2.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-coding-agent-sessions` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/coding-agent-sessions` | source archive `4.14.0`; commit `NOT_PROVEN` | `modified derivative` with retained byte-identical files | Sustainable Use License 1.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-debugging` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/debugging` | source archive `4.14.0`; commit `NOT_PROVEN` | `modified derivative` | Sustainable Use License 1.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
-| `cx-design-director` | current local references; method source: `fivetaku/insane-design`; research: `changeroa/StyleGallery`; optional `ibelick/ui-skills@0.2.4` | insane-design `a5eb1d976d29309092170ff7ba475a487df0b683`; StyleGallery `e67b440147970c5d4f5b83f922d2593e12d09e74`; UI Skills content not bundled | original content with an `independently worded` evidence-contract adaptation; `research reference`; `runtime invocation` | original content license; insane-design MIT; StyleGallery license `NOT_PROVEN`; UI Skills MIT | `references/upstream.md`, `references/LICENSE.insane-design.txt` |
+| `cx-design-director` | current local references; method source: `fivetaku/insane-design`; research: `changeroa/StyleGallery`; research: `uizze/uizze` (`anti-ui-slop`); optional `ibelick/ui-skills@0.2.4` | insane-design `a5eb1d976d29309092170ff7ba475a487df0b683`; StyleGallery `e67b440147970c5d4f5b83f922d2593e12d09e74`; uizze `3f08d874627be4d89d2af8e6409dc5e660050b5c`; UI Skills content not bundled | original content with an `independently worded` insane-design evidence-contract adaptation; `modified derivative` (condensed) of the uizze surface-intent material; `research reference`; `runtime invocation` | original content license; insane-design MIT; StyleGallery license `NOT_PROVEN`; uizze MIT; UI Skills MIT | `references/upstream.md`, `references/LICENSE.insane-design.txt`, `references/LICENSE.anti-ui-slop.txt` |
 | `cx-insane-search` | `fivetaku/insane-search`; method reference: `fivetaku/insane-research` | original insane-search snapshot `NOT_PROVEN`; selective refresh `019ee16bbf471595f9b67b164e4a92208183af2d`; insane-research `68f7e59168a9c9b0a586bd4122cb7a229e119d9c` | `modified derivative`; engine and tests retained; independently worded retrieval-evidence adaptation | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt`, `references/LICENSE.insane-research.txt` |
-| `cx-interview` | `Q00/ouroboros` | `2dec0dbd01bb5b2243ea138af9d91f3583b92c5d` | `independently worded` | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
+| `cx-interview` | `Q00/ouroboros`; method source: `mattpocock/skills` | ouroboros `2dec0dbd01bb5b2243ea138af9d91f3583b92c5d`; mattpocock/skills `5b15a47f2d7150f545fbcacbfe381787fc0230dc` | `independently worded` from ouroboros; `modified derivative` (condensed) of the mattpocock questioning and decision-record material | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt`, `references/LICENSE.mattpocock-skills.txt` |
 | `cx-programming` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/programming` | source archive `4.14.0`; commit `NOT_PROVEN` | `modified derivative` | Sustainable Use License 1.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-scope-check` | `Q00/ouroboros` | `2dec0dbd01bb5b2243ea138af9d91f3583b92c5d` | `independently worded` | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-slopslap` | `vibedesignlab/slopslap` | plugin version `1.3.0`; commit `NOT_PROVEN` | `modified derivative`; taxonomy, data, references, scripts retained | MIT | `references/upstream-attribution.md`, `references/UPSTREAM_LICENSE.txt` |
 | `cx-ultraresearch` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/ulw-research`; method reference: `fivetaku/insane-research` | source archive `4.14.0`, commit `NOT_PROVEN`; insane-research `68f7e59168a9c9b0a586bd4122cb7a229e119d9c` | `modified derivative`; independently worded adaptation of selected research-method concepts | Sustainable Use License 1.0; MIT | `references/upstream.md`, `references/LICENSE.upstream.txt`, `references/LICENSE.insane-research.txt` |
 | `cx-understand-codebase` | `Egonex-AI/Understand-Anything` | `fe8c5bc591716aafd79b4765549328f08ef5a52e`; plugin version `2.9.4` | `modified derivative` with vendored analysis and viewer runtime | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-unstuck` | `Q00/ouroboros` | `2dec0dbd01bb5b2243ea138af9d91f3583b92c5d` | `independently worded` | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
-| `cx-visual-qa` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/visual-qa` | source archive `4.14.0`; commit `NOT_PROVEN` | `modified derivative` with retained byte-identical files | Sustainable Use License 1.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
+| `cx-visual-qa` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/visual-qa`; method source: `uizze/uizze` (`anti-ui-slop`) | source archive `4.14.0`; commit `NOT_PROVEN`; uizze `3f08d874627be4d89d2af8e6409dc5e660050b5c` | `modified derivative` with retained byte-identical files plus a condensed uizze recapture-bound adaptation | Sustainable Use License 1.0; MIT | `references/upstream.md`, `references/LICENSE.upstream.txt`, `references/LICENSE.anti-ui-slop.txt` |
 
 Distribution boundary:
 
@@ -67,7 +67,54 @@ Distribution boundary:
 - `oh-my-openagent` derivatives may be distributed only free of charge for non-commercial purposes and must retain the Sustainable Use License terms and prominent modification notice.
 - `code-yeongyu/lazycodex` and `Yeachan-Heo/gajae-code` remain research/comparison references, not current redistribution sources.
 
-## 4. 2026-08-09 additions and design research refresh
+## 4. 2026-08-22 governance-path fix and method refresh
+
+Documentation fix:
+
+- Corrected the global-instruction governance pointer. The installer never
+  distributed the three canonical governance documents, so no installed copy
+  exists; Codex now reads `skills/CX_SKILLS.md` from a Highfloor checkout and
+  states the constraint when none exists.
+
+Method sources reviewed:
+
+- [`mattpocock/skills`](https://github.com/mattpocock/skills)
+  at `5b15a47f2d7150f545fbcacbfe381787fc0230dc` (MIT): `grilling`,
+  `grill-me`, `grill-with-docs`, `improve-codebase-architecture`.
+- [`uizze/uizze`](https://github.com/uizze/uizze)
+  at `3f08d874627be4d89d2af8e6409dc5e660050b5c` (MIT):
+  `skills/anti-ui-slop/SKILL.md`.
+
+Absorbed (condensed):
+
+- `cx-interview`: optional batched questioning rounds with per-question
+  recommended answers; opt-in durable decision-record handoff (ADR or
+  glossary) requiring explicit approval; colloquial grill/stress-test
+  triggers.
+- `agents/architect.toml`: hot-spot-first scoping, shallow-module friction
+  signals, deletion test, recommendation-strength vocabulary, and
+  decision-record non-re-litigation.
+- `cx-design-director`: surface-intent classification lens and the rule not
+  to soften a selected replacement direction by polishing the discarded look.
+- `cx-visual-qa`: post-fix evidence recapture bound limited to the affected
+  surface with at most one confirmation round.
+- `docs/WORKFLOWS.md`: batched UI verification pass budget in Recipe D and an
+  open-ended polish-loop anti-pattern.
+
+Deliberately not migrated:
+
+- Uizze advertising lines, covert runtime metadata, paid-MCP catalogue
+  integration, command suite, hooks, and detector scripts.
+- The fixed frontier-empty completion rule, which conflicts with this
+  library's material-unknown readiness boundary.
+- HTML report artifacts and mandatory parallel sub-agent fan-out from the
+  architecture workflow.
+- Alias-only skills as separate library entries; their useful behavior is
+  owned by the absorptions above.
+
+No skill was added, removed, or renamed; the live inventory is unchanged.
+
+## 5. 2026-08-09 additions and design research refresh
 
 Added:
 
@@ -106,7 +153,7 @@ Highfloor added independently worded refinements to the existing
 corpus, CLI, MCP, governance runtime or visual defaults. Redistribution rights
 remain `NOT_PROVEN`, so no StyleGallery source is bundled.
 
-## 5. 2026-07-30 guarded retrieval and research composition
+## 6. 2026-07-30 guarded retrieval and research composition
 
 Selected concepts reviewed from `fivetaku/insane-research` at
 `68f7e59168a9c9b0a586bd4122cb7a229e119d9c`:
@@ -137,7 +184,7 @@ Deliberately not migrated:
 - claim truth or signature claims from self-reported metadata;
 - the upstream validator and report evaluator.
 
-## 6. 2026-07-29 upstream research refresh
+## 7. 2026-07-29 upstream research refresh
 
 ### Gajae Code `v0.12.0`
 
@@ -167,7 +214,7 @@ The `ralplan` re-review ratchet remains a reviewed agent-workflow candidate. It
 was not added to the skill library because it requires an explicit multi-agent
 review context rather than a general skill runtime.
 
-## 7. 2026-07-28 additions and normalization
+## 8. 2026-07-28 additions and normalization
 
 ### Added from `Q00/ouroboros`
 
@@ -218,7 +265,7 @@ The first migration preserved safety boundaries but left some rationale too impl
 - `CX_SKILL_CATALOG.md`: uniform five-field summary for all live skills
 - `CX_MIGRATION_MANIFEST.md`: inventory, migration history, upstream provenance, and license ledger
 
-## 8. 2026-07-22 restructure
+## 9. 2026-07-22 restructure
 
 - Renamed `cx-visual-qa-strict` to `cx-visual-qa`.
 - Replaced copied third-party design trees with six original references.
@@ -228,7 +275,7 @@ The first migration preserved safety boundaries but left some rationale too impl
 - Condensed browser, session, debugging, slopslap, and ultraresearch hot paths.
 - Absorbed generic refactor and implementation-neutral anti-slop rules into retained owners.
 
-## 9. Removed from live root
+## 10. Removed from live root
 
 - `cx-ultimate-browsing` — deleted by the user on 2026-07-28; stale routes removed
 - `cx-refactor`
@@ -239,8 +286,9 @@ The first migration preserved safety boundaries but left some rationale too impl
 
 Managed/plugin skills outside the `cx-*` namespace are out of scope.
 
-## 10. Synchronization
+## 11. Synchronization
 
-Canonical public files live under this repository's `skills/` directory.
-Installed copies are generated runtime artifacts and must not be treated as the
-authoring source.
+Canonical public files live under this repository's `skills/` directory. The
+installer does not distribute governance documents; it manages only the
+manifest-listed skill directories and agent files. Treat any copy outside this
+repository as an unverified convenience, not the authoring source.

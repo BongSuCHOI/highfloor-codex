@@ -8,6 +8,13 @@ Evaluate whether the assigned problem is tactical or structural. Do not redesign
 
 Philosophy: when repeated fixes fight the same boundary, inspect the foundation. Architecture earns its cost only when it removes a demonstrated structural mismatch.
 
+Method:
+- Weight recently changed areas first when the assignment does not name a scope: walk recent history for hot spots instead of scanning uniformly, and widen to stable structural code when history shows no clear hotspot.
+- Suspect shallow modules: interface complexity near implementation complexity, pure functions extracted for testability while defects live at call sites, or one concept requiring bounces across many small modules.
+- Apply the deletion test: prefer deepening refactors where removing a module would concentrate complexity rather than relocate it.
+- Name seams with the project's domain vocabulary, state test consequences of each option, and grade recommendations Strong, Worth exploring, or Speculative.
+- Do not re-propose what an existing decision record rejects unless the current friction justifies reopening it; say so explicitly when it does.
+
 Hard floor:
 - Ground claims in current code, interfaces, data flow, failure modes, and operational constraints.
 - Identify responsibility overlap, leaky abstractions, coupling, compatibility, and blast radius.

@@ -192,13 +192,16 @@ Runtime contract: [`SKILL.md`](cx-interview/SKILL.md)
 - **Owns:** a user-approved Task Contract for a materially ambiguous idea,
   feature, workflow, or brownfield improvement.
 - **Trigger:** goal, actor, constraint, non-goal, outcome, AC, or product
-  decision could materially change the result.
+  decision could materially change the result; the user asks to grill or
+  stress-test an idea, plan, or design.
 - **Non-trigger:** an already specified narrow edit, pure diagnosis, or a
   decision already settled by project rules.
 - **Method:** expose hidden assumptions through Socratic questions; for
   materially multi-surface requests, confirm top-level coverage before
   converging through restatement, explicit review of reductions, and approval;
-  persistent contracts may name the terminal artifact and required gates.
+  several independent material decisions may be batched into numbered rounds
+  with recommended answers; persistent contracts may name the terminal
+  artifact and required gates.
 - **Routes:** UI/product-flow discovery → `cx-design-director`; external
   comparison → `cx-ultraresearch`; implementation drift, deadlock, or formal
   proof → the corresponding owner.

@@ -22,6 +22,8 @@ third-party or derivative component.
 | `cx-insane-search` | `fivetaku/insane-search`, original conversion commit `NOT_PROVEN`; selective refresh at `019ee16bbf471595f9b67b164e4a92208183af2d` | modified derivative | MIT | `LICENSES/MIT-fivetaku-insane-search.txt` |
 | `cx-insane-search`, `cx-ultraresearch` | `fivetaku/insane-research` at `68f7e59168a9c9b0a586bd4122cb7a229e119d9c` | independently worded adaptations of selected access-evidence and research-method concepts | MIT | `LICENSES/MIT-fivetaku-insane-research.txt` |
 | `cx-slopslap` | `vibedesignlab/slopslap` version `1.3.0`, exact commit `NOT_PROVEN` | modified derivative with vendored taxonomy, data, references, and scripts | MIT | `LICENSES/MIT-vibedesignlab-slopslap.txt` |
+| `cx-interview`, `agents/architect.toml` | `mattpocock/skills` at `5b15a47f2d7150f545fbcacbfe381787fc0230dc` | modified derivative; condensed selected batched-questioning, decision-record, and architecture-review concepts into existing owners; no executable source redistributed | MIT | `LICENSES/MIT-mattpocock-skills.txt` |
+| `cx-design-director`, `cx-visual-qa`, `docs/WORKFLOWS.md` | `uizze/uizze` (`anti-ui-slop`) at `3f08d874627be4d89d2af8e6409dc5e660050b5c` | modified derivative; condensed selected surface-intent and verification-budget concepts into existing owners; no executable source, scripts, or catalogue integration redistributed | MIT | `LICENSES/MIT-uizze-uizze.txt` |
 
 ## Modification notices
 
@@ -111,6 +113,31 @@ Copyright (c) 2026 fivetaku.
 `cx-slopslap` converts `vibedesignlab/slopslap` for Codex and modifies host discovery, concurrency, Git behavior, report serving, and browser resolution while retaining upstream taxonomy and implementation material.
 
 Copyright (c) 2026 groovelb.
+
+### Matt Pocock Skills
+
+`cx-interview` and the `architect` agent condense selected ideas from
+`mattpocock/skills`: batching currently answerable questions into
+recommended-answer rounds, offering durable decision records with explicit
+approval, hot-spot-first architecture scoping, the deletion test,
+recommendation-strength vocabulary, and decision-record non-re-litigation. The
+condensation retains upstream method structure and terminology where noted. No
+upstream skill, executable source, sub-agent orchestration, HTML report
+tooling, or companion skills are bundled.
+
+Copyright (c) 2026 Matt Pocock.
+
+### Uizze Anti-UI-Slop
+
+`cx-design-director`, `cx-visual-qa`, and `docs/WORKFLOWS.md` condense selected
+ideas from uizze's `anti-ui-slop` skill: classifying surface intent from the
+requested surface, avoiding compromise polish on a discarded direction, and
+bounding post-fix evidence recapture. The condensation retains upstream method
+structure and terminology where noted. No upstream skill, executable source,
+scripts, hooks, catalogue integration, advertising behavior, or covert runtime
+metadata is bundled.
+
+Copyright (c) 2026 UIZZE.
 
 ### Ouroboros
 
