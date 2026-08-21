@@ -39,8 +39,8 @@
 - 요구사항 정리, 진단, 조사, 범위 관리, 브라우저 작업, 디자인 방향,
   검증, 영상 분석과 낯선 코드베이스 구조화를 맡는 **15개의 집중된
   `cx-*` 스킬**
-- 조사, 검토, 구현, 문서화를 각자의 전문 영역에서 수행하는
-  **27개의 전문 에이전트**
+- 조사, 검토, 구현, 문서화와 범위가 정해진 fallback 작업을 수행하는
+  **29개의 custom agent profile**
 
 Highfloor는 아직 독립형 에이전트 하네스나 자동 파이프라인이 아닙니다.
 각 스킬과 에이전트는 분명한 역할을 가지며, 현재 작업에 필요한 것만
@@ -357,6 +357,18 @@ Codex가 불러올 수도 있습니다.
 
 ## Custom agents
 
+Highfloor는 `default`, `worker`, `explorer`라는 custom definition을
+의도적으로 제공합니다. Codex에서는 같은 이름의 custom agent가 built-in
+definition보다 우선하므로, installer가 사용자 `config.toml`을 수정하지
+않아도 Highfloor의 model, reasoning과 역할 경계가 적용됩니다.
+
+### Built-in fallback
+
+| Agent | Mode | 역할 |
+|---|---|---|
+| `default` | workspace-write | 전문 agent가 맡지 않는 범위가 정해진 위임 작업만 수행합니다. |
+| `worker` | workspace-write | 전문 agent가 맡지 않는 범위가 정해진 변경만 구현합니다. |
+
 ### 조사와 결정
 
 | Agent | Mode | 역할 |
@@ -511,7 +523,7 @@ Highfloor는 지금 바로 쓸 수 있는 구성요소, 즉 이 저장소의 Cod
 ```text
 highfloor-codex/
 ├── .github/              issue form, PR template, CI
-├── agents/               설치 가능한 custom-agent TOML 27개
+├── agents/               설치 가능한 custom-agent TOML 29개
 ├── assets/               repository artwork
 ├── docs/                 설치, catalog, workflow, architecture
 ├── LICENSES/             upstream license text

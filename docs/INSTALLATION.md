@@ -103,6 +103,20 @@ explicitly pass that path through `--skills-dir` or
 `HIGHFLOOR_SKILLS_DIR`. If your Codex build uses another location, override it
 explicitly.
 
+### Managed built-in overrides
+
+The agent manifest includes custom `default`, `worker`, and `explorer` files.
+Codex gives a matching custom definition precedence over the built-in agent of
+the same name. Installation therefore applies Highfloor's model, reasoning,
+authority, and instruction profile to those roles through the existing managed
+agent lifecycle.
+
+The installer does not create or edit `$CODEX_HOME/config.toml`. Global
+`agents.default_subagent_model` and
+`agents.default_subagent_reasoning_effort` remain user-owned settings, and
+unrelated custom agents continue to follow the user's own configuration or
+inheritance rules.
+
 ## Optional global instructions
 
 `CODEX_AGENTS.md` is the portable repository source for Codex global

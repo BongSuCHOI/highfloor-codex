@@ -16,6 +16,8 @@ cleanup() {
 trap cleanup EXIT HUP INT TERM
 
 mkdir -p "$TEST_HOME" "$TEST_CODEX" "$TEST_SKILLS" "$TEST_AGENTS"
+printf 'model = "user-root-model"\n' > "$TEST_CODEX/config.toml"
+cp "$TEST_CODEX/config.toml" "$TEST_ROOT/config.before.toml"
 
 REAL_CP="$(command -v cp)"
 FAIL_BIN="$TEST_ROOT/fail-bin"
@@ -56,6 +58,18 @@ while IFS= read -r entry || [ -n "$entry" ]; do
     exit 1
   }
 done < "$ROOT/manifest/agents.txt"
+
+for entry in default.toml worker.toml; do
+  cmp -s "$ROOT/agents/$entry" "$TEST_AGENTS/$entry" || {
+    printf 'managed built-in override differs after install: %s\n' "$entry" >&2
+    exit 1
+  }
+done
+
+cmp -s "$TEST_ROOT/config.before.toml" "$TEST_CODEX/config.toml" || {
+  printf 'installer changed user-owned config.toml\n' >&2
+  exit 1
+}
 
 mkdir -p "$TEST_SKILLS/user-skill"
 : > "$TEST_SKILLS/user-skill/SKILL.md"

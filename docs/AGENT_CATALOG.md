@@ -36,6 +36,7 @@ Every delegated assignment still needs a concrete scope and expected result.
 | `data-engineer` | `gpt-5.6-terra` / `high` | workspace-write | Ingestion, transformation, data contracts, backfills, and recoverable ETL |
 | `database-engineer` | `gpt-5.6-terra` / `high` | workspace-write | Schema, migration, query, transaction, and compatibility changes |
 | `debugger` | `gpt-5.6-sol` / `medium` | evidence workspace | Root-cause isolation for crashes, hangs, wrong behavior, flakiness, and binaries |
+| `default` | `gpt-5.6-luna` / `xhigh` | workspace-write | General fallback for bounded delegated work without a better specialist owner |
 | `docs-researcher` | `gpt-5.6-luna` / `xhigh` | read-only | Current APIs, defaults, versions, and framework behavior from primary sources |
 | `explorer` | `gpt-5.6-luna` / `xhigh` | read-only | Owning paths, execution flow, state transitions, and change boundaries |
 | `financial-systems-reviewer` | `gpt-5.6-sol` / `high` | read-only | Payment, ledger, settlement, reconciliation, precision, idempotency, and audit flows |
@@ -47,15 +48,25 @@ Every delegated assignment still needs a concrete scope and expected result.
 | `planner` | `gpt-5.6-sol` / `medium` | read-only | Executable, right-sized plans from approved intent |
 | `reliability-reviewer` | `gpt-5.6-sol` / `medium` | read-only | Failure modes, retries, timeouts, recovery, observability, and degraded operation |
 | `research-analyst` | `gpt-5.6-sol` / `medium` | read-only | Bounded source-backed investigations, comparisons, and evidence synthesis |
-| `reviewer` | `gpt-5.6-sol` / `medium` | read-only | PR-style correctness, regression, integration, security, and test review |
+| `reviewer` | `gpt-5.6-terra` / `high` | read-only | PR-style correctness, regression, integration, security, and test review |
 | `risk-reviewer` | `gpt-5.6-sol` / `medium` | read-only | Product, technical, operational, legal-adjacent, and delivery risk |
 | `security-reviewer` | `gpt-5.6-sol` / `high` | read-only | Trust, authentication, authorization, secrets, inputs, exploitability, and mitigation |
 | `systems-engineer` | `gpt-5.6-terra` / `high` | workspace-write | Ownership, concurrency, memory, process, resource, and performance-sensitive systems |
-| `technical-writer` | `gpt-5.6-sol` / `low` | workspace-write | Release notes, migrations, onboarding, operator guidance, and developer docs |
-| `test-engineer` | `gpt-5.6-terra` / `medium` | workspace-write | Targeted regression coverage, deterministic fixtures, and focused verification |
+| `technical-writer` | `gpt-5.6-terra` / `medium` | workspace-write | Release notes, migrations, onboarding, operator guidance, and developer docs |
+| `test-engineer` | `gpt-5.6-luna` / `xhigh` | workspace-write | Targeted regression coverage, deterministic fixtures, and focused verification |
 | `windows-engineer` | `gpt-5.6-terra` / `high` | workspace-write | PowerShell, services, identity, policy, registry, and Windows administration |
+| `worker` | `gpt-5.6-luna` / `xhigh` | workspace-write | Execution fallback for bounded implementation without a better specialist owner |
 
 ## Common choices
+
+### `default` vs `worker` vs specialists
+
+- Use a named specialist whenever one owns the task boundary.
+- Use `worker` for bounded implementation with no better specialist owner.
+- Use `default` only for other bounded delegated work with no better specialist
+  owner.
+- These files intentionally override Codex's built-in agents with matching
+  names; they are fallbacks, not replacements for deliberate role selection.
 
 ### `explorer` vs `architect`
 
@@ -120,6 +131,9 @@ repository and unrelated changes must not be reverted.
 The model names and reasoning efforts are intentional defaults, but they are
 not portable guarantees. Codex accounts and product surfaces may expose
 different catalogs. Installation preserves the repository values exactly.
+Highfloor installs custom `default`, `worker`, and `explorer` definitions, so
+their values override the matching built-in agents without editing the user's
+`config.toml` or changing unrelated subagent defaults.
 
 If a model is unavailable:
 
