@@ -1,6 +1,6 @@
 # CX Skills Migration Manifest
 
-- Updated: 2026-08-22
+- Updated: 2026-08-28
 - Repository root: `skills/`
 - Installed root: selected by `install.sh` (`$CODEX_HOME/skills` by default,
   unless explicitly overridden)
@@ -56,7 +56,7 @@ Relationships follow the licensing governance in `CX_SKILLS.md`.
 | `cx-interview` | `Q00/ouroboros`; method source: `mattpocock/skills`; method research: `Yeachan-Heo/gajae-code`, `mattpocock/skills` | Ouroboros `2dec0dbd01bb5b2243ea138af9d91f3583b92c5d`; GJC `4e927cca7e6dda31d715957a2ecfbcbc4e62869a`; Matt source `5b15a47f2d7150f545fbcacbfe381787fc0230dc`; Matt research `6654f6b60cd9d5be8b54c6fafe44346dabeb3b76` | `independently worded` from Ouroboros; `modified derivative` (condensed) of questioning and decision-record material; independently worded synthesis adaptation | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt`, `references/LICENSE.mattpocock-skills.txt` |
 | `cx-programming` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/programming` | source archive `4.14.0`; commit `NOT_PROVEN` | `modified derivative` | Sustainable Use License 1.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-scope-check` | `Q00/ouroboros` | `2dec0dbd01bb5b2243ea138af9d91f3583b92c5d` | `independently worded` | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
-| `cx-slopslap` | `vibedesignlab/slopslap` | plugin version `1.3.0`; commit `NOT_PROVEN` | `modified derivative`; taxonomy, data, references, scripts retained | MIT | `references/upstream-attribution.md`, `references/UPSTREAM_LICENSE.txt` |
+| `cx-slopslap` | `vibedesignlab/slopslap`; optional runtime and research: `Gesso-Build/skills` | slopslap plugin version `1.3.0`, commit `NOT_PROVEN`; Gesso `ab68f1878dd5f19ac8dee9d55d2f4313060cac83`, package `@gessobuild/anti-slop@0.4.2` | `modified derivative`; taxonomy, data, references, scripts retained; Gesso `runtime invocation` and `research reference` with no source bundled | MIT | `references/upstream-attribution.md`, `references/UPSTREAM_LICENSE.txt` |
 | `cx-ultraresearch` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/ulw-research`; method references: `fivetaku/insane-research`, `LilMGenius/paperthin` | source archive `4.14.0`, commit `NOT_PROVEN`; insane-research `68f7e59168a9c9b0a586bd4122cb7a229e119d9c`; paperthin `3bca079a51bcfff5dafb53d1d7f9f523d66ee317` | `modified derivative`; independently worded adaptation of selected research and claim-checking concepts | Sustainable Use License 1.0; MIT | `references/upstream.md`, `references/LICENSE.upstream.txt`, `references/LICENSE.insane-research.txt` |
 | `cx-understand-codebase` | `Egonex-AI/Understand-Anything` | `fe8c5bc591716aafd79b4765549328f08ef5a52e`; plugin version `2.9.4` | `modified derivative` with vendored analysis and viewer runtime | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-unstuck` | `Q00/ouroboros`; method research: `LilMGenius/paperthin` | Ouroboros `2dec0dbd01bb5b2243ea138af9d91f3583b92c5d`; paperthin `3bca079a51bcfff5dafb53d1d7f9f523d66ee317` | `independently worded` with research reference | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
@@ -106,6 +106,24 @@ Deliberately not migrated:
 For the additions in this subsection, no upstream source or wording is bundled;
 the pinned repositories are research references for independently worded method
 changes.
+
+### Gesso checker review
+
+Reviewed `Gesso-Build/skills` at
+`ab68f1878dd5f19ac8dee9d55d2f4313060cac83` under MIT and absorbed only the
+useful execution boundary into `cx-slopslap`:
+
+- optional pinned `@gessobuild/anti-slop@0.4.2` check-only JSON invocation for
+  self-contained rendered HTML;
+- an explicit precheck for external stylesheets because v0.4.2 JSON does not
+  surface that coverage gap, plus incomplete-evidence handling for malformed
+  output, rule errors, and nonzero exits;
+- structured local-scanner coverage, detector errors, target/read failures,
+  sanitized excerpts, and regression tests.
+
+The Gesso skill catalog, prevention prompt, rule corpus, baseline CSS, and
+automatic fix path were not imported. No new skill was added, and
+`cx-design-director` and `cx-visual-qa` ownership did not change.
 
 ## 5. 2026-08-22 governance-path fix and method refresh
 

@@ -151,6 +151,9 @@ The following tools are referenced or invoked but their source code is not bundl
 
 - `vercel-labs/agent-browser@0.29.1` — Apache License 2.0
 - `cx-design-director`: `ibelick/ui-skills@0.2.4` — MIT License
+- `cx-slopslap`: `Gesso-Build/skills` at
+  `ab68f1878dd5f19ac8dee9d55d2f4313060cac83`, runtime package
+  `@gessobuild/anti-slop@0.4.2` — MIT License
 
 They are recorded for dependency provenance and are not classified as redistributed source.
 

@@ -8,6 +8,12 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Added an optional pinned, check-only Gesso rendered-HTML cross-check to
+  `cx-slopslap` without bundling its rules or auto-fix path. The local scanner
+  now exposes structured coverage and detector errors, reports missing or
+  unreadable targets as incomplete with exit code `2`, sanitizes excerpts, and
+  returns help without starting a scan. Regression coverage now exercises help,
+  clean, incomplete, invalid-detector, and candidate-evidence paths.
 - Absorbed selected restraint and method principles from `mattpocock/skills`
   and `LilMGenius/paperthin` without importing their catalogs or adding a new
   skill: `NO_CHANGE` is an explicit successful outcome, evaluation now checks

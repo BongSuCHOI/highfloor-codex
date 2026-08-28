@@ -23,11 +23,36 @@ Remove UI slop while preserving product meaning, intentional design, accessibili
    node "<skill-root>/scripts/scan-slop-signals.mjs" <target-path> --json
    ```
 
+   Treat `coverage.complete: false`, a non-empty `detectorErrors` array, or
+   exit code `2` as incomplete evidence, not a clean scan.
+
 4. Evaluate the areas in `references/inspection-areas.md`: A decorative slop, B layout/containers/media, C spacing, D typography, E color/contrast.
 5. For a small surface, evaluate locally in one focused pass. For broad work, order repairs A → B → C → D → E because structural changes can invalidate later findings.
 6. For each actionable finding, record the problem, located evidence, prescription, measurable check and area. Scanner hits are not proof.
 7. In Audit mode, stop after findings and an optional report. In repair modes, apply only accepted findings and verify the changed surface once with the nearest relevant check.
 8. Route broad redesign direction to `$cx-design-director`, rendered judgment to `$cx-visual-qa`, and browser interaction to `$cx-browser-automation`.
+
+### Optional rendered-HTML cross-check
+
+When a self-contained rendered or exported HTML file exists, an explicit
+de-slopping task may add this pinned check-only pass. Inspect the file first:
+if it loads CSS through `<link rel="stylesheet">` or `@import`, skip this pass
+or mark its CSS coverage `NOT_PROVEN` because v0.4.2 JSON does not report that
+gap.
+
+```bash
+npx -y @gessobuild/anti-slop@0.4.2 check <rendered-html> --json
+```
+
+Use its issues as another candidate list, not a verdict. Keep `[advisory]`
+issues advisory and judge every other issue against product intent,
+accessibility, project rules, and current rendered evidence. A nonzero exit,
+malformed JSON, or checker or rule error is incomplete evidence, never zero
+findings.
+
+Do not run `fix`, `fix --write`, or copy its baseline CSS. Those operations can
+rewrite intentional UI, copy, semantics, and accessibility without the local
+judgment this skill requires.
 
 ## Optional artifacts and corpus
 
@@ -40,6 +65,7 @@ node "<skill-root>/scripts/build-findings-report.mjs" <findings-dir> <report/ind
 Use these deterministic resources:
 
 - Candidate scanner: `scripts/scan-slop-signals.mjs`
+- Scanner regression test: `scripts/scan-slop-signals.test.mjs`
 - Taxonomy: `assets/data/aiSlopTaxonomyData.js`
 - Quantitative lookup: `scripts/fetch-references.mjs`
 - Transform directions: `scripts/fetch-answer.mjs`
