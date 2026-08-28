@@ -20,3 +20,17 @@ Deliberate changes:
 - treat lenses as optional scaffolding so stronger models may use a better reasoning method.
 
 This implementation is independently worded. Preserve this provenance record if the skill is redistributed.
+
+## Method research reference
+
+- Reference: `LilMGenius/paperthin`
+- Commit: `3bca079a51bcfff5dafb53d1d7f9f523d66ee317`
+- Relevant source: `skills/depth/hate/SKILL.md`
+- License: MIT
+- Relationship: `research reference`; no source or wording is bundled
+
+Independently absorbed idea:
+
+- collapse a stalled plan to one load-bearing failed assumption and identify
+  the cheapest experiment that can discriminate it before multiplying
+  alternatives.

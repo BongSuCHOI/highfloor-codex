@@ -9,6 +9,9 @@ Thank you for helping improve Highfloor for Codex.
 - For any `cx-*` skill change, read `skills/CX_SKILLS.md`.
 - Identify whether the change affects runtime behavior, distribution,
   documentation, provenance, or only formatting.
+- For a proposed skill, identify the ownership gap, held-out task, maintenance
+  surfaces, and existing behavior it replaces or cannot reuse. `NO_CHANGE` is
+  the correct outcome when the proposal adds no unique value.
 - Open an issue first for new skills, new agents, renames, removals, installer
   ownership changes, or license-boundary changes.
 
@@ -41,7 +44,9 @@ Describe:
 - stop and fallback conditions;
 - permissions and destructive boundaries;
 - relationship to adjacent skills;
-- upstream source, license, and modification status.
+- upstream source, license, and modification status;
+- context, routing, catalog, installer, documentation, test, and upstream
+  maintenance cost.
 
 Keep `SKILL.md` concise enough for progressive disclosure. Put deep method,
 examples, and provenance in `references/` when appropriate.
@@ -140,6 +145,9 @@ without:
 5. an entry in `THIRD_PARTY_NOTICES.md`.
 
 When provenance cannot be proven, do not publish the component as original.
+Pure research references that contribute no copied source or wording remain in
+the applicable per-skill provenance and migration manifest; do not present them
+as redistributed components.
 
 ## Reporting security issues
 

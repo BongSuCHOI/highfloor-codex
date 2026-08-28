@@ -44,6 +44,12 @@ It is a kit, not a standalone agent harness or an automatic pipeline. Each
 skill and agent has a specific job, and you combine only the parts the current
 task needs.
 
+Adding another skill is not the default form of progress. When an existing
+owner, native capability, or ordinary model judgment can preserve the useful
+behavior, Highfloor absorbs the method or records `NO_CHANGE` instead. A pass
+that finds no necessary improvement leaves the artifact untouched; that
+restraint keeps the kit maintainable.
+
 The long-term direction is a harness built on the same ideas. The philosophy
 below is the design standard connecting today's kit to anything Highfloor
 becomes later.
@@ -325,11 +331,11 @@ does not install legacy `/watch` or `/understand` custom-prompt aliases.
 | Skill | What it does | Use it when |
 |---|---|---|
 | [`cx-analyze-video`](skills/cx-analyze-video/SKILL.md) | Aligns sampled frames with captions or explicitly authorized transcription. | You need timestamped evidence from YouTube or another public URL, a local `.mp4` or `.mov`, or a screen recording. |
-| [`cx-interview`](skills/cx-interview/SKILL.md) | Turns an unclear request into an approved Task Contract. | Important boundaries or success conditions are unclear before implementation. |
-| [`cx-unstuck`](skills/cx-unstuck/SKILL.md) | Challenges a failed approach and offers a few realistic alternatives. | The same planning or implementation strategy keeps failing or has reached a real dead end. |
+| [`cx-interview`](skills/cx-interview/SKILL.md) | Clarifies ambiguity or synthesizes settled decisions into an approved Task Contract. | Important boundaries are unresolved or an existing conversation needs a durable implementation contract. |
+| [`cx-unstuck`](skills/cx-unstuck/SKILL.md) | Finds the load-bearing failed assumption and its cheapest discriminating experiment before offering alternatives. | The same planning or implementation strategy keeps failing or has reached a real dead end. |
 | [`cx-browser-automation`](skills/cx-browser-automation/SKILL.md) | Operates a real browser and records what happened. | The task requires navigation, forms, signed-in state, screenshots, snapshots, or traces. |
 | [`cx-coding-agent-sessions`](skills/cx-coding-agent-sessions/SKILL.md) | Finds and summarizes earlier coding-agent sessions. | You need the exact prior task, prompt, session, child task, or transcript. |
-| [`cx-debugging`](skills/cx-debugging/SKILL.md) | Reproduces a runtime failure and separates the proven cause from guesses. | A crash, hang, wrong result, silent failure, flaky behavior, or binary symptom needs diagnosis. |
+| [`cx-debugging`](skills/cx-debugging/SKILL.md) | Builds the smallest useful failure loop and separates the proven cause from guesses. | A crash, hang, wrong result, silent failure, flaky behavior, or binary symptom needs diagnosis. |
 | [`cx-design-director`](skills/cx-design-director/SKILL.md) | Sets the direction for a broad product UI or UX change. | The visual language, layout system, component patterns, or an end-to-end flow will change. |
 | [`cx-insane-search`](skills/cx-insane-search/SKILL.md) | Reads blocked public content through a guarded fetch path and preserves retrieval evidence. | A public page is blocked by `402`, `403`, WAF, empty HTML, JavaScript-only rendering, or broken markup. |
 | [`cx-programming`](skills/cx-programming/SKILL.md) | Handles tricky language behavior in Python, TypeScript, Go, or Rust. | Types, concurrency, resources, errors, FFI, or toolchain behavior could change the correct implementation. |

@@ -33,3 +33,17 @@ in-context default and optional artifact contract. It did not copy the fixed
 seven-phase workflow, automatic agent fan-out, permission bypass, mandatory
 session artifacts, source grades, domain-based independence rule, claim
 validator, or report evaluator.
+
+## Claim-checking research reference
+
+- Reference: `LilMGenius/paperthin`
+- Commit: `3bca079a51bcfff5dafb53d1d7f9f523d66ee317`
+- Relevant source: `skills/depth/factchk/SKILL.md`
+- License: MIT
+- Relationship: `research reference`; no source or wording is bundled
+
+Independently absorbed idea:
+
+- when a material claim relies on intuition about plausibility, novelty, or
+  impossibility, countercheck both the surprising and obvious readings before
+  treating either as fact.

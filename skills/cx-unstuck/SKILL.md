@@ -1,6 +1,6 @@
 ---
 name: cx-unstuck
-description: "Break planning, product, architecture, or implementation-strategy deadlock by challenging the failed approach and producing bounded alternatives. Use when the same approach has failed repeatedly, constraints conflict, progress stalls, or the user asks for another angle. Use cx-debugging first for unresolved runtime failures; do not trigger a persona fan-out or replace evidence with brainstorming."
+description: "Break planning, product, architecture, or implementation-strategy deadlock by identifying the load-bearing failed assumption and its cheapest discriminating experiment before producing bounded alternatives. Use when the same approach has failed repeatedly, constraints conflict, progress stalls, or the user asks for another angle. Use cx-debugging first for unresolved runtime failures; do not trigger a persona fan-out or replace evidence with brainstorming."
 ---
 
 # Unstuck
@@ -9,9 +9,10 @@ Change the frame only after identifying why the current approach is stuck. Produ
 
 ## Method
 
-- Use lateral thinking to challenge the frame or assumption that keeps reproducing the deadlock, not merely to generate more variants of the same approach.
+- Collapse the deadlock to the one load-bearing assumption whose failure would make the current approach untenable, then find the cheapest experiment or decision that can discriminate it.
+- Use lateral thinking to challenge the frame that keeps reproducing the deadlock, not merely to generate more variants of the same approach.
 - Apply only the useful perspective—researcher, contrarian, simplifier, architect, or another evidence-backed lens—without role-play or mandatory persona fan-out.
-- Diverge into a few materially different paths, then converge with constraints, downsides, and the smallest discriminating experiment.
+- Add alternatives only when the first discriminating result does not already resolve the path. Keep the output centered on one root, not a checklist of objections.
 - Creative alternatives remain advisory until the user approves any required contract change.
 
 ## Hard floor
@@ -26,26 +27,28 @@ Change the frame only after identifying why the current approach is stuck. Produ
 
 1. Reconstruct the stuck point and distinguish runtime failure, missing fact, conflicting requirement, oversized scope, and structural recurrence.
 2. Stop and use `$cx-debugging` when cause isolation is still the real task.
-3. Select only the useful lens or lenses:
+3. Identify the load-bearing assumption that must hold for the current approach to work. Collapse related objections to the single root whose failure makes the others secondary.
+4. Define the cheapest discriminating experiment or decision for that root. Execute it when it is safe, authorized, and cheaper than expanding the plan; otherwise report the exact check and required authority or evidence.
+5. If the result already selects or kills the approach, return that conclusion without manufacturing alternatives. Otherwise select only the useful lens or lenses:
    - **Researcher** for a missing external or repository fact.
    - **Contrarian** for a repeated or untested assumption.
    - **Simplifier** for oversized scope or unnecessary coupling.
    - **Architect** for a structural problem that recurs across local fixes.
-4. Produce at most three materially different alternatives. For each include:
+6. Produce at most two materially different alternatives. For each include:
    - challenged assumption;
    - preserved and endangered constraints;
-   - smallest discriminating experiment or decision;
+   - evidence expected from the discriminating experiment or decision;
    - main downside.
-5. Recommend one only when evidence supports it. Otherwise expose the decision cleanly.
-6. Record rejected approaches so the originating workflow does not cycle back without new evidence.
-7. Return to the originating workflow. If the choice changes the approved contract, require a `$cx-interview` amendment before implementation.
+7. Recommend one only when evidence supports it. Otherwise expose the decision cleanly.
+8. Record rejected approaches so the originating workflow does not cycle back without new evidence.
+9. Return to the originating workflow. If the choice changes the approved contract, require a `$cx-interview` amendment before implementation.
 
 ## Adaptive freedom
 
 - Use a better reasoning method than the named lenses when it produces a clearer bounded decision.
 - Combine lenses without role-play or subagent fan-out.
-- Produce one alternative when only one credible path exists.
-- Expand beyond three alternatives only when the user explicitly asks for broad ideation.
+- Return only the root and discriminating experiment when alternatives would add no decision value.
+- Expand beyond two alternatives only when the user explicitly asks for broad ideation.
 
 ## Chains
 

@@ -1,4 +1,4 @@
 interface:
   display_name: "CX Unstuck"
   short_description: "Break stalled reasoning with bounded reframing"
-  default_prompt: "Use $cx-unstuck to challenge the stalled approach and produce bounded alternatives."
+  default_prompt: "Use $cx-unstuck to find the stalled approach's load-bearing failed assumption and cheapest discriminating experiment."

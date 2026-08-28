@@ -46,6 +46,12 @@ Highfloor는 아직 독립형 에이전트 하네스나 자동 파이프라인�
 각 스킬과 에이전트는 분명한 역할을 가지며, 현재 작업에 필요한 것만
 골라 조합하는 키트입니다.
 
+스킬을 하나 더 만드는 것을 기본적인 발전으로 보지 않습니다. 기존 owner,
+native capability 또는 모델의 일반적인 판단으로 유용한 동작을 보존할 수
+있다면 새 스킬 대신 그 원리를 흡수하거나 `NO_CHANGE`를 기록합니다. 필요한
+개선이 없는 검토는 artifact를 건드리지 않으며, 그 절제가 키트를 유지
+가능하게 만듭니다.
+
 장기적인 방향은 같은 철학을 실제 실행 환경에 담은 하네스입니다. 아래
 철학은 지금의 키트와 앞으로 Highfloor라는 이름으로 만들 모든 것을
 연결하는 설계 기준입니다.
@@ -338,11 +344,11 @@ Codex가 불러올 수도 있습니다.
 | Skill | 하는 일 | 사용 시점 |
 |---|---|---|
 | [`cx-analyze-video`](skills/cx-analyze-video/SKILL.md) | Sampling frame과 caption 또는 명시적으로 승인된 transcription을 시간축으로 맞춥니다. | YouTube 등 공개 URL, 로컬 `.mp4`·`.mov`, screen recording에서 timestamp evidence가 필요할 때 사용합니다. |
-| [`cx-interview`](skills/cx-interview/SKILL.md) | 모호한 요청을 사용자가 승인한 Task Contract로 정리합니다. | 구현 전에 중요한 경계나 성공 조건이 분명하지 않을 때 사용합니다. |
-| [`cx-unstuck`](skills/cx-unstuck/SKILL.md) | 실패한 접근을 다시 검토하고 현실적인 대안을 몇 가지 제시합니다. | 같은 계획이나 구현 전략이 반복해서 실패하거나 실제 막다른 길에 도달했을 때 사용합니다. |
+| [`cx-interview`](skills/cx-interview/SKILL.md) | 모호함을 해소하거나 이미 결정된 내용을 승인 가능한 Task Contract로 종합합니다. | 중요한 경계가 미정이거나 기존 대화를 지속 가능한 구현 계약으로 남겨야 할 때 사용합니다. |
+| [`cx-unstuck`](skills/cx-unstuck/SKILL.md) | 막힌 접근의 핵심 실패 가정과 가장 저렴한 판별 실험을 찾은 뒤 필요한 대안만 제시합니다. | 같은 계획이나 구현 전략이 반복해서 실패하거나 실제 막다른 길에 도달했을 때 사용합니다. |
 | [`cx-browser-automation`](skills/cx-browser-automation/SKILL.md) | 실제 브라우저를 조작하고 일어난 일을 증거로 남깁니다. | 페이지 이동, 폼 입력, 로그인 상태, 스크린샷, snapshot 또는 trace가 필요할 때 사용합니다. |
 | [`cx-coding-agent-sessions`](skills/cx-coding-agent-sessions/SKILL.md) | 이전 코딩 에이전트 세션을 찾아 요약합니다. | 과거의 정확한 작업, prompt, session, child task 또는 transcript가 필요할 때 사용합니다. |
-| [`cx-debugging`](skills/cx-debugging/SKILL.md) | 런타임 실패를 재현하고 확인된 원인과 추측을 구분합니다. | crash, hang, 잘못된 결과, 조용한 실패, flaky 동작 또는 binary 증상을 진단할 때 사용합니다. |
+| [`cx-debugging`](skills/cx-debugging/SKILL.md) | 가장 작은 유효 failure loop를 만들고 확인된 원인과 추측을 구분합니다. | crash, hang, 잘못된 결과, 조용한 실패, flaky 동작 또는 binary 증상을 진단할 때 사용합니다. |
 | [`cx-design-director`](skills/cx-design-director/SKILL.md) | 넓은 범위의 product UI 또는 UX 변경 방향을 정합니다. | 시각 언어, layout system, component pattern 또는 end-to-end flow가 바뀔 때 사용합니다. |
 | [`cx-insane-search`](skills/cx-insane-search/SKILL.md) | 보호된 fetch 경로로 차단된 공개 콘텐츠를 읽고 retrieval evidence를 보존합니다. | 공개 페이지가 `402`, `403`, WAF, 빈 HTML, JavaScript-only rendering 또는 손상된 markup으로 막혔을 때 사용합니다. |
 | [`cx-programming`](skills/cx-programming/SKILL.md) | Python, TypeScript, Go 또는 Rust의 까다로운 언어 동작을 다룹니다. | type, concurrency, resource, error, FFI 또는 toolchain 동작이 올바른 구현을 바꿀 수 있을 때 사용합니다. |

@@ -25,8 +25,8 @@ detailed triggers, workflow, scripts, and fallbacks.
 | Current need | Primary owner |
 |---|---|
 | Analyze a public or local video from timestamped visual and spoken evidence | `cx-analyze-video` |
-| Turn an ambiguous product, feature, or improvement request into an approved contract | `cx-interview` |
-| Reframe a repeatedly failed planning, product, or architecture strategy | `cx-unstuck` |
+| Clarify ambiguity or synthesize settled decisions into an approved contract | `cx-interview` |
+| Find the failed load-bearing assumption in a stalled strategy | `cx-unstuck` |
 | Interact with and capture a real browser | `cx-browser-automation` |
 | Find a prior coding-agent task or transcript | `cx-coding-agent-sessions` |
 | Isolate the cause of a runtime failure | `cx-debugging` |
@@ -145,9 +145,10 @@ Runtime contract: [`SKILL.md`](cx-debugging/SKILL.md)
   plausible causes.
 - **Non-trigger:** routine review, requirement clarification, a planned
   refactor, or an acceptance verdict.
-- **Method:** use the smallest reproduction and discriminating hypotheses to
-  test whether the cause predicts the failure; if the exact symptom survives a
-  fix, reopen the cause or scope before stacking another change.
+- **Method:** for unclear failures, first establish the smallest red-capable
+  feedback loop for the exact symptom, then use discriminating hypotheses to
+  test whether the cause predicts it; if the symptom survives a fix, reopen the
+  cause or scope before stacking another change.
 - **Routes:** browser-only reproduction → `cx-browser-automation`; formal
   verdict → `cx-acceptance-qa`.
 
@@ -189,19 +190,21 @@ Runtime contract: [`SKILL.md`](cx-insane-search/SKILL.md)
 
 Runtime contract: [`SKILL.md`](cx-interview/SKILL.md)
 
-- **Owns:** a user-approved Task Contract for a materially ambiguous idea,
-  feature, workflow, or brownfield improvement.
+- **Owns:** a user-approved Task Contract produced either by clarifying material
+  ambiguity or synthesizing decisions already resolved in conversation and
+  project evidence.
 - **Trigger:** goal, actor, constraint, non-goal, outcome, AC, or product
-  decision could materially change the result; the user asks to grill or
+  decision could materially change the result, settled decisions need to be
+  captured without restarting discovery, or the user asks to grill or
   stress-test an idea, plan, or design.
 - **Non-trigger:** an already specified narrow edit, pure diagnosis, or a
   decision already settled by project rules.
-- **Method:** expose hidden assumptions through Socratic questions; for
-  materially multi-surface requests, confirm top-level coverage before
-  converging through restatement, explicit review of reductions, and approval;
-  several independent material decisions may be batched into numbered rounds
-  with recommended answers; persistent contracts may name the terminal
-  artifact and required gates.
+- **Method:** choose clarification only while material forks remain; otherwise
+  synthesize current decisions silently. For materially multi-surface requests,
+  confirm top-level coverage before converging through restatement, explicit
+  review of reductions, and approval. Several independent unresolved decisions
+  may be batched into numbered rounds with recommended answers; persistent
+  contracts may name the terminal artifact and required gates.
 - **Routes:** UI/product-flow discovery → `cx-design-director`; external
   comparison → `cx-ultraresearch`; implementation drift, deadlock, or formal
   proof → the corresponding owner.
@@ -265,7 +268,8 @@ Runtime contract: [`SKILL.md`](cx-ultraresearch/SKILL.md)
   source and material-claim maps, distinguish source lineage from domain, and
   classify claims as `supported`, `unresolved`, or `refuted`; distinguish
   direct measurement, first-principles bounds, transferred estimates, and
-  scenarios for material quantitative claims.
+  scenarios for material quantitative claims, and countercheck both surprising
+  and intuitive readings when a material claim rests on plausibility alone.
 - **Routes:** blocked public URL → `cx-insane-search`; real page interaction or
   rendered state → `cx-browser-automation`; apply the evidence contract in
   context for high-stakes or citation-heavy work, but materialize durable
@@ -292,14 +296,16 @@ Runtime contract: [`SKILL.md`](cx-understand-codebase/SKILL.md)
 
 Runtime contract: [`SKILL.md`](cx-unstuck/SKILL.md)
 
-- **Owns:** bounded alternatives for a planning, product, architecture, or
-  implementation-strategy deadlock.
+- **Owns:** the load-bearing failed assumption, cheapest discriminating
+  experiment, and only the bounded alternatives still needed for a planning,
+  product, architecture, or implementation-strategy deadlock.
 - **Trigger:** repeated failure of the same approach, conflicting constraints,
   structural stagnation, or a request for a different perspective.
 - **Non-trigger:** a runtime failure whose cause is not yet isolated or broad
   ideation without a genuine deadlock.
-- **Method:** use lateral thinking to change the frame reproducing the deadlock,
-  then reconverge through small discriminating experiments.
+- **Method:** collapse the deadlock to one load-bearing assumption and test it
+  with the cheapest discriminating experiment; use lateral thinking and at most
+  two alternatives only when that result does not already resolve the path.
 - **Routes:** runtime cause → `cx-debugging`; missing current fact →
   `cx-ultraresearch`; contract change → `cx-interview`; expanded surface →
   `cx-scope-check`.

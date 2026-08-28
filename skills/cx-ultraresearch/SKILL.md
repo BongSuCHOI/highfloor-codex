@@ -22,7 +22,10 @@ repetition.
    interest, and retrieval completeness.
 5. Compare dates, scope, definitions, and contradictions. For central,
    high-risk, contested, or incentivized claims, actively search for
-   counterevidence.
+   counterevidence. When a material claim rests on intuition about what is
+   obvious, novel, plausible, absurd, or impossible, check both directions:
+   whether the surprising claim is documented and whether the intuitive claim
+   is false, narrower, or already established.
 6. Run code only when an executable claim benefits from direct observation.
    Record the environment and do not generalize beyond what the run proves.
    Classify material quantitative claims using the basis in the evidence

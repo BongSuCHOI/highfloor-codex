@@ -10,8 +10,23 @@ Diagnose before fixing unless the user explicitly requests implementation.
 ## Choose the smallest investigation
 
 - For a direct local symptom, reproduce once, inspect the nearest evidence and state the cause.
-- For an unclear, intermittent or multi-layer failure, record the exact runtime/build identity, form distinguishable hypotheses and collect only evidence that separates them.
+- For an unclear, intermittent or multi-layer failure, record the exact runtime/build identity and first build the cheapest runnable feedback loop that can detect the user's exact symptom. Then form distinguishable hypotheses and collect only evidence that separates them.
 - When execution is blocked, use `references/methodology/partial-runtime-evidence.md` and state the confidence limit.
+
+## Feedback loop
+
+A useful loop is red-capable: it exercises the relevant path and can fail on the
+reported symptom rather than merely proving that the process starts. Prefer the
+smallest fitting surface, such as a focused test, direct CLI or HTTP invocation,
+browser reproduction, captured-input replay, or minimal driver. Run it at least
+once before treating it as evidence, keep it bounded and deterministic enough
+to distinguish a change, and tighten it only when doing so materially reduces
+diagnostic uncertainty.
+
+The loop is an evidence tool, not ceremony. Skip additional harness work when a
+direct reproduction already isolates the cause. When the runtime cannot be
+executed, do not invent a red loop or block all analysis; use the partial-runtime
+path and keep the conclusion within the available evidence.
 
 Confirm a root cause by showing that it predicts the failure or that changing the suspected condition changes the result. If asked to fix, make the smallest change and run the closest regression check. Remove temporary instrumentation, restore modified runtime state and report remaining uncertainty. Use a journal only for repeated rounds or multiple temporary artifacts.
 

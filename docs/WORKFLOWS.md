@@ -18,8 +18,10 @@ state and stop when the owned outcome is complete.
 Use when actor, outcome, constraints, non-goals, or acceptance behavior could
 change the implementation materially.
 
-1. Run `cx-interview` until the remaining unknowns no longer change the
-   result, then obtain the user's approval of the Task Contract.
+1. Use `cx-interview` in clarification mode while material decisions remain
+   unresolved. When the conversation and current project evidence already
+   settle them, use synthesis mode and ask only about a genuine surviving fork.
+   Then obtain the user's approval of the Task Contract.
 2. Follow one of the skill's three recommended exits: implement now, save the
    contract, or start a Codex Goal for persistent multi-stage work.
 3. If implementation begins now, use `explorer` to find current ownership or
@@ -45,7 +47,9 @@ when the task is already clear and low risk.
 
 1. Choose one diagnostic owner. Use `cx-debugging` in the current task, or
    delegate to `debugger` when a noisy investigation benefits from isolation.
-2. Build the smallest reproduction that still shows the failure.
+2. For an unclear failure, build the smallest red-capable feedback loop that
+   exercises the relevant path and can detect the reported symptom. A direct
+   reproduction is already enough when it isolates the cause.
 3. List the plausible causes and collect evidence that distinguishes them.
 4. State the cause only when the evidence proves where the failure begins.
 5. If the user requested a fix, make the smallest change that addresses the
@@ -89,7 +93,10 @@ If the request is specifically about common AI UI patterns, add
    evidence.
 5. Use `cx-insane-search` only when ordinary access cannot read a relevant
    public page. Reuse its single-fetch content and retrieval-evidence handoff.
-6. Classify material claims as `supported`, `unresolved`, or `refuted`, then
+6. When a material claim rests on intuition about what is obvious, novel,
+   plausible, absurd, or impossible, countercheck both the surprising and
+   intuitive readings.
+7. Classify material claims as `supported`, `unresolved`, or `refuted`, then
    stop when the available claim-relative evidence is sufficient.
 
 Separate documentation claims, code evidence, observed runtime behavior, and
@@ -188,6 +195,23 @@ otherwise spans continued execution across material stages.
    not completion evidence.
 
 Do not impose this ledger on an ordinary narrow task.
+
+## Recipe L: Strategy deadlock
+
+Use only after the same planning, product, architecture, or implementation
+strategy has failed repeatedly or its constraints no longer fit together.
+
+1. Use `cx-unstuck` only after separating the deadlock from an unresolved
+   runtime cause; runtime cause belongs to `cx-debugging`.
+2. Identify the one load-bearing assumption that must hold for the current
+   approach to survive.
+3. Define and run the cheapest safe, authorized experiment that can
+   discriminate that assumption. If it resolves the path, stop without
+   manufacturing alternatives.
+4. When a decision remains, present at most two materially different paths with
+   their preserved constraints, expected evidence, and main downside.
+5. Return any change to an approved goal, constraint, non-goal, or observable
+   outcome to `cx-interview` before implementation.
 
 ## Anti-patterns
 

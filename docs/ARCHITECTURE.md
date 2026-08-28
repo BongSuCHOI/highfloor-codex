@@ -17,7 +17,9 @@ Anything built under the Highfloor name should preserve the same design test:
   prohibitions;
 - leave stronger models room to reason beyond the default path;
 - ask for human judgment where authority or consequences materially change,
-  not at every harmless intermediate step.
+  not at every harmless intermediate step;
+- treat `NO_CHANGE` as a successful result when no necessary improvement
+  exists, and prefer absorbing or pruning behavior over growing the catalog.
 
 ## Distribution units
 
@@ -104,6 +106,12 @@ how they should be judged.
 | Distribution ownership | `manifest/*.txt`, `install.sh` |
 | License and provenance | `LICENSE`, `THIRD_PARTY_NOTICES.md`, per-skill references |
 | Verification | `scripts/validate_repo.py`, `scripts/test-install.sh`, CI |
+
+The CX portfolio records `incubating`, `active`, `sunset candidate`, and
+deprecated states in `skills/CX_MIGRATION_MANIFEST.md`. Maturity does not move
+or rename a runtime directory. A candidate becomes active only after it proves
+a unique owner and held-out benefit; a native capability or adjacent owner may
+instead absorb the useful method and leave the inventory unchanged.
 
 ## Compatibility policy
 

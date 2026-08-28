@@ -16,3 +16,17 @@ Prominent modification notice:
 - removed upstream runtime-specific orchestration.
 
 Redistribution is limited by the upstream Sustainable Use License. Copies may be provided only free of charge for non-commercial purposes.
+
+## Method research reference
+
+- Reference: `mattpocock/skills`
+- Commit: `6654f6b60cd9d5be8b54c6fafe44346dabeb3b76`
+- Relevant source: `skills/engineering/diagnosing-bugs/SKILL.md`
+- License: MIT
+- Relationship: `research reference`; no source or wording is bundled
+
+Independently absorbed idea:
+
+- treat a bounded, red-capable feedback loop for the reported symptom as the
+  preferred first instrument for unclear runtime failures, while preserving a
+  partial-runtime path when execution is unavailable.

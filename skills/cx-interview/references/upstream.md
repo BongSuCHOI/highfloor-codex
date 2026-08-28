@@ -59,6 +59,20 @@ Deliberately not migrated:
 - alias skills and any automatic documentation side effects during
   questioning.
 
+## Specification-synthesis research reference
+
+- Reference: `mattpocock/skills`
+- Commit: `6654f6b60cd9d5be8b54c6fafe44346dabeb3b76`
+- Relevant source: `skills/engineering/to-spec/SKILL.md`
+- License: MIT
+- Relationship: `research reference`; no source or wording is bundled
+
+Independently absorbed idea:
+
+- when the current conversation and project evidence already resolve material
+  decisions, synthesize them into the contract without replaying an interview;
+  ask only about a genuine surviving fork.
+
 Deliberate changes:
 
 - combine interview and seed into one compact task-contract skill;

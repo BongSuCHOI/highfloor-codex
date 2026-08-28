@@ -18,7 +18,7 @@ Document ownership is divided as follows:
 |---|---|---|
 | `CX_SKILLS.md` | philosophy, design criteria, migration, evaluation, lifecycle | detailed workflows and simulations for individual skills |
 | `CX_SKILL_CATALOG.md` | same-depth summaries and routing for all current skills | complete runtime instructions |
-| `CX_MIGRATION_MANIFEST.md` | live inventory, rename/removal, migration history, provenance pointers | repeated philosophy and runtime instructions |
+| `CX_MIGRATION_MANIFEST.md` | live inventory, lifecycle state, rename/removal, migration history, provenance pointers, and rejected or absorbed patterns | repeated philosophy and runtime instructions |
 | `cx-*/SKILL.md` | actual trigger, method, hard floor, and workflow for that skill | whole-library governance |
 | `cx-*/references/` | schemas, variants, examples, and provenance loaded only when needed | hot-path repetition |
 
@@ -186,6 +186,27 @@ Representative boundaries that should remain separate:
 Do not assume that one skill is a separate runtime that directly executes
 another skill. Instruct the model to route to the appropriate owner or reuse
 existing results and evidence.
+
+### 5.1 Restraint and maintenance budget
+
+Restraint is part of the product. A review, migration, or cleanup that finds no
+necessary improvement should return `NO_CHANGE` and leave the artifact
+untouched. Do not create a diff, file, option, abstraction, verification pass,
+or compatibility path merely to demonstrate activity.
+
+Prefer `Condense`, `Absorb`, or `Delete` over a new skill when an existing owner
+can preserve the useful behavior. A proposed addition must identify:
+
+- the concrete ownership gap and held-out task that exposes it;
+- the always-loaded context and human routing cost it adds;
+- the catalog, installer, documentation, test, provenance, and upstream-refresh
+  surfaces that must remain synchronized;
+- the existing behavior or artifact it replaces, or why the new responsibility
+  is genuinely orthogonal.
+
+Record a rejected, absorbed, or deferred pattern in
+`CX_MIGRATION_MANIFEST.md` when the decision is likely to recur. Do not create a
+new decision file for every proposal.
 
 ## 6. Trigger and non-trigger
 
@@ -387,6 +408,20 @@ routing actually raises the floor without constraining the ceiling.
 - Do not promote a rule from a familiar example alone. Use held-out tasks and
   retain the rule only when its trigger and benefit survive paraphrase and
   artifact changes.
+- Map the model or system under treatment, evaluator, rubric author, task or
+  dataset author, and source of ground truth. A score is not independent merely
+  because it was produced in a separate call or by a second model.
+- Check for evaluation leakage: treatment examples reappearing as hold-outs,
+  the treatment defining the rubric that grades it, evaluators seeing the
+  design rationale they are meant to test, train and hold-out labels sharing
+  one unexamined bias, or a validator measuring only claims the treatment
+  itself selected.
+- For material adoption decisions, include at least one evidence path whose
+  expected answer was not produced by the treatment or its authoring session.
+  When independent ground truth is unavailable, report the limitation instead
+  of converting agreement into proof.
+- Treat a treatment that correctly returns `NO_CHANGE` as a valid outcome. Do
+  not require a diff to count the run as successful.
 
 Adoption order:
 
@@ -399,6 +434,15 @@ read-only shadow
 
 ## 13. Lifecycle
 
+- **Incubating:** a candidate with a plausible unique owner that remains
+  shadow-only or explicitly invoked until held-out evaluation proves value. It
+  is not promoted into the default installer inventory merely because its first
+  example works.
+- **Active:** a skill with a current unique owner, maintained runtime contract,
+  and evidence that its benefit exceeds its routing and maintenance cost.
+- **Sunset candidate:** a skill or behavior whose result may now be supplied by
+  a native capability, agent, or adjacent owner. Compare them on a frozen task
+  set before removal.
 - **Deprecate:** a unique trigger or behavior has disappeared or another owner
   fully replaces it.
 - **Merge:** trigger, outcome, and evidence boundaries overlap, and separation
@@ -411,6 +455,9 @@ read-only shadow
   decide whether a temporary alias is needed.
 - **Prune:** remove references, scripts, assets, and dependencies with no inbound
   reference or unique behavior.
+
+Lifecycle state belongs in `CX_MIGRATION_MANIFEST.md`; do not rename or move a
+skill directory merely to express maturity.
 
 Stop rule:
 

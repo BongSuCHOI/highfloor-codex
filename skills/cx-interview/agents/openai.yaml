@@ -1,4 +1,4 @@
 interface:
   display_name: "CX Interview"
   short_description: "Clarify ambiguity into an approved task contract"
-  default_prompt: "Use $cx-interview to turn this ambiguous request into an approved task contract."
+  default_prompt: "Use $cx-interview to clarify or synthesize this request into an approved task contract."

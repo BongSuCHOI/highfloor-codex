@@ -8,6 +8,15 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Absorbed selected restraint and method principles from `mattpocock/skills`
+  and `LilMGenius/paperthin` without importing their catalogs or adding a new
+  skill: `NO_CHANGE` is an explicit successful outcome, evaluation now checks
+  ground-truth independence, `cx-debugging` prefers a red-capable feedback
+  loop for unclear failures, `cx-interview` can synthesize settled decisions
+  without replaying discovery, and `cx-unstuck` starts from one load-bearing
+  failed assumption and its cheapest discriminating experiment.
+  `cx-ultraresearch` now counterchecks both surprising and intuitive readings
+  when a material claim otherwise rests on plausibility alone.
 - Rebuilt the portable `CODEX_AGENTS.md` around the maintainer's proven
   outcome-driven contract: a binding intent gate, end-to-end execution,
   proportional verification, deterministic test guidance, manual QA, explicit

@@ -19,7 +19,10 @@ each `SKILL.md` owns actual behavior.
 
 ## 2. Live inventory
 
-Current live `cx-*` skills: 15.
+Current live `cx-*` skills: 15. All are `active`; no new skill was added by the
+2026-08-28 method absorption. `cx-browser-automation`, `cx-insane-search`, and
+`cx-unstuck` remain possible `sunset candidate` evaluations, not deprecated
+skills.
 
 - `cx-acceptance-qa`
 - `cx-analyze-video`
@@ -47,16 +50,16 @@ Relationships follow the licensing governance in `CX_SKILLS.md`.
 | `cx-analyze-video` | `bradautomates/claude-video`, `skills/watch` | `83da59fa78c3eee9e20f515fe75c438bb5166efd`; skill version `0.2.0` | `modified derivative` with retained Python analysis scripts | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-browser-automation` | `microsoft/playwright-cli`; runtime: `vercel-labs/agent-browser@0.29.1` | Playwright commit `NOT_PROVEN`; agent-browser source not bundled | `modified derivative`; `runtime invocation` | Apache-2.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-coding-agent-sessions` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/coding-agent-sessions` | source archive `4.14.0`; commit `NOT_PROVEN` | `modified derivative` with retained byte-identical files | Sustainable Use License 1.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
-| `cx-debugging` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/debugging` | source archive `4.14.0`; commit `NOT_PROVEN` | `modified derivative` | Sustainable Use License 1.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
+| `cx-debugging` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/debugging`; method research: `mattpocock/skills` | source archive `4.14.0`, commit `NOT_PROVEN`; Matt `6654f6b60cd9d5be8b54c6fafe44346dabeb3b76` | `modified derivative`; independently worded feedback-loop adaptation | Sustainable Use License 1.0; MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-design-director` | current local references; method source: `fivetaku/insane-design`; research: `changeroa/StyleGallery`; research: `uizze/uizze` (`anti-ui-slop`); optional `ibelick/ui-skills@0.2.4` | insane-design `a5eb1d976d29309092170ff7ba475a487df0b683`; StyleGallery `e67b440147970c5d4f5b83f922d2593e12d09e74`; uizze `3f08d874627be4d89d2af8e6409dc5e660050b5c`; UI Skills content not bundled | original content with an `independently worded` insane-design evidence-contract adaptation; `modified derivative` (condensed) of the uizze surface-intent material; `research reference`; `runtime invocation` | original content license; insane-design MIT; StyleGallery license `NOT_PROVEN`; uizze MIT; UI Skills MIT | `references/upstream.md`, `references/LICENSE.insane-design.txt`, `references/LICENSE.anti-ui-slop.txt` |
 | `cx-insane-search` | `fivetaku/insane-search`; method reference: `fivetaku/insane-research` | original insane-search snapshot `NOT_PROVEN`; selective refresh `019ee16bbf471595f9b67b164e4a92208183af2d`; insane-research `68f7e59168a9c9b0a586bd4122cb7a229e119d9c` | `modified derivative`; engine and tests retained; independently worded retrieval-evidence adaptation | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt`, `references/LICENSE.insane-research.txt` |
-| `cx-interview` | `Q00/ouroboros`; method source: `mattpocock/skills` | ouroboros `2dec0dbd01bb5b2243ea138af9d91f3583b92c5d`; mattpocock/skills `5b15a47f2d7150f545fbcacbfe381787fc0230dc` | `independently worded` from ouroboros; `modified derivative` (condensed) of the mattpocock questioning and decision-record material | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt`, `references/LICENSE.mattpocock-skills.txt` |
+| `cx-interview` | `Q00/ouroboros`; method source: `mattpocock/skills`; method research: `Yeachan-Heo/gajae-code`, `mattpocock/skills` | Ouroboros `2dec0dbd01bb5b2243ea138af9d91f3583b92c5d`; GJC `4e927cca7e6dda31d715957a2ecfbcbc4e62869a`; Matt source `5b15a47f2d7150f545fbcacbfe381787fc0230dc`; Matt research `6654f6b60cd9d5be8b54c6fafe44346dabeb3b76` | `independently worded` from Ouroboros; `modified derivative` (condensed) of questioning and decision-record material; independently worded synthesis adaptation | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt`, `references/LICENSE.mattpocock-skills.txt` |
 | `cx-programming` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/programming` | source archive `4.14.0`; commit `NOT_PROVEN` | `modified derivative` | Sustainable Use License 1.0 | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-scope-check` | `Q00/ouroboros` | `2dec0dbd01bb5b2243ea138af9d91f3583b92c5d` | `independently worded` | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-slopslap` | `vibedesignlab/slopslap` | plugin version `1.3.0`; commit `NOT_PROVEN` | `modified derivative`; taxonomy, data, references, scripts retained | MIT | `references/upstream-attribution.md`, `references/UPSTREAM_LICENSE.txt` |
-| `cx-ultraresearch` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/ulw-research`; method reference: `fivetaku/insane-research` | source archive `4.14.0`, commit `NOT_PROVEN`; insane-research `68f7e59168a9c9b0a586bd4122cb7a229e119d9c` | `modified derivative`; independently worded adaptation of selected research-method concepts | Sustainable Use License 1.0; MIT | `references/upstream.md`, `references/LICENSE.upstream.txt`, `references/LICENSE.insane-research.txt` |
+| `cx-ultraresearch` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/ulw-research`; method references: `fivetaku/insane-research`, `LilMGenius/paperthin` | source archive `4.14.0`, commit `NOT_PROVEN`; insane-research `68f7e59168a9c9b0a586bd4122cb7a229e119d9c`; paperthin `3bca079a51bcfff5dafb53d1d7f9f523d66ee317` | `modified derivative`; independently worded adaptation of selected research and claim-checking concepts | Sustainable Use License 1.0; MIT | `references/upstream.md`, `references/LICENSE.upstream.txt`, `references/LICENSE.insane-research.txt` |
 | `cx-understand-codebase` | `Egonex-AI/Understand-Anything` | `fe8c5bc591716aafd79b4765549328f08ef5a52e`; plugin version `2.9.4` | `modified derivative` with vendored analysis and viewer runtime | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
-| `cx-unstuck` | `Q00/ouroboros` | `2dec0dbd01bb5b2243ea138af9d91f3583b92c5d` | `independently worded` | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
+| `cx-unstuck` | `Q00/ouroboros`; method research: `LilMGenius/paperthin` | Ouroboros `2dec0dbd01bb5b2243ea138af9d91f3583b92c5d`; paperthin `3bca079a51bcfff5dafb53d1d7f9f523d66ee317` | `independently worded` with research reference | MIT | `references/upstream.md`, `references/LICENSE.upstream.txt` |
 | `cx-visual-qa` | `code-yeongyu/oh-my-openagent`, `packages/shared-skills/skills/visual-qa`; method source: `uizze/uizze` (`anti-ui-slop`) | source archive `4.14.0`; commit `NOT_PROVEN`; uizze `3f08d874627be4d89d2af8e6409dc5e660050b5c` | `modified derivative` with retained byte-identical files plus a condensed uizze recapture-bound adaptation | Sustainable Use License 1.0; MIT | `references/upstream.md`, `references/LICENSE.upstream.txt`, `references/LICENSE.anti-ui-slop.txt` |
 
 Distribution boundary:
@@ -67,7 +70,44 @@ Distribution boundary:
 - `oh-my-openagent` derivatives may be distributed only free of charge for non-commercial purposes and must retain the Sustainable Use License terms and prominent modification notice.
 - `code-yeongyu/lazycodex` and `Yeachan-Heo/gajae-code` remain research/comparison references, not current redistribution sources.
 
-## 4. 2026-08-22 governance-path fix and method refresh
+## 4. 2026-08-28 restraint and method absorption
+
+Reviewed:
+
+- `mattpocock/skills` at
+  `6654f6b60cd9d5be8b54c6fafe44346dabeb3b76` under MIT;
+- `LilMGenius/paperthin` at
+  `3bca079a51bcfff5dafb53d1d7f9f523d66ee317` under MIT.
+
+Independently absorbed:
+
+- governance: `NO_CHANGE` as a valid success, explicit maintenance-cost review,
+  independent-ground-truth checks for evaluation, and lifecycle states without
+  directory churn;
+- `cx-debugging`: a bounded red-capable feedback loop as the preferred first
+  instrument for unclear failures, without removing partial-runtime analysis;
+- `cx-interview`: synthesis mode when the conversation and current evidence
+  already resolve material decisions;
+- `cx-unstuck`: one load-bearing failed assumption and its cheapest
+  discriminating experiment before alternatives;
+- `cx-ultraresearch`: two-direction counterchecking when a material claim rests
+  on intuition about plausibility, novelty, absurdity, or impossibility.
+
+Deliberately not migrated:
+
+- automatic post-edit skill chaining or mandatory recursive audits;
+- separate micro-skills for prose cleanup, ordering, punctuation, routing, or
+  ordinary intent restatement;
+- model-tier routing, mandatory subagent fan-out, fresh-context consensus, or a
+  generic project execution engine;
+- the upstream skill catalogs, directory taxonomies, project setup workflows,
+  issue-tracker orchestration, and artifact lifecycle runtimes.
+
+For the additions in this subsection, no upstream source or wording is bundled;
+the pinned repositories are research references for independently worded method
+changes.
+
+## 5. 2026-08-22 governance-path fix and method refresh
 
 Documentation fix:
 
@@ -114,7 +154,7 @@ Deliberately not migrated:
 
 No skill was added, removed, or renamed; the live inventory is unchanged.
 
-## 5. 2026-08-09 additions and design research refresh
+## 6. 2026-08-09 additions and design research refresh
 
 Added:
 
