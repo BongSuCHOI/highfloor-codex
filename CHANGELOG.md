@@ -8,6 +8,10 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Made the portable workflow proportional and semantically deduplicated its
+  instructions: clear, direct tasks now skip visible preambles and process that
+  adds no decision or evidence value, while all authority, evidence, safety,
+  verification, and stop boundaries remain intact.
 - Added an optional pinned, check-only Gesso rendered-HTML cross-check to
   `cx-slopslap` without bundling its rules or auto-fix path. The local scanner
   now exposes structured coverage and detector errors, reports missing or
