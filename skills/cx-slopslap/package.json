@@ -5,7 +5,8 @@
   "type": "module",
   "description": "Optional corpus regeneration dependencies for cx-slopslap",
   "scripts": {
-    "gen-references": "bash scripts/run-node-deps.sh gen-references"
+    "gen-references": "bash scripts/run-node-deps.sh gen-references",
+    "test": "node --test scripts/scan-slop-signals.test.mjs"
   },
   "devDependencies": {
     "@radix-ui/colors": "3.0.0",
