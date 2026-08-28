@@ -259,6 +259,14 @@ curl -fsSL https://raw.githubusercontent.com/BongSuCHOI/highfloor-codex/v0.2.0/i
 | Portable global instruction | `${CODEX_HOME:-$HOME/.codex}/AGENTS.md` |
 | 설치 상태와 백업 | `${CODEX_HOME:-$HOME/.codex}/highfloor-codex` |
 
+Portable [`CODEX_AGENTS.md`](CODEX_AGENTS.md)는 intent, end-to-end 실행,
+위험 비례 검증, manual QA와 관찰 가능한 stop을 묶은 outcome-driven 작업
+계약에 Highfloor의 authority, scope, evidence, provenance floor를
+결합합니다. Codex host가 달라도 같은 계약을 쓸 수 있도록 tool 지침은
+capability 기반으로 표현합니다. 저장소별 규칙은 더 가까운
+[`AGENTS.md`](AGENTS.md)에 남고, 해당 범위에서는 global 기본값보다
+우선합니다.
+
 기본 `CODEX_HOME`을 사용하면 스킬은 `~/.codex/skills`, 에이전트는
 `~/.codex/agents`에 설치됩니다. 상태 디렉터리는 Codex가 불러오는
 스킬이나 에이전트가 아닙니다. 설치한 버전과 source ref, 두 설치 경로,

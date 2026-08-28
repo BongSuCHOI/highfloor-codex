@@ -246,6 +246,14 @@ curl -fsSL https://raw.githubusercontent.com/BongSuCHOI/highfloor-codex/v0.2.0/i
 | Portable global instructions | `${CODEX_HOME:-$HOME/.codex}/AGENTS.md` |
 | Install state and backups | `${CODEX_HOME:-$HOME/.codex}/highfloor-codex` |
 
+The portable [`CODEX_AGENTS.md`](CODEX_AGENTS.md) combines an outcome-driven
+work contract—intent, end-to-end execution, proportional verification, manual
+QA, and an observable stop—with Highfloor's authority, scope, evidence, and
+provenance floor. It uses capability-based tool guidance so the same contract
+remains usable across Codex hosts. Repository-specific rules stay
+in the nearer [`AGENTS.md`](AGENTS.md) and override the global defaults where
+their scope is more specific.
+
 With the default `CODEX_HOME`, skills go to `~/.codex/skills` and agents go to
 `~/.codex/agents`. The state directory is not loaded as a skill or agent. It
 records the installed version and source ref, the two destinations, and the

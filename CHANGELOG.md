@@ -8,6 +8,14 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Rebuilt the portable `CODEX_AGENTS.md` around the maintainer's proven
+  outcome-driven contract: a binding intent gate, end-to-end execution,
+  proportional verification, deterministic test guidance, manual QA, explicit
+  failure recovery, and an observable stop. Merged Highfloor's authority,
+  scope, `NOT_PROVEN`, and provenance floor once, resolved test and delegation
+  conflicts, and generalized host-specific tool names into portable capability
+  guidance. Skill governance and search or UI routing remain owned by
+  capability discovery or explicit user direction instead of the global file.
 - Added managed `default` and `worker` custom-agent overrides at
   `gpt-5.6-luna` / `xhigh`, preserving the user's `config.toml` while making
   Highfloor's fallback profile portable through install, update, doctor, and
