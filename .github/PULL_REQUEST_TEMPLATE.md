@@ -18,6 +18,19 @@
 - [ ] `./scripts/test-install.sh` when installer, manifest, skill, agent, or release behavior changed
 - [ ] Required behavior not observed is labeled `NOT_PROVEN`
 
+## Runtime / governance evidence
+
+<!-- Complete only when this PR changes routing, instructions, skills, agents,
+or workflow behavior. Leave as not applicable for ordinary docs/format fixes. -->
+
+- Baseline:
+- Treatment:
+- Held-out / independent evidence:
+- Decision or failure gap addressed:
+- Why `NO_CHANGE` / absorption is insufficient:
+- Added routing / context / coordination cost:
+- Kill or rollback condition:
+
 ## Runtime and migration impact
 
 <!-- Names, triggers, authority, paths, update behavior, rollback, compatibility. -->

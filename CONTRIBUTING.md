@@ -12,6 +12,16 @@ Thank you for helping improve Highfloor for Codex.
 - For a proposed skill, identify the ownership gap, held-out task, maintenance
   surfaces, and existing behavior it replaces or cannot reuse. `NO_CHANGE` is
   the correct outcome when the proposal adds no unique value.
+- For a proposed agent, identify the delegated ownership gap, a held-out case,
+  the no-delegation / `default` / `worker` / nearest-specialist baseline,
+  coordination cost, authority and stop boundaries, and a merge or sunset
+  condition.
+- For a new named method or workflow rule, identify the repeated measured
+  failure in the current owner and explain why `NO_CHANGE`, clarification,
+  condensation, or absorption is insufficient. Fame, industry convention, and
+  personal preference are not admission evidence.
+- Read [`docs/EVALUATION.md`](docs/EVALUATION.md) for changes that claim runtime
+  or governance improvement.
 - Open an issue first for new skills, new agents, renames, removals, installer
   ownership changes, or license-boundary changes.
 
@@ -55,12 +65,32 @@ examples, and provenance in `references/` when appropriate.
 
 Preserve one narrow role. The filename stem and `name` should match. Explain:
 
-- why delegation is useful;
-- read/write authority;
+- why delegation is useful and which evidence or artifact it uniquely owns;
+- read/write authority and any distinct approval boundary;
 - expected inputs and output;
 - stop condition;
-- chosen model and reasoning effort;
-- overlap with existing agents.
+- chosen model and reasoning effort as resource allocation, not a behavioral
+  justification;
+- overlap with existing agents;
+- the no-delegation / `default` / `worker` / nearest-specialist comparison;
+- held-out evidence, coordination cost, and the merge or sunset criterion.
+
+
+### Named methods and workflow rules
+
+Before preserving a named methodology or adding a general workflow rule, answer:
+
+- What repeated failure exists in the current owner?
+- Which frozen held-out cases demonstrate that failure?
+- Why are `NO_CHANGE`, wording clarification, absorption, or condensation
+  insufficient?
+- What new decision order, misuse guard, or proof boundary does the method add?
+- What measurable routing, context, latency, coordination, or maintenance cost
+  does it add?
+- What evidence would make Highfloor remove it again?
+
+Prefer changing the smallest existing owner over introducing new vocabulary, a
+new skill, or a new agent.
 
 ### Installer changes
 

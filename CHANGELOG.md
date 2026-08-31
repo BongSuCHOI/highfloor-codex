@@ -8,6 +8,24 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Hardened Highfloor's operating semantics around observable task state: Soft
+  Scaffold activation no longer depends on subjective model confidence, Open
+  Ceiling is evidence-bounded rather than model-privileged, and Hard Floor
+  documentation now distinguishes declarative rules from future mechanical
+  enforcement and independent verification.
+- Generalized portable test-first guidance into red-capable regression evidence,
+  made early end-to-end tracer work conditional on unproven cross-boundary
+  paths, made manual verification proportional to the additional evidence it
+  can provide, and replaced a fixed failure-attempt count with falsifiable
+  hypothesis-based recovery.
+- Added cross-cutting evaluation governance for global instructions, skills,
+  agents, and workflow composition, including held-out negative routing,
+  per-task hard regressions, ceiling and coordination cost, explicit removal
+  conditions, and agent lifecycle/admission criteria.
+- Clarified that stakeholder authority to choose a product direction does not
+  by itself prove an end-user need or behavior claim; `cx-interview` now keeps
+  empirical claim status separate from authorized decisions.
+
 - Made the portable workflow proportional and semantically deduplicated its
   instructions: clear, direct tasks now skip visible preambles and process that
   adds no decision or evidence value, while all authority, evidence, safety,

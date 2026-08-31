@@ -4,7 +4,7 @@
 
 <p align="center">
   <strong>A practical skill and specialist-agent kit for OpenAI Codex.</strong><br>
-  Clearer paths for less capable models. More room for stronger ones.
+  Raise minimum reliability without prescribing one reasoning path.
 </p>
 
 <p align="center">
@@ -92,9 +92,9 @@ does.
 
 ## Goal
 
-> Its goal is not to force every model through the same workflow. Its goal is
-> to reduce avoidable behavior variance, raise minimum quality, and preserve
-> the judgment available to stronger models.
+> Highfloor raises minimum reliability without prescribing one reasoning path.
+> It adds procedure only when authority, evidence, consequence, observability,
+> or execution state leaves a material decision unresolved.
 
 ## Philosophy
 
@@ -120,23 +120,37 @@ Every model must preserve the same minimum guarantees:
 
 ### Soft Scaffold
 
-When information or confidence is insufficient, skills provide the smallest
-useful procedure:
+When a material decision, claim, or boundary remains unresolved by authority or
+evidence—or when consequence, reversibility, observability, or execution state
+makes direct action unsafe—Highfloor supplies the smallest useful procedure that
+can close that gap.
 
-- focused questions;
-- explicit contracts and decision records;
-- evidence maps and verdict vocabulary;
-- domain-specific guardrails;
-- clear stop and fallback conditions.
-
-Scaffolding is optional once authoritative evidence resolves the decision.
+A scaffold is not justified by subjective model confidence alone. Skip or
+compress it when its owned question is already closed by authoritative evidence
+or an equal-or-stronger proof. Before adding more questions, research, planning,
+delegation, verification, or artifacts, prefer the smallest action that can
+plausibly change a material decision or prevent a material error at acceptable
+cost.
 
 ### Open Ceiling
 
-Stronger models remain free to compress, replace, or extend the scaffold when
-they preserve the hard floor and produce better evidence.
+Open Ceiling is evidence privilege, not model privilege. Once the Hard Floor is
+preserved, a model may compress, replace, or skip a scaffold step when the
+question or evidence responsibility owned by that step is already closed by
+authoritative evidence or an equal-or-stronger proof.
 
-Highfloor guides outcomes and boundaries, not identical reasoning traces.
+The freedom is bounded by observable outcomes, not by a model name or a claim of
+being capable enough. Highfloor guides outcomes and boundaries, not identical
+reasoning traces.
+
+### Evolve by evidence
+
+Skills, agents, instructions, and workflows are engineering hypotheses, not
+permanent achievements. Retain them only while comparative evidence shows that
+their reliability benefit exceeds their routing, context, latency, coordination,
+and maintenance cost. `NO_CHANGE`, absorption, merge, and pruning are successful
+outcomes when they leave a smaller system with the same or better floor. See
+[`docs/EVALUATION.md`](docs/EVALUATION.md) for the shared evaluation contract.
 
 ### Guardrails should show the way
 
@@ -183,11 +197,11 @@ procedure, and discover better solutions above that foundation.
 Human-in-the-loop is essential in production. The human is also often the
 bottleneck. Those ideas are not contradictory.
 
-I do not believe high-quality AI automation can be built in a domain that the
-person or organization has never practiced and does not understand. Reliable
-automation begins with a domain whose work has been repeated, corrected, and
-verified. Domain knowledge defines what good looks like, where the exceptions
-are, and which evidence is strong enough to trust.
+Reliable automation requires access to trustworthy domain competence and a
+credible way to validate outcomes. That competence may come from experienced
+practitioners, authoritative standards, validated data, expert review, or other
+reliable evidence. When neither competence nor credible validation is
+available, automation should remain exploratory rather than authoritative.
 
 Humans should own intent, scope, risk acceptance, irreversible actions, and
 final accountability. They should not have to approve every harmless
@@ -216,6 +230,9 @@ runtime contract.
 - Cause-first diagnosis for runtime failures.
 - Existing project rules and architecture before generic advice.
 - Provenance and license boundaries for migrated material.
+- Metrics as evidence about the objective, never the objective itself.
+- More evidence, procedure, or delegation only when it can plausibly change a
+  material decision or prevent a material error at acceptable cost.
 
 ## Install
 

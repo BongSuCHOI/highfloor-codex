@@ -91,15 +91,32 @@ Do not block on optional detail that can be safely decided during implementation
 
 Ask the question with the highest expected effect on goal, architecture, cost, risk, or acceptance. Prefer one question. Combine questions only when the answers remain independently visible.
 
-Resolve facts from authoritative sources:
+Resolve decisions and claims from the appropriate authority or evidence owner:
 
-```text
-Exact project fact       → inspect code/config/docs
-Current external fact    → research
-Product preference       → user
-Trade-off or non-goal    → user
-Implementation detail    → model, inside approved boundaries
+| Question | Default authority / evidence owner |
+|---|---|
+| Exact project fact | Repository code, configuration, or documentation |
+| Current external fact | Current research or an authoritative external source |
+| Product direction, preference, trade-off, or non-goal | Authorized stakeholder |
+| End-user need or behavior claim | Direct user evidence, analytics, research, support evidence, or another credible empirical source; otherwise hypothesis |
+| Implementation detail inside the approved boundary | Model or implementer |
+| High-consequence external action | Explicit authorized human or role |
+
+Authority to choose a direction and evidence that a factual claim is true are
+different dimensions. A stakeholder may knowingly authorize a hypothesis; that
+does not promote the hypothesis to observed evidence.
+
+When a product-problem claim materially affects the contract, optionally record:
+
+```yaml
+problem_evidence:
+  - claim: ""
+    status: observed | supported | hypothesis
+    source: ""
+    contract_impact: ""
 ```
+
+Do not require this block for ordinary implementation work.
 
 ## Batched questioning (optional scaffold)
 

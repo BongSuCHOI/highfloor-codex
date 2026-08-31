@@ -1,6 +1,6 @@
 # CX Skills Governance
 
-- Snapshot date: 2026-07-28
+- Snapshot date: 2026-08-31
 - Canonical governance: `skills/CX_SKILLS.md`
 - Uniform skill catalog: `skills/CX_SKILL_CATALOG.md`
 - Inventory and history: `skills/CX_MIGRATION_MANIFEST.md`
@@ -16,7 +16,8 @@ Document ownership is divided as follows:
 
 | Document | Owns | Does not include |
 |---|---|---|
-| `CX_SKILLS.md` | philosophy, design criteria, migration, evaluation, lifecycle | detailed workflows and simulations for individual skills |
+| `CX_SKILLS.md` | skill-family philosophy, design criteria, routing, migration, and lifecycle | cross-cutting evaluation policy and detailed workflows |
+| `../docs/EVALUATION.md` | comparative evaluation policy for instructions, skills, agents, and compositions | runtime behavior and component-specific routing |
 | `CX_SKILL_CATALOG.md` | same-depth summaries and routing for all current skills | complete runtime instructions |
 | `CX_MIGRATION_MANIFEST.md` | live inventory, lifecycle state, rename/removal, migration history, provenance pointers, and rejected or absorbed patterns | repeated philosophy and runtime instructions |
 | `cx-*/SKILL.md` | actual trigger, method, hard floor, and workflow for that skill | whole-library governance |
@@ -44,29 +45,22 @@ when the model and reasoning effort selected in Codex differ.
 
 Core objective:
 
-> Reduce unnecessary behavior variance between models, raising the minimum
-> quality of lower-performing models without obstructing the reasoning ability,
-> choice, or context headroom of stronger models.
+> Reduce unnecessary behavior variance, raise the minimum reliability of work,
+> and preserve task-appropriate judgment without prescribing one reasoning
+> path.
 
 In shorter form:
 
 > Install guardrails at the floor; do not build a ceiling over the top.
 
 The objective is not to make every model use the same number of questions,
-workflow, implementation strategy, or expression.
+workflow, implementation strategy, or expression. What remains consistent is
+the minimum floor for correctness, authority, evidence, and consequence.
 
-- Lower-performing model: predictable minimum quality without critical
-  omissions
-- Mid-range model: stable practical results using the scaffold
-- Stronger model: better judgment and adaptation while preserving the same
-  invariants
-
-What remains consistent is not artifact shape, but the minimum floor for
-correctness, authority, and evidence.
-
-Adaptation is driven by the current task state, evidence, risk, and execution
-conditions. Model names and reasoning-effort labels are evaluation dimensions,
-not runtime branches.
+Different model configurations may benefit from different amounts of guidance,
+but runtime adaptation is driven by task state, authority, evidence, risk,
+observability, and execution conditions. Model names and reasoning-effort labels
+are evaluation dimensions, not runtime branches.
 
 ## 3. Hard Floor / Soft Scaffold / Open Ceiling
 
@@ -75,11 +69,12 @@ Hard Floor
   Quality, authority, and evidence invariants every model must preserve
 
 Soft Scaffold
-  Minimum procedure and templates used when information or confidence is insufficient
+  Minimum procedure used when a material authority, evidence, consequence,
+  observability, or execution-state gap remains unresolved
 
 Open Ceiling
-  Freedom to compress, replace, or extend the procedure with a better method
-  as long as the invariants remain satisfied
+  Evidence-bounded freedom to compress, replace, or skip procedure when its
+  owned question is already closed without weakening the invariants
 ```
 
 ### 3.1 Hard Floor
@@ -120,10 +115,23 @@ Examples:
 - terminal artifact and open-gate ledger for persistent work
 - failure-topology selection for behavior-bearing claims
 
-Use the scaffold only when needed. Skip a step already resolved by
-authoritative evidence or irrelevant to the current work.
+A scaffold activates only when a material authority, evidence, consequence,
+observability, or execution-state gap remains unresolved. Before loading more
+procedure, evidence, delegation, or verification, prefer the smallest action
+that can plausibly change a material decision or prevent a material error at
+acceptable cost. If the answer cannot change the next action, acceptance
+boundary, or risk posture, do not acquire it merely for completeness.
+
+Skip a step already resolved by authoritative evidence, irrelevant to the
+current work, or replaced by an equal-or-stronger proof. Subjective model
+confidence alone is not an activation condition.
 
 ### 3.3 Open Ceiling
+
+Open Ceiling is evidence privilege, not model privilege. A model may compress,
+replace, or skip a scaffold step only when the question or evidence
+responsibility owned by that step is already closed by authoritative evidence
+or an equal-or-stronger proof while the Hard Floor remains intact.
 
 Allowed freedom:
 
@@ -386,42 +394,20 @@ verification's sake.
 
 ## 12. Evaluation protocol
 
-Compare baseline and treatment to determine whether a new skill or broader
-routing actually raises the floor without constraining the ceiling.
+[`docs/EVALUATION.md`](../docs/EVALUATION.md) is the canonical cross-cutting
+evaluation contract for global instructions, skills, agents, and workflow
+compositions. Skill evaluation follows that contract and adds these
+skill-specific requirements:
 
-- Use a frozen task set composed of versioned tasks, artifacts, and ACs.
-- Compare a baseline without the skill against a treatment with the skill.
-- Within a cell, hold model, reasoning effort, prompt, project snapshot, tools,
-  and permissions constant.
-- Preserve results by `model × reasoning effort × task × execution state`,
-  including ordinary, resumed or compacted, persistent, and delegated work when
-  those states are relevant.
-- Lower-performing region: critical omissions, invented requirements, scope
-  violations, false `PASS`, artifact or evidence mismatch, and first-pass
-  success.
-- Stronger-performing region: token use, latency, unnecessary questions, false
-  blocks, unnecessary continuations or delegation, time to the first
-  end-to-end artifact, open-gate reduction, and restrictions on valid judgment
-  or action.
-- Inspect worst cases and per-task regressions, not only averages.
-- Do not offset regression in one model with improvement in another.
-- Do not promote a rule from a familiar example alone. Use held-out tasks and
-  retain the rule only when its trigger and benefit survive paraphrase and
-  artifact changes.
-- Map the model or system under treatment, evaluator, rubric author, task or
-  dataset author, and source of ground truth. A score is not independent merely
-  because it was produced in a separate call or by a second model.
-- Check for evaluation leakage: treatment examples reappearing as hold-outs,
-  the treatment defining the rubric that grades it, evaluators seeing the
-  design rationale they are meant to test, train and hold-out labels sharing
-  one unexamined bias, or a validator measuring only claims the treatment
-  itself selected.
-- For material adoption decisions, include at least one evidence path whose
-  expected answer was not produced by the treatment or its authoring session.
-  When independent ground truth is unavailable, report the limitation instead
-  of converting agreement into proof.
-- Treat a treatment that correctly returns `NO_CHANGE` as a valid outcome. Do
-  not require a diff to count the run as successful.
+- include true-trigger cases, ambiguous-boundary cases, `NO_SKILL` cases,
+  direct-execution cases, and the nearest existing-owner alternative;
+- measure false activation and owner collision as first-class failures, not only
+  usefulness on positive examples;
+- preserve results by relevant model/profile and execution-state slices without
+  making model identity a runtime branch;
+- compare the always-loaded context, human routing cost, catalog, installer,
+  documentation, test, provenance, and refresh burden introduced by the skill;
+- retain the smallest owner that preserves the measured benefit.
 
 Adoption order:
 
@@ -432,6 +418,11 @@ read-only shadow
 → broader routing only after evidence
 ```
 
+A famous or canonical named method is not admission evidence. Preserve it only
+when it closes a measured failure in the current owner better than `NO_CHANGE`,
+clarification, condensation, or absorption and adds a distinct decision order,
+misuse guard, or proof boundary.
+
 ## 13. Lifecycle
 
 - **Incubating:** a candidate with a plausible unique owner that remains
@@ -439,7 +430,9 @@ read-only shadow
   is not promoted into the default installer inventory merely because its first
   example works.
 - **Active:** a skill with a current unique owner, maintained runtime contract,
-  and evidence that its benefit exceeds its routing and maintenance cost.
+  and evidence that its benefit exceeds its routing and maintenance cost. Each
+  retained procedural owner should have an explicit condition that would make
+  the project absorb, merge, prune, or simplify it again.
 - **Sunset candidate:** a skill or behavior whose result may now be supplied by
   a native capability, agent, or adjacent owner. Compare them on a frozen task
   set before removal.
@@ -488,6 +481,9 @@ Stop rule:
 [ ] Does agents/openai.yaml match the current role?
 [ ] Does its UI metadata follow the CX display, English description, and $cx-* prompt contract?
 [ ] Is there a baseline/treatment comparison or an appropriate forward test?
+[ ] Does evaluation include negative routing (`NO_SKILL`, existing owner, or direct execution)?
+[ ] Is there an explicit removal or rollback condition?
+[ ] Would the proposal still be justified if its named methodology label were removed?
 [ ] Are catalog, manifest, and canonical/generated copies synchronized?
 ```
 

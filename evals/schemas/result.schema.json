@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://highfloor.local/evals/result.schema.json",
+  "title": "Highfloor published evaluation result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "campaign_id",
+    "component",
+    "hypothesis",
+    "baseline",
+    "treatment",
+    "task_set",
+    "ground_truth",
+    "hard_gates",
+    "metrics",
+    "conclusion",
+    "removal_condition"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "campaign_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "component": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hypothesis": {
+      "type": "string",
+      "minLength": 1
+    },
+    "baseline": {
+      "$ref": "#/$defs/run"
+    },
+    "treatment": {
+      "$ref": "#/$defs/run"
+    },
+    "task_set": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "integrity_hash",
+        "payloads_private_during_run"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "integrity_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "payloads_private_during_run": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ground_truth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "independent"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "independent": {
+          "type": "boolean"
+        },
+        "limitation": {
+          "type": "string"
+        }
+      }
+    },
+    "hard_gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "regressions"
+      ],
+      "properties": {
+        "regressions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object"
+    },
+    "conclusion": {
+      "enum": [
+        "RETAIN",
+        "REVISE",
+        "ABSORB",
+        "MERGE",
+        "PRUNE",
+        "NO_CHANGE"
+      ]
+    },
+    "removal_condition": {
+      "type": "string",
+      "minLength": 1
+    },
+    "report": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "$defs": {
+    "run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "snapshot",
+        "model_profile",
+        "reasoning_effort",
+        "tools",
+        "permissions"
+      ],
+      "properties": {
+        "snapshot": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model_profile": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reasoning_effort": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

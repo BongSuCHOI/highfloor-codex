@@ -23,6 +23,61 @@ review to multiple agents merely to repeat verification.
 `sandbox_mode` is a technical capability, not authorization to expand the task.
 Every delegated assignment still needs a concrete scope and expected result.
 
+## Agent and skill ownership
+
+A skill owns a task-state procedure or evidence method in the current context.
+An agent owns a delegated boundary: isolation, independent evidence generation,
+specialist authority, or parallel execution.
+
+A similarly named skill and agent are justified only when those ownership
+dimensions are genuinely different. For example, `cx-debugging` supplies a
+current-thread diagnostic method while `debugger` supplies an isolated delegated
+diagnostic boundary. A new role label by itself is not sufficient reason for a
+new agent.
+
+## New-agent admission test
+
+Before adding an agent, establish all of the following:
+
+1. **Unique delegated responsibility** — name the evidence or artifact that the
+   agent owns separately from the parent.
+2. **Isolation benefit** — show why a separate context reduces contamination,
+   conflict, or coordination cost, or why independent evidence is material.
+3. **Authority distinction** — identify any distinct permission or approval
+   boundary; technical sandbox capability alone is not authority.
+4. **Alternative comparison** — compare the proposal with no delegation,
+   `default` or `worker`, and the nearest existing specialist.
+5. **Held-out task class** — identify repeatable cases where the new owner
+   produces incremental value.
+6. **Coordination cost** — include delegation latency, tokens, context, handoff
+   error, and integration work.
+7. **Removal condition** — state what evidence would justify merge, deprecation,
+   or pruning.
+
+Follow [`docs/EVALUATION.md`](EVALUATION.md) for the comparison contract.
+
+## Agent lifecycle
+
+```text
+Incubating
+  ↓ evidence supports unique delegated value
+Active
+  ↓ value no longer exceeds coordination and maintenance cost
+Sunset candidate
+  ↓
+Merge / Deprecate / Prune
+```
+
+The current installed inventory is grandfathered as the operational baseline;
+it is not retroactively invalid because comparative evidence is not linked in
+the repository. Backfill evidence over time and use overlap campaigns to decide
+real merges or removals. Say `repository evidence not linked` rather than
+claiming that no evaluation exists.
+
+A role may intentionally use a different model profile. This is resource
+allocation, not a behavioral branch. The agent's authority, evidence contract,
+and stop condition do not change merely because its configured model changes.
+
 ## Complete inventory
 
 | Agent | Model / effort | Authority | Primary responsibility |

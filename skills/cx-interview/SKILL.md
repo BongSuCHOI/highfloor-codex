@@ -19,6 +19,7 @@ synthesize them without replaying discovery.
 ## Hard floor
 
 - Distinguish user decisions, exact code or document facts, external evidence, model inference, and defaults.
+- Stakeholder authority to choose a product direction is not evidence that an end-user need, behavior, or market claim is true. Preserve the difference between an authorized decision and an empirical claim.
 - Inspect available project evidence before asking the user factual brownfield questions.
 - Never promote an inference, hypothesis, or safe-looking default into a confirmed requirement.
 - Keep material unknowns and conflicts visible.
@@ -33,7 +34,7 @@ synthesize them without replaying discovery.
    - **Clarification:** material decisions remain unresolved, so build the decision ledger and ask only questions whose answers change the result.
    - **Synthesis:** the conversation and project evidence already resolve the material decisions, so recover them into the ledger, verify current brownfield facts, and ask only about a genuine surviving fork. Do not restart the interview to refill a template.
 3. Build or recover a decision ledger covering goal, users or actors, constraints, non-goals, outcomes, verification, unknowns, and assumptions with provenance. If the request spans multiple material surfaces, enumerate the top-level shape and mark each surface active, deferred, or out of scope before deep questioning.
-4. Resolve exact facts from code, configuration, documentation, or current research. Label product hypotheses as hypotheses.
+4. Resolve exact facts from code, configuration, documentation, or current research. Label product hypotheses as hypotheses. When a product-problem claim materially changes the contract, classify it as observed evidence, supported inference, or hypothesis. The stakeholder may still authorize a direction under uncertainty; do not silently upgrade the claim's evidence status.
 5. In clarification mode, prefer the highest-impact unresolved decision and one question at a time; when several independent material decisions are pending, use the batched-round scaffold in `references/task-contract.md`. In synthesis mode, proceed silently when the available evidence resolves the item.
 6. Draft a task contract using `references/task-contract.md`. Keep optional sections optional.
 7. Close only when no material item remains `MISSING`, `CONFLICTING`, or `BLOCKED` and every confirmed material item is represented or has an explicitly approved reduction or substitution. Then present the complete contract for explicit approval.
