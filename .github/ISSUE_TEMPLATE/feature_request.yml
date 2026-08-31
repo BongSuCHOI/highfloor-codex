@@ -40,6 +40,21 @@ body:
     validations:
       required: true
   - type: textarea
+    id: current_owner_evidence
+    attributes:
+      label: Current owner and repeated evidence
+      description: If this changes runtime structure or method, what existing owner fails repeatedly and what evidence shows it?
+  - type: textarea
+    id: decision_value_cost
+    attributes:
+      label: Expected decision value and cost
+      description: What material decision or error should this change improve, and what routing, context, latency, coordination, or maintenance cost does it add?
+  - type: textarea
+    id: removal_condition
+    attributes:
+      label: Removal or rollback condition
+      description: What future evidence would justify NO_CHANGE, absorption, merge, pruning, or revert?
+  - type: textarea
     id: alternatives
     attributes:
       label: Alternatives considered
