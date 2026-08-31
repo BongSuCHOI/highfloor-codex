@@ -13,13 +13,52 @@ Anything built under the Highfloor name should preserve the same design test:
 - adapt scaffolding to task state, evidence, risk, and execution conditions;
   model names and reasoning-effort labels remain evaluation dimensions, not
   runtime branches;
-- guide less capable models with clear positive actions rather than a maze of
-  prohibitions;
-- leave stronger models room to reason beyond the default path;
+- guide uncertain or under-specified work with clear positive actions rather
+  than a maze of prohibitions;
+- remove or compress procedure when its owned question is already closed by
+  authoritative evidence or an equal-or-stronger proof;
 - ask for human judgment where authority or consequences materially change,
   not at every harmless intermediate step;
 - treat `NO_CHANGE` as a successful result when no necessary improvement
   exists, and prefer absorbing or pruning behavior over growing the catalog.
+
+
+## Operational semantics
+
+Highfloor distinguishes four runtime concepts:
+
+- **Skill** — a task-state procedure or evidence method loaded into the current
+  reasoning context. A skill owns how to close one class of unresolved question.
+- **Agent** — a delegated execution, isolation, or authority boundary. An agent
+  owns a separated responsibility and returns evidence or an artifact to the
+  parent thread.
+- **Workflow** — a compositional example that connects owners for a recurring
+  state transition. It is not a mandatory lifecycle.
+- **Model profile** — a resource configuration attached to a role. Selecting a
+  role may select a different model or reasoning effort, but model identity does
+  not change the role's behavioral contract or Hard Floor.
+
+## Hard Floor implementation levels
+
+A floor requirement can be:
+
+1. **declarative** — expressed as an instruction;
+2. **mechanically enforced** — constrained by permissions, sandboxing, schemas,
+   budgets, path boundaries, or approval capabilities;
+3. **evidentially verified** — checked from observable results.
+
+The current kit necessarily relies on declarative constraints in places. A
+future harness should move high-consequence constraints toward mechanical
+enforcement and independent verification where practical. Do not call a prose
+rule mechanically enforced merely because it uses mandatory language.
+
+## Controller complexity
+
+Add runtime variety only for recurring task-state, authority, isolation, or
+evidence distinctions that materially change behavior. More skills or agents
+are not inherently better; unnecessary variety increases routing, context, and
+coordination error. When two owners remain distinguishable in prose but not in
+held-out outcomes, prefer the smaller controller.
 
 ## Distribution units
 
@@ -105,7 +144,8 @@ how they should be judged.
 | Runtime behavior | each `SKILL.md` or agent TOML |
 | Distribution ownership | `manifest/*.txt`, `install.sh` |
 | License and provenance | `LICENSE`, `THIRD_PARTY_NOTICES.md`, per-skill references |
-| Verification | `scripts/validate_repo.py`, `scripts/test-install.sh`, CI |
+| Comparative evaluation | `docs/EVALUATION.md`, `evals/` |
+| Repository verification | `scripts/validate_repo.py`, `scripts/validate_evals.py`, `scripts/test-install.sh`, CI |
 
 The CX portfolio records `incubating`, `active`, `sunset candidate`, and
 deprecated states in `skills/CX_MIGRATION_MANIFEST.md`. Maturity does not move

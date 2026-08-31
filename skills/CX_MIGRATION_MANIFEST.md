@@ -70,7 +70,66 @@ Distribution boundary:
 - `oh-my-openagent` derivatives may be distributed only free of charge for non-commercial purposes and must retain the Sustainable Use License terms and prominent modification notice.
 - `code-yeongyu/lazycodex` and `Yeachan-Heo/gajae-code` remain research/comparison references, not current redistribution sources.
 
-## 4. 2026-08-28 restraint and method absorption
+## 4. 2026-08-31 philosophy hardening and methodology review
+
+This review deliberately changed governance before growing the runtime
+inventory. No new skill or agent was admitted from the methodology survey.
+
+### Absorbed as general governance principles
+
+- acquire additional evidence or procedure only when its marginal decision or
+  error-prevention value plausibly exceeds its cost;
+- stop search after the stated evidence and quality threshold is satisfied
+  rather than optimizing indefinitely;
+- add only the runtime variety required by recurring task-state, authority,
+  isolation, or evidence distinctions;
+- move high-consequence Hard Floor constraints toward capability boundaries and
+  independent verification in a future harness;
+- treat metrics as evidence about the objective and inspect per-task or hard
+  regressions instead of optimizing a proxy alone.
+
+### Existing semantics / `NO_CHANGE`
+
+- ADR: optional durable-decision handoff already exists in `cx-interview`;
+- tracer-like end-to-end proof: retained with a narrower cross-boundary trigger;
+- falsification: already present in debugging, research, critique, and deadlock
+  recovery;
+- inversion: already owned by `critic`;
+- divergence/convergence: already present in interview and design governance;
+- assumption testing: already owned by `cx-unstuck`.
+
+### Deferred until measured failure
+
+- BDD;
+- Jobs to Be Done;
+- Customer Journey Mapping;
+- Mikado Method;
+- Strangler Fig;
+- USE / RED;
+- Nielsen usability heuristics;
+- Atomic Design;
+- moodboard / 2x2 positioning.
+
+These are not rejected as general practices. They are deferred because no
+measured failure in the current owner yet justifies new vocabulary, routing,
+context, or maintenance cost.
+
+### Deliberately not migrated into core/runtime
+
+- RFC as a default internal ceremony;
+- 5 Whys as root-cause proof;
+- Golden Circle;
+- Feynman Technique as a runtime requirement;
+- Zettelkasten;
+- MECE as a mandatory structure;
+- Six Thinking Hats;
+- SCAMPER.
+
+Future proposals must start from a frozen repeated failure and compare
+`NO_CHANGE`, clarification, condensation, and absorption before introducing a
+named method. See [`docs/EVALUATION.md`](../docs/EVALUATION.md).
+
+## 5. 2026-08-28 restraint and method absorption
 
 Reviewed:
 
@@ -125,7 +184,7 @@ The Gesso skill catalog, prevention prompt, rule corpus, baseline CSS, and
 automatic fix path were not imported. No new skill was added, and
 `cx-design-director` and `cx-visual-qa` ownership did not change.
 
-## 5. 2026-08-22 governance-path fix and method refresh
+## 6. 2026-08-22 governance-path fix and method refresh
 
 Documentation fix:
 
@@ -172,7 +231,7 @@ Deliberately not migrated:
 
 No skill was added, removed, or renamed; the live inventory is unchanged.
 
-## 6. 2026-08-09 additions and design research refresh
+## 7. 2026-08-09 additions and design research refresh
 
 Added:
 
@@ -211,7 +270,7 @@ Highfloor added independently worded refinements to the existing
 corpus, CLI, MCP, governance runtime or visual defaults. Redistribution rights
 remain `NOT_PROVEN`, so no StyleGallery source is bundled.
 
-## 6. 2026-07-30 guarded retrieval and research composition
+## 8. 2026-07-30 guarded retrieval and research composition
 
 Selected concepts reviewed from `fivetaku/insane-research` at
 `68f7e59168a9c9b0a586bd4122cb7a229e119d9c`:
@@ -242,7 +301,7 @@ Deliberately not migrated:
 - claim truth or signature claims from self-reported metadata;
 - the upstream validator and report evaluator.
 
-## 7. 2026-07-29 upstream research refresh
+## 9. 2026-07-29 upstream research refresh
 
 ### Gajae Code `v0.12.0`
 
@@ -272,7 +331,7 @@ The `ralplan` re-review ratchet remains a reviewed agent-workflow candidate. It
 was not added to the skill library because it requires an explicit multi-agent
 review context rather than a general skill runtime.
 
-## 8. 2026-07-28 additions and normalization
+## 10. 2026-07-28 additions and normalization
 
 ### Added from `Q00/ouroboros`
 
@@ -323,7 +382,7 @@ The first migration preserved safety boundaries but left some rationale too impl
 - `CX_SKILL_CATALOG.md`: uniform five-field summary for all live skills
 - `CX_MIGRATION_MANIFEST.md`: inventory, migration history, upstream provenance, and license ledger
 
-## 9. 2026-07-22 restructure
+## 11. 2026-07-22 restructure
 
 - Renamed `cx-visual-qa-strict` to `cx-visual-qa`.
 - Replaced copied third-party design trees with six original references.
@@ -333,7 +392,7 @@ The first migration preserved safety boundaries but left some rationale too impl
 - Condensed browser, session, debugging, slopslap, and ultraresearch hot paths.
 - Absorbed generic refactor and implementation-neutral anti-slop rules into retained owners.
 
-## 10. Removed from live root
+## 12. Removed from live root
 
 - `cx-ultimate-browsing` — deleted by the user on 2026-07-28; stale routes removed
 - `cx-refactor`
@@ -344,7 +403,7 @@ The first migration preserved safety boundaries but left some rationale too impl
 
 Managed/plugin skills outside the `cx-*` namespace are out of scope.
 
-## 11. Synchronization
+## 13. Synchronization
 
 Canonical public files live under this repository's `skills/` directory. The
 installer does not distribute governance documents; it manages only the

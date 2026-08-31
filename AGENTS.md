@@ -12,12 +12,15 @@ Do not describe the current repository as a finished harness.
 
 Preserve the governing model:
 
-- **Hard Floor:** preserve the minimum guarantees for authority, scope,
-  evidence, safety, cost, and provenance.
-- **Soft Scaffold:** when guidance is needed, show the smallest useful path of
-  positive actions, defaults, stops, and fallbacks.
-- **Open Ceiling:** stronger reasoning may compress, replace, or extend the
-  path while preserving the hard floor.
+- **Hard Floor:** preserve the minimum authority, scope, evidence, safety,
+  cost, and provenance invariants that must not depend on model discretion.
+- **Soft Scaffold:** when a material authority, evidence, consequence,
+  observability, or execution-state gap remains open, use the smallest
+  procedure that can close it at acceptable cost.
+- **Open Ceiling:** once the floor is preserved, compress, replace, or skip a
+  scaffold step only when its owned question is already closed by authoritative
+  evidence or an equal-or-stronger proof. This is evidence privilege, not model
+  privilege.
 - **Human judgment at meaningful boundaries:** keep people in control of intent,
   risk, irreversible actions, and final accountability without making every
   harmless intermediate step wait for approval.
@@ -28,7 +31,9 @@ capability. Treat `Hard Floor → Soft Scaffold → Open Ceiling` and
 change explicitly reopens the project's governing philosophy.
 
 Prefer clear desired behavior over exhaustive prohibition lists. Keep true
-trust-boundary prohibitions short and explicit.
+trust-boundary prohibitions short and explicit. Procedures are hypotheses, not
+invariants: keep them only while evidence shows that their reliability benefit
+exceeds their routing, context, latency, coordination, and maintenance cost.
 
 ## Change boundaries
 
@@ -39,6 +44,9 @@ trust-boundary prohibitions short and explicit.
 - Follow [`skills/CX_SKILLS.md`](skills/CX_SKILLS.md) before creating,
   modifying, evaluating, integrating, renaming, migrating, or deleting a
   `cx-*` skill.
+- Follow [`docs/EVALUATION.md`](docs/EVALUATION.md) before claiming that a
+  global instruction, skill, agent, workflow rule, or named method improves the
+  system.
 - Preserve component-level upstream, modification, and license notices.
 - Never imply that the root MIT license relicenses third-party or derivative
   content.
