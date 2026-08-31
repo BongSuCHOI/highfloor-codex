@@ -21,7 +21,12 @@ change the implementation materially.
 1. Use `cx-interview` in clarification mode while material decisions remain
    unresolved. When the conversation and current project evidence already
    settle them, use synthesis mode and ask only about a genuine surviving fork.
-   Then obtain the user's approval of the Task Contract.
+   Then obtain the user's approval of the Task Contract. If the product problem
+   itself is material and uncertain, separate the stakeholder's authority to
+   choose a direction from evidence that end users actually have the claimed
+   need or behavior. Gather only the smallest evidence that can change the
+   contract; otherwise preserve the claim as a hypothesis and allow an
+   authorized stakeholder to proceed knowingly.
 2. Follow one of the skill's three recommended exits: implement now, save the
    contract, or start a Codex Goal for persistent multi-stage work.
 3. If implementation begins now, use `explorer` to find current ownership or
