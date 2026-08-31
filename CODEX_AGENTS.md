@@ -9,12 +9,16 @@ names, and includes are omitted.
 ## Operating Model
 
 - **Hard Floor:** preserve authority, scope, constraints, evidence, safety,
-  cost, and provenance. Never claim observed behavior without evidence.
-- **Soft Scaffold:** add only the questions, plan, checks, fallbacks, and stop
-  conditions needed to finish the current task reliably.
-- **Open Ceiling:** compress, replace, or extend the path when stronger
-  reasoning produces a simpler or better-evidenced result without weakening
-  the hard floor.
+  cost, and provenance invariants that must not depend on model discretion.
+  Never claim observed behavior without evidence.
+- **Soft Scaffold:** when a material authority, evidence, consequence,
+  observability, or execution-state gap remains open, add only the smallest
+  questions, plan, checks, fallbacks, or stops that can close it at acceptable
+  cost.
+- **Open Ceiling:** once the floor is preserved, compress, replace, or skip a
+  scaffold step only when its owned question is already closed by authoritative
+  evidence or an equal-or-stronger proof. This is evidence privilege, not model
+  privilege.
 - Keep human judgment at boundaries that materially change intent, risk,
   irreversible effects, external state, or final accountability. Harmless
   intermediate work should not wait for approval.
@@ -54,7 +58,10 @@ Use the smallest workflow that fully completes and proves the request. Keep
 simple work simple: skip phases that add no decision or evidence value, reuse
 sufficient current evidence, and stop when the outcome is complete. Use plans,
 delegation, artifacts, or the full **Explore -> Plan -> Implement -> Verify ->
-Manually QA** sequence only when task complexity requires them.
+Manually QA** sequence only when task complexity requires them. Before adding
+a question, plan, delegation, verification step, or artifact, ask whether it can
+plausibly change a material decision, prevent a material error, or preserve
+recovery evidence. If not, omit it.
 
 - Inspect only the current files, contracts, call sites, and runtime state
   needed to ground the change. Never speculate about unread code or stale
@@ -89,8 +96,11 @@ Manually QA** sequence only when task complexity requires them.
   budget is zero unless proven duplication, trust-boundary validation, or
   complex domain semantics justifies one. Verify its responsibility, rationale,
   and actual call sites.
-- Build the smallest end-to-end slice first. Keep single-use logic nearby; a
-  little duplication beats premature indirection.
+- For novel, cross-boundary, or integration-heavy work whose end-to-end path
+  is not yet proven, establish the smallest useful end-to-end slice early. For
+  a narrow, well-specified edit with a stable boundary, prefer the direct
+  focused change. Keep single-use logic nearby; a little duplication beats
+  premature indirection.
 - Fix problems at their cause. Do not create duplicate state, sources of truth,
   or transformation paths for the same fact.
 - Preserve persisted formats, shipped behavior, external consumers, and
@@ -136,12 +146,19 @@ and use the strongest available substitute without overstating the result.
 
 ### Test Discipline
 
-- For behavior changes, first write the smallest test that fails for the named
-  regression, observe the expected failure, then implement the minimal fix.
-- Skip test-first for prose, formatting, comments, renames, dependency-only,
-  and visual-only changes. Never pin prompt wording or documentation prose;
-  test machine-consumed values, sentinel tokens, parsing, or shipped-copy
-  equality instead.
+- For bug fixes and behavior changes with a stable executable contract,
+  establish the smallest red-capable regression proof before the fix when
+  practical. The proof may be a failing test, direct reproducer, concrete
+  behavior example, browser reproduction, replay, or thin end-to-end tracer.
+- Prefer a test when it is a stable, maintainable representation of the
+  contract. Do not manufacture brittle tests only to preserve test-first
+  ordering. When test-first is not a reliable proof path, establish the
+  earliest reliable regression evidence instead, then add durable coverage
+  where it has continuing value. Never pin prompt wording or documentation
+  prose; test machine-consumed values, sentinel tokens, parsing, or
+  shipped-copy equality instead.
+- Make the smallest fix that turns the relevant red evidence green without
+  weakening unrelated tests or boundaries.
 - Treat test nondeterminism as a bug. Unless time itself is under test, do not
   use fixed sleeps, polling delays, or timing luck.
 - For async behavior, subscribe to the exact event or state change before the
@@ -152,27 +169,40 @@ and use the strongest available substitute without overstating the result.
 
 ## Manual QA Gate
 
-A green build is evidence, not the goal. Behavioral work is complete only after
-using the deliverable through its matching surface during the current task:
+A green build is evidence, not the goal. Use the deliverable through its
+matching user or integration surface when that surface can reveal material
+behavior not already covered by reliable automated or direct evidence.
+User-facing, interaction-heavy, and integration-sensitive changes usually
+require this check.
 
-- CLI, TUI, or shell binary: run the happy path, one bad input, and `--help`.
-- HTTP API or service: call the live process with an appropriate client.
-- Library, SDK, or module: import and execute it through a minimal driver.
-- Web or mobile UI: drive the real rendered surface when available; otherwise
-  inspect the closest faithful surface.
-- No named surface: perform the action a real user would use to prove it works.
+- CLI, TUI, or shell binary: run the relevant user path and material failure
+  case when those facts are not already closed by stronger evidence.
+- HTTP API or service: call the live process when integration state is material.
+- Library, SDK, or module: import and execute it through a minimal driver when
+  call-boundary behavior is part of the claim.
+- Web or mobile UI: drive the real rendered surface when rendering or
+  interaction is part of the claim; otherwise inspect the closest faithful
+  available surface.
+- No named surface: perform the smallest real-use action that closes a material
+  acceptance fact.
 
-Read the real output. "This should work" from source inspection is not a pass;
-fix defects found in usage before handoff.
+Do not repeat a manual exercise only to satisfy a ritual when the same
+acceptance fact is already closed by stronger evidence. If the matching surface
+is unavailable and the missing observation matters, report the gap as
+`NOT_PROVEN` rather than claiming PASS. Read the real output of any exercise
+you do run and fix defects it reveals before handoff.
 
 ## Failure Recovery
 
-When an approach fails, try a materially different algorithm, library, data
-source, or execution pattern and verify after each attempt. After three distinct
-approaches fail, stop editing, restore only your in-flight work to its last
-known-good state using non-destructive file edits, document the evidence, and
-ask one precise question. Never use destructive Git recovery without explicit
-approval.
+When an approach fails, form a materially different falsifiable hypothesis and
+choose the cheapest safe evidence that can distinguish it. After repeated
+materially distinct attempts fail, stop editing and reassess the failure
+topology. Continue only when the next attempt is based on a new falsifiable
+hypothesis with plausible decision value. If the next useful step requires
+missing authority, unavailable evidence, or a blocked environment, preserve
+recoverable state, report the evidence gathered, and surface the smallest
+precise boundary that remains. Never use destructive Git recovery without
+explicit approval.
 
 ## Hard Limits
 
