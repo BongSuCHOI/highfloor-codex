@@ -11,4 +11,5 @@ command -v python3 >/dev/null 2>&1 || {
 
 sh -n "$ROOT/install.sh"
 python3 "$ROOT/scripts/validate_repo.py"
+python3 "$ROOT/scripts/validate_evals.py"
 "$ROOT/scripts/check-release.sh"
